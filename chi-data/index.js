@@ -4,112 +4,117 @@
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
   BubbleChart = (function() {
-    var i;
-
     function BubbleChart(data) {
-      this.hide_years = __bind(this.hide_years, this);
-      this.display_years = __bind(this.display_years, this);
-      this.move_towards_year = __bind(this.move_towards_year, this);
-      this.display_by_year = __bind(this.display_by_year, this);
+      this.hide_details = __bind(this.hide_details, this);
+      this.show_details = __bind(this.show_details, this);
       this.move_towards_center = __bind(this.move_towards_center, this);
-      this.display_group_all = __bind(this.display_group_all, this);
-      this.start = __bind(this.start, this);
-      this.create_vis = __bind(this.create_vis, this);
-      this.create_nodes = __bind(this.create_nodes, this);
-      console.log(data);
+      this.update = __bind(this.update, this);
+      this.remove_nodes = __bind(this.remove_nodes, this);
+      this.add_nodes = __bind(this.add_nodes, this);
+      this.toggleTeam = __bind(this.toggleTeam, this);
+      var that;
       this.data = data;
       this.width = 940;
-      this.height = 600;
+      this.height = 700;
+      this.i = 0;
+      this.tooltip = CustomTooltip("nfl_tooltip", 240);
+      this.vis = d3.select("#vis").append("svg").attr("width", this.width).attr("height", this.height);
+      this.force = d3.layout.force().gravity(-0.01).charge(function(d) {
+        return -Math.pow(d.radius, 2.0) / 8;
+      }).size([this.width, this.height]);
+      this.nodes = this.force.nodes();
       this.center = {
         x: this.width / 2,
         y: this.height / 2
       };
-      this.year_centers = {
-        "2008": {
-          x: this.width / 3,
-          y: this.height / 2
-        },
-        "2009": {
-          x: this.width / 2,
-          y: this.height / 2
-        },
-        "2010": {
-          x: 2 * this.width / 3,
-          y: this.height / 2
-        }
-      };
-      this.layout_gravity = -0.01;
-      this.damper = 0.1;
-      this.vis = null;
-      this.nodes = [];
-      this.force = null;
-      this.circles = null;
-      this.fill_color = d3.scale.ordinal().domain(["Houston Texans", "Denver Broncos", "Carolina Panthers"]).range(["#d84b2a", "#beccae", "#7aa25c"]);
-      this.create_nodes();
-      this.create_vis();
+      this.teams = [];
+      this.data.forEach((function(_this) {
+        return function(d) {
+          if (_this.teams.indexOf(d.team) < 0) {
+            return _this.teams.push(d.team);
+          }
+        };
+      })(this));
+      this.teams.forEach((function(_this) {
+        return function(t, i) {
+          return _this.teams[i] = {
+            name: t,
+            visible: false
+          };
+        };
+      })(this));
+      that = this;
+      d3.select("body").selectAll("input").data(this.teams).enter().append("input").attr("type", "button").attr("class", "button").attr("value", function(d) {
+        return d.name;
+      }).on("click", function(d) {
+        return that.toggleTeam(d);
+      });
     }
 
-    i = 0;
+    BubbleChart.prototype.toggleTeam = function(team) {
+      if (!team.visible) {
+        this.add_nodes(team);
+        return team.visible = true;
+      } else {
+        this.remove_nodes(team);
+        return team.visible = false;
+      }
+    };
 
-    BubbleChart.prototype.create_nodes = function() {
-      return this.data.forEach((function(_this) {
+    BubbleChart.prototype.add_nodes = function(team) {
+      this.data.forEach((function(_this) {
         return function(d) {
           var node;
-          if (d.team === 'Houston Texans') {
+          if (d.team === team.name) {
             node = {
-              id: i,
+              id: _this.i,
               radius: 10,
               name: d.name,
               team: d.team,
               school: d.school,
+              position: d.position,
               x: Math.random() * 900,
               y: Math.random() * 800
             };
-            i += 1;
+            _this.i += 1;
             return _this.nodes.push(node);
           }
         };
       })(this));
+      return this.update();
     };
 
-    BubbleChart.prototype.create_vis = function() {
+    BubbleChart.prototype.remove_nodes = function(team) {
+      var len;
+      len = this.nodes.length;
+      while (len--) {
+        if (this.nodes[len].team === team.name) {
+          this.nodes.splice(len, 1);
+        }
+      }
+      return this.update();
+    };
+
+    BubbleChart.prototype.update = function() {
       var that;
-      this.vis = d3.select("#vis").append("svg").attr("width", this.width).attr("height", this.height).attr("id", "svg_vis");
       this.circles = this.vis.selectAll("circle").data(this.nodes, function(d) {
         return d.id;
       });
-      console.log(this.nodes);
       that = this;
-      this.circles.enter().append("circle").attr("r", 0).attr("fill", (function(_this) {
-        return function(d) {
-          return _this.fill_color(d.team);
-        };
-      })(this)).attr("stroke-width", 2).attr("stroke", (function(_this) {
-        return function(d) {
-          return d3.rgb(_this.fill_color(d.team)).darker();
-        };
-      })(this)).attr("id", function(d) {
+      this.circles.enter().append("circle").attr("r", 0).attr("stroke-width", 3).attr("id", function(d) {
         return "bubble_" + d.id;
+      }).attr("class", function(d) {
+        return d.team.toLowerCase().replace(/\s/g, '_');
       }).on("mouseover", function(d, i) {
         return that.show_details(d, i, this);
       }).on("mouseout", function(d, i) {
         return that.hide_details(d, i, this);
       });
-      return this.circles.transition().duration(2000).attr("r", function(d) {
+      this.circles.transition().duration(2000).attr("r", function(d) {
         return d.radius;
       });
-    };
-
-    BubbleChart.prototype.charge = function(d) {
-      return -Math.pow(d.radius, 2.0) / 8;
-    };
-
-    BubbleChart.prototype.start = function() {
-      return this.force = d3.layout.force().nodes(this.nodes).size([this.width, this.height]);
-    };
-
-    BubbleChart.prototype.display_group_all = function() {
-      this.force.gravity(this.layout_gravity).charge(this.charge).friction(0.9).on("tick", (function(_this) {
+      this.circles.exit().remove();
+      this.force.on("tick", (function(_this) {
         return function(e) {
           return _this.circles.each(_this.move_towards_center(e.alpha)).attr("cx", function(d) {
             return d.x;
@@ -118,65 +123,29 @@
           });
         };
       })(this));
-      this.force.start();
-      return this.hide_years();
+      return this.force.start();
     };
 
     BubbleChart.prototype.move_towards_center = function(alpha) {
       return (function(_this) {
         return function(d) {
-          d.x = d.x + (_this.center.x - d.x) * (_this.damper + 0.02) * alpha;
-          return d.y = d.y + (_this.center.y - d.y) * (_this.damper + 0.02) * alpha;
+          d.x = d.x + (_this.center.x - d.x) * 0.1 * alpha;
+          return d.y = d.y + (_this.center.y - d.y) * 0.1 * alpha;
         };
       })(this);
     };
 
-    BubbleChart.prototype.display_by_year = function() {
-      this.force.gravity(this.layout_gravity).charge(this.charge).friction(0.9).on("tick", (function(_this) {
-        return function(e) {
-          return _this.circles.each(_this.move_towards_year(e.alpha)).attr("cx", function(d) {
-            return d.x;
-          }).attr("cy", function(d) {
-            return d.y;
-          });
-        };
-      })(this));
-      this.force.start();
-      return this.display_years();
+    BubbleChart.prototype.show_details = function(data, i, element) {
+      var content;
+      content = "<span class=\"name\">Name:</span><span class=\"value\"> " + data.name + "</span><br/>";
+      content += "<span class=\"name\">Team:</span><span class=\"value\"> " + data.team + "</span><br/>";
+      content += "<span class=\"name\">School:</span><span class=\"value\"> " + data.school + "</span><br/>";
+      content += "<span class=\"name\">Position:</span><span class=\"value\"> " + data.position + "</span>";
+      return this.tooltip.showTooltip(content, d3.event);
     };
 
-    BubbleChart.prototype.move_towards_year = function(alpha) {
-      return (function(_this) {
-        return function(d) {
-          var target;
-          target = _this.year_centers[d.year];
-          d.x = d.x + (target.x - d.x) * (_this.damper + 0.02) * alpha * 1.1;
-          return d.y = d.y + (target.y - d.y) * (_this.damper + 0.02) * alpha * 1.1;
-        };
-      })(this);
-    };
-
-    BubbleChart.prototype.display_years = function() {
-      var years, years_data, years_x;
-      years_x = {
-        "2008": 160,
-        "2009": this.width / 2,
-        "2010": this.width - 160
-      };
-      years_data = d3.keys(years_x);
-      years = this.vis.selectAll(".years").data(years_data);
-      return years.enter().append("text").attr("class", "years").attr("x", (function(_this) {
-        return function(d) {
-          return years_x[d];
-        };
-      })(this)).attr("y", 40).attr("text-anchor", "middle").text(function(d) {
-        return d;
-      });
-    };
-
-    BubbleChart.prototype.hide_years = function() {
-      var years;
-      return years = this.vis.selectAll(".years").remove();
+    BubbleChart.prototype.hide_details = function(data, i, element) {
+      return this.tooltip.hideTooltip();
     };
 
     return BubbleChart;
@@ -189,29 +158,8 @@
     var chart, render_vis;
     chart = null;
     render_vis = function(csv) {
-      chart = new BubbleChart(csv);
-      chart.start();
-      return root.display_all();
+      return chart = new BubbleChart(csv);
     };
-    root.display_all = (function(_this) {
-      return function() {
-        return chart.display_group_all();
-      };
-    })(this);
-    root.display_year = (function(_this) {
-      return function() {
-        return chart.display_by_year();
-      };
-    })(this);
-    root.toggle_view = (function(_this) {
-      return function(view_type) {
-        if (view_type === 'year') {
-          return root.display_year();
-        } else {
-          return root.display_all();
-        }
-      };
-    })(this);
     return d3.csv("data/players.csv", render_vis);
   });
 

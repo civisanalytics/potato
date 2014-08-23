@@ -1,88 +1,90 @@
 class BubbleChart
   constructor: (data) ->
-    console.log(data)
     @data = data
     @width = 940
-    @height = 600
+    @height = 700
+    @i = 0
 
-    # locations the nodes will move towards
-    # depending on which view is currently being
-    # used
+    @tooltip = CustomTooltip("nfl_tooltip", 240)
+
+    @vis = d3.select("#vis").append("svg")
+      .attr("width", @width)
+      .attr("height", @height)
+
+    @force = d3.layout.force()
+      .gravity(-0.01)
+      .charge((d) -> -Math.pow(d.radius, 2.0) / 8 )
+      .size([@width, @height])
+
+    @nodes = @force.nodes()
+
+    # default center
     @center = {x: @width / 2, y: @height / 2}
-    @year_centers = {
-      "2008": {x: @width / 3, y: @height / 2},
-      "2009": {x: @width / 2, y: @height / 2},
-      "2010": {x: 2 * @width / 3, y: @height / 2}
-    }
 
-    # used when setting up force and
-    # moving around nodes
-    @layout_gravity = -0.01
-    @damper = 0.1
+    @teams = []
 
-    # these will be set in create_nodes and create_vis
-    @vis = null
-    @nodes = []
-    @force = null
-    @circles = null
-
-    # nice looking colors - no reason to buck the trend
-    @fill_color = d3.scale.ordinal()
-      .domain(["Houston Texans", "Denver Broncos", "Carolina Panthers"])
-      .range(["#d84b2a", "#beccae", "#7aa25c"])
-
-    # use the max total_amount in the data as the max in the scale's domain
-#    max_amount = d3.max(@data, (d) -> parseInt(d.total_amount))
-#    @radius_scale = d3.scale.pow().exponent(0.5).domain([0, max_amount]).range([2, 85])
-
-    this.create_nodes()
-    this.create_vis()
-
-  # create node objects from original data
-  # that will serve as the data behind each
-  # bubble in the vis, then add each node
-  # to @nodes to be used later
-  i = 0
-  create_nodes: () =>
     @data.forEach (d) =>
-      if d.team == 'Houston Texans'
+      if @teams.indexOf(d.team) < 0
+        @teams.push d.team
+
+    @teams.forEach (t, i) =>
+      @teams[i] = { name: t, visible: false }
+
+    that = this
+
+    d3.select("body").selectAll("input").data(@teams).enter()
+      .append("input")
+      .attr("type","button")
+      .attr("class","button")
+      .attr("value", (d) -> d.name)
+      .on("click", (d) -> that.toggleTeam(d))
+
+  toggleTeam: (team) =>
+    if !team.visible
+      this.add_nodes(team)
+      team.visible = true
+    else
+      this.remove_nodes(team)
+      team.visible = false
+
+  add_nodes: (team) =>
+    @data.forEach (d) =>
+      if d.team == team.name
         node = {
-          id: i
+          id: @i
           radius: 10
           name: d.name
           team: d.team
           school: d.school
+          position: d.position
           x: Math.random() * 900
           y: Math.random() * 800
         }
-        i += 1
+        @i += 1
         @nodes.push node
+    this.update()
 
-  # create svg at #vis and then
-  # create circle representation for each node
-  create_vis: () =>
-    @vis = d3.select("#vis").append("svg")
-      .attr("width", @width)
-      .attr("height", @height)
-      .attr("id", "svg_vis")
+  remove_nodes: (team) =>
+    # note to self, coffeescript array iteration is the worst
+    len = @nodes.length
+    while (len--)
+      if @nodes[len].team == team.name
+        @nodes.splice(len, 1)
+    this.update()
 
+  update: () =>
     @circles = @vis.selectAll("circle")
       .data(@nodes, (d) -> d.id)
 
-    console.log(@nodes)
-
-    # used because we need 'this' in the
-    # mouse callbacks
     that = this
 
     # radius will be set to 0 initially.
     # see transition below
     @circles.enter().append("circle")
       .attr("r", 0)
-      .attr("fill", (d) => @fill_color(d.team))
-      .attr("stroke-width", 2)
-      .attr("stroke", (d) => d3.rgb(@fill_color(d.team)).darker())
+      .attr("stroke-width", 3)
       .attr("id", (d) -> "bubble_#{d.id}")
+      .attr("class", (d) -> d.team.toLowerCase().replace(/\s/g, '_'))
       .on("mouseover", (d,i) -> that.show_details(d,i,this))
       .on("mouseout", (d,i) -> that.hide_details(d,i,this))
 
@@ -90,86 +92,32 @@ class BubbleChart
     # correct radius
     @circles.transition().duration(2000).attr("r", (d) -> d.radius)
 
+    # this is IMPORTANT otherwise removing ndoes won't work
+    @circles.exit().remove()
 
-  # Charge function that is called for each node.
-  # Charge is proportional to the diameter of the
-  # circle (which is stored in the radius attribute
-  # of the circle's associated data.
-  # This is done to allow for accurate collision
-  # detection with nodes of different sizes.
-  # Charge is negative because we want nodes to
-  # repel.
-  # Dividing by 8 scales down the charge to be
-  # appropriate for the visualization dimensions.
-  charge: (d) ->
-    -Math.pow(d.radius, 2.0) / 8
-
-  # Starts up the force layout with
-  # the default values
-  start: () =>
-    @force = d3.layout.force()
-      .nodes(@nodes)
-      .size([@width, @height])
-
-  # Sets up force layout to display
-  # all nodes in one circle.
-  display_group_all: () =>
-    @force.gravity(@layout_gravity)
-      .charge(this.charge)
-      .friction(0.9)
-      .on "tick", (e) =>
+    @force.on "tick", (e) =>
         @circles.each(this.move_towards_center(e.alpha))
           .attr("cx", (d) -> d.x)
           .attr("cy", (d) -> d.y)
-    @force.start()
 
-    this.hide_years()
+    @force.start()
 
   # Moves all circles towards the @center
   # of the visualization
   move_towards_center: (alpha) =>
     (d) =>
-      d.x = d.x + (@center.x - d.x) * (@damper + 0.02) * alpha
-      d.y = d.y + (@center.y - d.y) * (@damper + 0.02) * alpha
+      d.x = d.x + (@center.x - d.x) * (0.1) * alpha
+      d.y = d.y + (@center.y - d.y) * (0.1) * alpha
 
-  # sets the display of bubbles to be separated
-  # into each year. Does this by calling move_towards_year
-  display_by_year: () =>
-    @force.gravity(@layout_gravity)
-      .charge(this.charge)
-      .friction(0.9)
-      .on "tick", (e) =>
-        @circles.each(this.move_towards_year(e.alpha))
-          .attr("cx", (d) -> d.x)
-          .attr("cy", (d) -> d.y)
-    @force.start()
+  show_details: (data, i, element) =>
+    content = "<span class=\"name\">Name:</span><span class=\"value\"> #{data.name}</span><br/>"
+    content +="<span class=\"name\">Team:</span><span class=\"value\"> #{data.team}</span><br/>"
+    content +="<span class=\"name\">School:</span><span class=\"value\"> #{data.school}</span><br/>"
+    content +="<span class=\"name\">Position:</span><span class=\"value\"> #{data.position}</span>"
+    @tooltip.showTooltip(content,d3.event)
 
-    this.display_years()
-
-  # move all circles to their associated @year_centers 
-  move_towards_year: (alpha) =>
-    (d) =>
-      target = @year_centers[d.year]
-      d.x = d.x + (target.x - d.x) * (@damper + 0.02) * alpha * 1.1
-      d.y = d.y + (target.y - d.y) * (@damper + 0.02) * alpha * 1.1
-
-  # Method to display year titles
-  display_years: () =>
-    years_x = {"2008": 160, "2009": @width / 2, "2010": @width - 160}
-    years_data = d3.keys(years_x)
-    years = @vis.selectAll(".years")
-      .data(years_data)
-
-    years.enter().append("text")
-      .attr("class", "years")
-      .attr("x", (d) => years_x[d] )
-      .attr("y", 40)
-      .attr("text-anchor", "middle")
-      .text((d) -> d)
-
-  # Method to hide year titles
-  hide_years: () =>
-    years = @vis.selectAll(".years").remove()
+  hide_details: (data, i, element) =>
+    @tooltip.hideTooltip()
 
 root = exports ? this
 
@@ -178,16 +126,5 @@ $ ->
 
   render_vis = (csv) ->
     chart = new BubbleChart csv
-    chart.start()
-    root.display_all()
-  root.display_all = () =>
-    chart.display_group_all()
-  root.display_year = () =>
-    chart.display_by_year()
-  root.toggle_view = (view_type) =>
-    if view_type == 'year'
-      root.display_year()
-    else
-      root.display_all()
 
   d3.csv "data/players.csv", render_vis

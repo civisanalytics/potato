@@ -1,3 +1,23 @@
 body {
   color: #123aba;
 }
+
+#vis {
+  width: 940px;
+  margin: 0 auto;
+}
+
+.houston_texans {
+  fill: #02253A;
+  stroke: #B31B34;
+}
+
+.new_orleans_saints {
+  stroke: #000000;
+  fill: #D2B887;
+}
+
+.kansas_city_chiefs {
+  stroke: #F2C800;
+  fill: #B20032;
+}
