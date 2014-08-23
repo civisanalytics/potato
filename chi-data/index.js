@@ -16,7 +16,6 @@
       this.data = data;
       this.width = 940;
       this.height = 700;
-      this.i = 0;
       this.tooltip = CustomTooltip("nfl_tooltip", 240);
       this.vis = d3.select("#vis").append("svg").attr("width", this.width).attr("height", this.height);
       this.force = d3.layout.force().gravity(-0.01).charge(function(d) {
@@ -67,7 +66,7 @@
           var node;
           if (d.team === team.name) {
             node = {
-              id: _this.i,
+              id: d.id,
               radius: 10,
               name: d.name,
               team: d.team,
@@ -76,7 +75,6 @@
               x: Math.random() * 900,
               y: Math.random() * 800
             };
-            _this.i += 1;
             return _this.nodes.push(node);
           }
         };

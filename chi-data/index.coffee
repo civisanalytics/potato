@@ -3,7 +3,6 @@ class BubbleChart
     @data = data
     @width = 940
     @height = 700
-    @i = 0
 
     @tooltip = CustomTooltip("nfl_tooltip", 240)
 
@@ -51,7 +50,7 @@ class BubbleChart
     @data.forEach (d) =>
       if d.team == team.name
         node = {
-          id: @i
+          id: d.id
           radius: 10
           name: d.name
           team: d.team
@@ -60,7 +59,6 @@ class BubbleChart
           x: Math.random() * 900
           y: Math.random() * 800
         }
-        @i += 1
         @nodes.push node
     this.update()
 
