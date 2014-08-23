@@ -4,7 +4,7 @@ class BubbleChart
     @width = 940
     @height = 700
 
-    @tooltip = CustomTooltip("nfl_tooltip", 240)
+    @tooltip = CustomTooltip("nfl_tooltip", 130)
 
     @vis = d3.select("#vis").append("svg")
       .attr("width", @width)
@@ -108,10 +108,10 @@ class BubbleChart
       d.y = d.y + (@center.y - d.y) * (0.1) * alpha
 
   show_details: (data, i, element) =>
-    content = "<span class=\"name\">Name:</span><span class=\"value\"> #{data.name}</span><br/>"
-    content +="<span class=\"name\">Team:</span><span class=\"value\"> #{data.team}</span><br/>"
-    content +="<span class=\"name\">School:</span><span class=\"value\"> #{data.school}</span><br/>"
-    content +="<span class=\"name\">Position:</span><span class=\"value\"> #{data.position}</span>"
+    content = "<span class=\"value\"> #{data.name}</span><br/>"
+    content +="<span class=\"value\"> #{data.team}</span><br/>"
+    content +="<span class=\"value\"> #{data.school}</span><br/>"
+    content +="<span class=\"value\"> #{data.position}</span>"
     @tooltip.showTooltip(content,d3.event)
 
   hide_details: (data, i, element) =>

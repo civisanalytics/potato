@@ -1,10 +1,18 @@
 body {
-  color: #123aba;
 }
 
 #vis {
   width: 940px;
   margin: 0 auto;
+}
+
+#nfl_tooltip {
+  border-radius: 10px;
+  padding: 10px;
+  position: absolute;
+  color: #FFF;
+  background-color: #222;
+  opacity: .9;
 }
 
 .houston_texans {

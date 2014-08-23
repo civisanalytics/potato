@@ -16,7 +16,7 @@
       this.data = data;
       this.width = 940;
       this.height = 700;
-      this.tooltip = CustomTooltip("nfl_tooltip", 240);
+      this.tooltip = CustomTooltip("nfl_tooltip", 130);
       this.vis = d3.select("#vis").append("svg").attr("width", this.width).attr("height", this.height);
       this.force = d3.layout.force().gravity(-0.01).charge(function(d) {
         return -Math.pow(d.radius, 2.0) / 8;
@@ -135,10 +135,10 @@
 
     BubbleChart.prototype.show_details = function(data, i, element) {
       var content;
-      content = "<span class=\"name\">Name:</span><span class=\"value\"> " + data.name + "</span><br/>";
-      content += "<span class=\"name\">Team:</span><span class=\"value\"> " + data.team + "</span><br/>";
-      content += "<span class=\"name\">School:</span><span class=\"value\"> " + data.school + "</span><br/>";
-      content += "<span class=\"name\">Position:</span><span class=\"value\"> " + data.position + "</span>";
+      content = "<span class=\"value\"> " + data.name + "</span><br/>";
+      content += "<span class=\"value\"> " + data.team + "</span><br/>";
+      content += "<span class=\"value\"> " + data.school + "</span><br/>";
+      content += "<span class=\"value\"> " + data.position + "</span>";
       return this.tooltip.showTooltip(content, d3.event);
     };
 
