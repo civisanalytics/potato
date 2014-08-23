@@ -12,6 +12,7 @@
       this.remove_nodes = __bind(this.remove_nodes, this);
       this.add_nodes = __bind(this.add_nodes, this);
       this.toggleTeam = __bind(this.toggleTeam, this);
+      this.teamChange = __bind(this.teamChange, this);
       var that;
       this.data = data;
       this.width = 940;
@@ -43,12 +44,20 @@
         };
       })(this));
       that = this;
-      d3.select("body").selectAll("input").data(this.teams).enter().append("input").attr("type", "button").attr("class", "button").attr("value", function(d) {
+      this.select = d3.select("#team-select").on("change", this.teamChange);
+      this.options = this.select.selectAll('option').data(this.teams).enter().append("option").attr("type", "button").attr("class", "button").attr("value", function(d) {
         return d.name;
-      }).on("click", function(d) {
-        return that.toggleTeam(d);
+      }).text(function(d) {
+        return d.name;
       });
     }
+
+    BubbleChart.prototype.teamChange = function() {
+      var index, team;
+      index = this.select.property('selectedIndex');
+      team = this.options[0][index].__data__;
+      return this.toggleTeam(team);
+    };
 
     BubbleChart.prototype.toggleTeam = function(team) {
       if (!team.visible) {

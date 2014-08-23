@@ -20,6 +20,7 @@ class BubbleChart
     # default center
     @center = {x: @width / 2, y: @height / 2}
 
+    # figure out the teams, then massage them into a select
     @teams = []
 
     @data.forEach (d) =>
@@ -31,12 +32,19 @@ class BubbleChart
 
     that = this
 
-    d3.select("body").selectAll("input").data(@teams).enter()
-      .append("input")
+    @select = d3.select("#team-select").on("change", this.teamChange)
+
+    @options = @select.selectAll('option').data(@teams).enter()
+      .append("option")
       .attr("type","button")
       .attr("class","button")
       .attr("value", (d) -> d.name)
-      .on("click", (d) -> that.toggleTeam(d))
+      .text((d) -> d.name)
+
+  teamChange: =>
+    index = @select.property('selectedIndex')
+    team = @options[0][index].__data__;
+    this.toggleTeam(team)
 
   toggleTeam: (team) =>
     if !team.visible
