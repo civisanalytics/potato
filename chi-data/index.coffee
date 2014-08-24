@@ -61,16 +61,7 @@ class BubbleChart
     }).on("change", (e) => this.toggleField('school', e))
 
 
-    @conferences = [ { name: "SEC", teams: [ "LSU", "Alabama", "Florida", "Georgia", "Kentucky", "Missouri", "South Carolina", "Tennessee", "Vanderbilt", "Arkansas", "Auburn", "Mississippi", "Mississippi State", "Texas A&M;" ] },
-      { name: "ACC", teams: [ "Boston College", "Clemson", "Duke", "Florida State", "Georgia Tech", "Louisville", "Miami (Fla.)", "North Carolina", "North Carolina State", "Pittsburgh", "Syracuse", "Virginia", "Virginia Tech", "Wake Forest" ] }
-    ]
-    # conferences
-    d3.select("#school-select-wrapper").selectAll('button').data(@conferences).enter()
-      .append("button")
-      .attr("value", (d) -> d.name)
-      .text((d) -> d.name)
-      .on("click", (d) -> $("#school-select").select2('val', d.teams, true))
-
+    
   do_positions: ->
     positions = []
 
@@ -298,3 +289,15 @@ $ ->
     chart = new BubbleChart csv
 
   d3.csv "data/players.csv", render_vis
+
+  render_conf = (csv) ->
+    conferences = []
+    d3.csv.parseRows(csv).forEach (r) =>
+      conferences.push { name: r[0], teams: r.slice(1) }
+    d3.select("#school-select-wrapper").selectAll('button').data(conferences).enter()
+      .append("button")
+      .attr("value", (d) -> d.name)
+      .text((d) -> d.name)
+      .on("click", (d) -> $("#school-select").select2('val', d.teams, true))
+
+  d3.text "data/conferences.csv", render_conf

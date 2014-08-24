@@ -80,22 +80,6 @@
           return _this.toggleField('school', e);
         };
       })(this));
-      this.conferences = [
-        {
-          name: "SEC",
-          teams: ["LSU", "Alabama", "Florida", "Georgia", "Kentucky", "Missouri", "South Carolina", "Tennessee", "Vanderbilt", "Arkansas", "Auburn", "Mississippi", "Mississippi State", "Texas A&M;"]
-        }, {
-          name: "ACC",
-          teams: ["Boston College", "Clemson", "Duke", "Florida State", "Georgia Tech", "Louisville", "Miami (Fla.)", "North Carolina", "North Carolina State", "Pittsburgh", "Syracuse", "Virginia", "Virginia Tech", "Wake Forest"]
-        }
-      ];
-      return d3.select("#school-select-wrapper").selectAll('button').data(this.conferences).enter().append("button").attr("value", function(d) {
-        return d.name;
-      }).text(function(d) {
-        return d.name;
-      }).on("click", function(d) {
-        return $("#school-select").select2('val', d.teams, true);
-      });
     };
 
     BubbleChart.prototype.do_positions = function() {
@@ -383,12 +367,32 @@
   root = typeof exports !== "undefined" && exports !== null ? exports : this;
 
   $(function() {
-    var chart, render_vis;
+    var chart, render_conf, render_vis;
     chart = null;
     render_vis = function(csv) {
       return chart = new BubbleChart(csv);
     };
-    return d3.csv("data/players.csv", render_vis);
+    d3.csv("data/players.csv", render_vis);
+    render_conf = function(csv) {
+      var conferences;
+      conferences = [];
+      d3.csv.parseRows(csv).forEach((function(_this) {
+        return function(r) {
+          return conferences.push({
+            name: r[0],
+            teams: r.slice(1)
+          });
+        };
+      })(this));
+      return d3.select("#school-select-wrapper").selectAll('button').data(conferences).enter().append("button").attr("value", function(d) {
+        return d.name;
+      }).text(function(d) {
+        return d.name;
+      }).on("click", function(d) {
+        return $("#school-select").select2('val', d.teams, true);
+      });
+    };
+    return d3.text("data/conferences.csv", render_conf);
   });
 
 }).call(this);
