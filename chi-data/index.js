@@ -15,26 +15,28 @@
       this.data = data;
       this.width = 940;
       this.height = 700;
-      this.tooltip = CustomTooltip("player_tooltip", 130);
+      this.tooltip = CustomTooltip("player_tooltip");
       this.vis = d3.select("#vis").append("svg").attr("width", this.width).attr("height", this.height);
       this.force = d3.layout.force().gravity(-0.01).charge(function(d) {
-        return -Math.pow(d.radius, 2.0) / 8;
+        return -Math.pow(d.radius, 2.0) / 6;
       }).size([this.width, this.height]);
       this.nodes = this.force.nodes();
       this.do_teams();
       this.do_schools();
+      this.do_positions();
     }
 
     BubbleChart.prototype.do_teams = function() {
-      this.teams = [];
+      var teams;
+      teams = [];
       this.data.forEach((function(_this) {
         return function(d) {
-          if (_this.teams.indexOf(d.team) < 0) {
-            return _this.teams.push(d.team);
+          if (teams.indexOf(d.team) < 0) {
+            return teams.push(d.team);
           }
         };
       })(this));
-      d3.select("#team-select").selectAll('option').data(this.teams).enter().append("option").attr("value", function(d) {
+      d3.select("#team-select").selectAll('option').data(teams).enter().append("option").attr("value", function(d) {
         return d;
       }).text(function(d) {
         return d;
@@ -50,15 +52,16 @@
     };
 
     BubbleChart.prototype.do_schools = function() {
-      this.schools = [];
+      var schools;
+      schools = [];
       this.data.forEach((function(_this) {
         return function(d) {
-          if (_this.schools.indexOf(d.school) < 0) {
-            return _this.schools.push(d.school);
+          if (schools.indexOf(d.school) < 0) {
+            return schools.push(d.school);
           }
         };
       })(this));
-      d3.select("#school-select").selectAll('option').data(this.schools).enter().append("option").attr("value", function(d) {
+      d3.select("#school-select").selectAll('option').data(schools).enter().append("option").attr("value", function(d) {
         return d;
       }).text(function(d) {
         return d;
@@ -69,6 +72,31 @@
       }).on("change", (function(_this) {
         return function(e) {
           return _this.toggleField('school', e);
+        };
+      })(this));
+    };
+
+    BubbleChart.prototype.do_positions = function() {
+      var positions;
+      positions = [];
+      this.data.forEach((function(_this) {
+        return function(d) {
+          if (positions.indexOf(d.position) < 0) {
+            return positions.push(d.position);
+          }
+        };
+      })(this));
+      d3.select("#position-select").selectAll('option').data(positions).enter().append("option").attr("value", function(d) {
+        return d;
+      }).text(function(d) {
+        return d;
+      });
+      return $("#position-select").select2({
+        placeholder: 'Select a Position',
+        width: 'resolve'
+      }).on("change", (function(_this) {
+        return function(e) {
+          return _this.toggleField('position', e);
         };
       })(this));
     };
@@ -156,7 +184,7 @@
 
     BubbleChart.prototype.show_details = function(data, i, element) {
       var content;
-      content = "" + data.name + "<br/>";
+      content = "<div class='tooltip-name'>" + data.name + "</div>";
       content += "" + data.team + "<br/>";
       content += "" + data.school + "<br/>";
       content += "" + data.position;

@@ -4,7 +4,7 @@ class BubbleChart
     @width = 940
     @height = 700
 
-    @tooltip = CustomTooltip("player_tooltip", 130)
+    @tooltip = CustomTooltip("player_tooltip")
 
     @vis = d3.select("#vis").append("svg")
       .attr("width", @width)
@@ -12,7 +12,7 @@ class BubbleChart
 
     @force = d3.layout.force()
       .gravity(-0.01)
-      .charge((d) -> -Math.pow(d.radius, 2.0) / 8 )
+      .charge((d) -> -Math.pow(d.radius, 2.0) / 6 )
       .size([@width, @height])
 
     # this is necessary so graph and model stay in sync
@@ -21,15 +21,16 @@ class BubbleChart
 
     this.do_teams()
     this.do_schools()
+    this.do_positions()
 
   do_teams: ->
-    @teams = []
+    teams = []
 
-    @data.forEach (d) => # from data, add all unique teams to @teams
-      if @teams.indexOf(d.team) < 0
-        @teams.push d.team
+    @data.forEach (d) => # from data, add all unique teams to array
+      if teams.indexOf(d.team) < 0
+        teams.push d.team
 
-    d3.select("#team-select").selectAll('option').data(@teams).enter()
+    d3.select("#team-select").selectAll('option').data(teams).enter()
       .append("option")
       .attr("value", (d) -> d)
       .text((d) -> d)
@@ -40,13 +41,13 @@ class BubbleChart
     }).on("change", (e) => this.toggleField('team', e))
 
   do_schools: ->
-    @schools = []
+    schools = []
 
-    @data.forEach (d) => # from data, add all unique teams to @schools
-      if @schools.indexOf(d.school) < 0
-        @schools.push d.school
+    @data.forEach (d) => # from data, add all unique schools to array
+      if schools.indexOf(d.school) < 0
+        schools.push d.school
 
-    d3.select("#school-select").selectAll('option').data(@schools).enter()
+    d3.select("#school-select").selectAll('option').data(schools).enter()
       .append("option")
       .attr("value", (d) -> d)
       .text((d) -> d)
@@ -55,6 +56,23 @@ class BubbleChart
       placeholder: 'Select a School',
       width: 'resolve'
     }).on("change", (e) => this.toggleField('school', e))
+
+  do_positions: ->
+    positions = []
+
+    @data.forEach (d) => # from data, add all unique positions to array
+      if positions.indexOf(d.position) < 0
+        positions.push d.position
+
+    d3.select("#position-select").selectAll('option').data(positions).enter()
+      .append("option")
+      .attr("value", (d) -> d)
+      .text((d) -> d)
+
+    $("#position-select").select2({
+      placeholder: 'Select a Position',
+      width: 'resolve'
+    }).on("change", (e) => this.toggleField('position', e))
 
 
   # select2 passes in object e, which contains either .added or .removed based on action
@@ -124,7 +142,7 @@ class BubbleChart
       d.y = d.y + (@height/2.0 - d.y) * (0.1) * alpha
 
   show_details: (data, i, element) =>
-    content = "#{data.name}<br/>"
+    content = "<div class='tooltip-name'>#{data.name}</div>"
     content +="#{data.team}<br/>"
     content +="#{data.school}<br/>"
     content +="#{data.position}"
