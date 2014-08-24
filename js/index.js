@@ -16,6 +16,8 @@
       this.remove_nodes = __bind(this.remove_nodes, this);
       this.add_nodes = __bind(this.add_nodes, this);
       this.toggleField = __bind(this.toggleField, this);
+      this.create_filters = __bind(this.create_filters, this);
+      var filters;
       this.data = data;
       this.width = 960;
       this.height = 750;
@@ -25,102 +27,58 @@
         return -Math.pow(d.radius, 2.0) * 1.5;
       }).size([this.width, this.height]);
       this.nodes = this.force.nodes();
-      this.do_teams();
-      this.do_schools();
-      this.do_positions();
+      filters = ['position', 'school', 'team'];
+      this.create_filters(filters);
       this.split_buttons();
     }
 
-    BubbleChart.prototype.do_teams = function() {
-      var teams;
-      teams = [];
-      this.data.forEach((function(_this) {
-        return function(d) {
-          if (teams.indexOf(d.team) < 0) {
-            return teams.push(d.team);
-          }
+    BubbleChart.prototype.create_filters = function(filters) {
+      filters.forEach((function(_this) {
+        return function(f, i) {
+          return filters[i] = {
+            type: f,
+            vals: []
+          };
         };
       })(this));
-      teams = teams.sort();
-      d3.select("#team-select").selectAll('option').data(teams).enter().append("option").attr("value", function(d) {
-        return d;
-      }).text(function(d) {
-        return d;
-      });
-      return $("#team-select").select2({
-        placeholder: 'Select a Team',
+      this.data.forEach((function(_this) {
+        return function(d) {
+          return filters.forEach(function(f) {
+            if (f.vals.indexOf(d[f.type]) < 0) {
+              return f.vals.push(d[f.type]);
+            }
+          });
+        };
+      })(this));
+      filters.forEach((function(_this) {
+        return function(f) {
+          return d3.select("#filter-select").selectAll('option').data(f.vals).enter().append("option").attr("value", function(d) {
+            return f.type + ':' + d;
+          }).text(function(d) {
+            return d;
+          });
+        };
+      })(this));
+      return $("#filter-select").select2({
+        placeholder: 'Start typing anything',
         width: 'resolve'
       }).on("change", (function(_this) {
         return function(e) {
-          return _this.toggleField('team', e);
+          return _this.toggleField(e);
         };
       })(this));
     };
 
-    BubbleChart.prototype.do_schools = function() {
-      var schools;
-      schools = [];
-      this.data.forEach((function(_this) {
-        return function(d) {
-          if (schools.indexOf(d.school) < 0) {
-            return schools.push(d.school);
-          }
-        };
-      })(this));
-      d3.select("#school-select").selectAll('option').data(schools).enter().append("option").attr("value", function(d) {
-        return d;
-      }).text(function(d) {
-        return d;
-      });
-      return $("#school-select").select2({
-        placeholder: 'Select a School',
-        width: 'resolve'
-      }).on("change", (function(_this) {
-        return function(e) {
-          return _this.toggleField('school', e);
-        };
-      })(this));
-    };
-
-    BubbleChart.prototype.do_positions = function() {
-      var positions;
-      positions = [];
-      this.data.forEach((function(_this) {
-        return function(d) {
-          if (positions.indexOf(d.position) < 0) {
-            return positions.push(d.position);
-          }
-        };
-      })(this));
-      d3.select("#position-select").selectAll('option').data(positions).enter().append("option").attr("value", function(d) {
-        return d;
-      }).text(function(d) {
-        return d;
-      });
-      return $("#position-select").select2({
-        placeholder: 'Select a Position',
-        width: 'resolve'
-      }).on("change", (function(_this) {
-        return function(e) {
-          return _this.toggleField('position', e);
-        };
-      })(this));
-    };
-
-    BubbleChart.prototype.toggleField = function(field, e) {
+    BubbleChart.prototype.toggleField = function(e) {
+      var val;
       if (typeof e.added !== 'undefined') {
         if (typeof e.added.id !== 'undefined') {
-          return this.add_nodes(field, e.added.id);
-        } else {
-          this.remove_nodes('radius', 8);
-          return e.added.forEach((function(_this) {
-            return function(item) {
-              return _this.add_nodes(field, item.id);
-            };
-          })(this));
+          val = e.added.id.split(':');
+          return this.add_nodes(val[0], val[1]);
         }
       } else if (typeof e.removed !== 'undefined') {
-        return this.remove_nodes(field, e.removed.id);
+        val = e.added.id.split(':');
+        return this.remove_nodes(val[0], val[1]);
       }
     };
 

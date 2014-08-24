@@ -19,81 +19,51 @@ class BubbleChart
     # http://stackoverflow.com/questions/9539294/adding-new-nodes-to-force-directed-layout
     @nodes = @force.nodes()
 
-    this.do_teams()
-    this.do_schools()
-    this.do_positions()
+    filters = ['position', 'school', 'team']
+
+    this.create_filters(filters)
+
     this.split_buttons()
 
-  do_teams: ->
-    teams = []
+  create_filters: (filters) =>
+    # prep filter array to hold all unique values for each filter
+    filters.forEach (f, i) =>
+      filters[i] = { type: f, vals: [] }
 
-    @data.forEach (d) => # from data, add all unique teams to array
-      if teams.indexOf(d.team) < 0
-        teams.push d.team
+    @data.forEach (d) => # now populate the filters from the dataset
+      filters.forEach (f) =>
+        if f.vals.indexOf(d[f.type]) < 0
+          f.vals.push d[f.type]
 
-    teams = teams.sort()
+    filters.forEach (f) => # take these filters and add to select
+      d3.select("#filter-select").selectAll('option').data(f.vals).enter()
+        .append("option")
+        # unfortunately value is the only thing passed to select2
+        # so we have to hack together this string param
+        .attr("value", (d) => f.type + ':' + d )
+        .text((d) -> d)
 
-    d3.select("#team-select").selectAll('option').data(teams).enter()
-      .append("option")
-      .attr("value", (d) -> d)
-      .text((d) -> d)
-
-    $("#team-select").select2({
-      placeholder: 'Select a Team',
+    $("#filter-select").select2({
+      placeholder: 'Start typing anything',
       width: 'resolve'
-    }).on("change", (e) => this.toggleField('team', e))
+    }).on("change", (e) => this.toggleField(e))
 
-  do_schools: ->
-    schools = []
-
-    @data.forEach (d) => # from data, add all unique schools to array
-      if schools.indexOf(d.school) < 0
-        schools.push d.school
-
-    d3.select("#school-select").selectAll('option').data(schools).enter()
-      .append("option")
-      .attr("value", (d) -> d)
-      .text((d) -> d)
-
-    $("#school-select").select2({
-      placeholder: 'Select a School',
-      width: 'resolve'
-    }).on("change", (e) => this.toggleField('school', e))
-
-
-    
-  do_positions: ->
-    positions = []
-
-    @data.forEach (d) => # from data, add all unique positions to array
-      if positions.indexOf(d.position) < 0
-        positions.push d.position
-
-    d3.select("#position-select").selectAll('option').data(positions).enter()
-      .append("option")
-      .attr("value", (d) -> d)
-      .text((d) -> d)
-
-    $("#position-select").select2({
-      placeholder: 'Select a Position',
-      width: 'resolve'
-    }).on("change", (e) => this.toggleField('position', e))
 
   # select2 passes in object e, which contains either .added or .removed based on action
-  # e.added.id && e.removed.id are the values of the options,
-  # eg. team name or school name
-  toggleField: (field, e) =>
+  # e.added.id && e.removed.id contain strings of form 'filter-type:filter-val'
+  toggleField: (e) =>
     if typeof e.added != 'undefined'
       if typeof e.added.id != 'undefined'
-        this.add_nodes(field, e.added.id)
-      else # a group was added
+        val = e.added.id.split(':')
+        this.add_nodes(val[0], val[1])
+#      else # a group was added
+#       this.remove_nodes('radius', 8) # hacky way to clear the board
 
-        this.remove_nodes('radius', 8) # hacky way to clear the board
-
-        e.added.forEach (item) =>
-          this.add_nodes(field, item.id)
+#        e.added.forEach (item) =>
+#          this.add_nodes(field, item.id)
     else if typeof e.removed != 'undefined'
-      this.remove_nodes(field, e.removed.id)
+      val = e.added.id.split(':')
+      this.remove_nodes(val[0], val[1])
 
   add_nodes: (field, val) =>
     @data.forEach (d) =>
