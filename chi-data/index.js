@@ -12,7 +12,6 @@
       this.remove_nodes = __bind(this.remove_nodes, this);
       this.add_nodes = __bind(this.add_nodes, this);
       this.toggleTeam = __bind(this.toggleTeam, this);
-      this.teamChange = __bind(this.teamChange, this);
       var that;
       this.data = data;
       this.width = 940;
@@ -44,36 +43,33 @@
         };
       })(this));
       that = this;
-      this.select = d3.select("#team-select").on("change", this.teamChange);
+      this.select = d3.select("#team-select");
       this.options = this.select.selectAll('option').data(this.teams).enter().append("option").attr("type", "button").attr("class", "button").attr("value", function(d) {
         return d.name;
       }).text(function(d) {
         return d.name;
       });
+      $("#team-select").select2({
+        placeholder: 'Select a Team',
+        width: 'resolve'
+      }).on("change", function(e) {
+        return that.toggleTeam(e);
+      });
     }
 
-    BubbleChart.prototype.teamChange = function() {
-      var index, team;
-      index = this.select.property('selectedIndex');
-      team = this.options[0][index].__data__;
-      return this.toggleTeam(team);
-    };
-
-    BubbleChart.prototype.toggleTeam = function(team) {
-      if (!team.visible) {
-        this.add_nodes(team);
-        return team.visible = true;
-      } else {
-        this.remove_nodes(team);
-        return team.visible = false;
+    BubbleChart.prototype.toggleTeam = function(e) {
+      if (typeof e.added !== 'undefined') {
+        return this.add_nodes('team', e.added.id);
+      } else if (typeof e.removed !== 'undefined') {
+        return this.remove_nodes('team', e.removed.id);
       }
     };
 
-    BubbleChart.prototype.add_nodes = function(team) {
+    BubbleChart.prototype.add_nodes = function(field, val) {
       this.data.forEach((function(_this) {
         return function(d) {
           var node;
-          if (d.team === team.name) {
+          if (d[field] === val) {
             node = {
               id: d.id,
               radius: 10,
@@ -91,11 +87,11 @@
       return this.update();
     };
 
-    BubbleChart.prototype.remove_nodes = function(team) {
+    BubbleChart.prototype.remove_nodes = function(field, val) {
       var len;
       len = this.nodes.length;
       while (len--) {
-        if (this.nodes[len].team === team.name) {
+        if (this.nodes[len][field] === val) {
           this.nodes.splice(len, 1);
         }
       }

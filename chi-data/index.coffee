@@ -32,7 +32,7 @@ class BubbleChart
 
     that = this
 
-    @select = d3.select("#team-select").on("change", this.teamChange)
+    @select = d3.select("#team-select")
 
     @options = @select.selectAll('option').data(@teams).enter()
       .append("option")
@@ -41,22 +41,23 @@ class BubbleChart
       .attr("value", (d) -> d.name)
       .text((d) -> d.name)
 
-  teamChange: =>
-    index = @select.property('selectedIndex')
-    team = @options[0][index].__data__;
-    this.toggleTeam(team)
+    $("#team-select").select2({
+      placeholder: 'Select a Team',
+      width: 'resolve'
+    }).on("change", (e) -> that.toggleTeam(e))
 
-  toggleTeam: (team) =>
-    if !team.visible
-      this.add_nodes(team)
-      team.visible = true
-    else
-      this.remove_nodes(team)
-      team.visible = false
+  # select2 passes in e, containing either .added or .removed based on action
+  # e.added.id && e.removed.id are the values of the options, in this case
+  # the team names
+  toggleTeam: (e) =>
+    if typeof e.added != 'undefined'
+      this.add_nodes('team', e.added.id)
+    else if typeof e.removed != 'undefined'
+      this.remove_nodes('team', e.removed.id)
 
-  add_nodes: (team) =>
+  add_nodes: (field, val) =>
     @data.forEach (d) =>
-      if d.team == team.name
+      if d[field] == val
         node = {
           id: d.id
           radius: 10
@@ -70,11 +71,11 @@ class BubbleChart
         @nodes.push node
     this.update()
 
-  remove_nodes: (team) =>
+  remove_nodes: (field, val) =>
     # note to self, coffeescript array iteration is the worst
     len = @nodes.length
     while (len--)
-      if @nodes[len].team == team.name
+      if @nodes[len][field] == val
         @nodes.splice(len, 1)
     this.update()
 

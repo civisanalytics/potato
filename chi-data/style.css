@@ -15,6 +15,10 @@ body {
   opacity: .9;
 }
 
+#team-select {
+  width: 40%;
+}
+
 .houston_texans {
   fill: #02253A;
   stroke: #B31B34;
