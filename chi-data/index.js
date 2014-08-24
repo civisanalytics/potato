@@ -25,9 +25,7 @@
     }
 
     BubbleChart.prototype.do_teams = function() {
-      var that;
       this.teams = [];
-      that = this;
       this.data.forEach((function(_this) {
         return function(d) {
           if (_this.teams.indexOf(d.team) < 0) {
@@ -43,9 +41,11 @@
       return $("#team-select").select2({
         placeholder: 'Select a Team',
         width: 'resolve'
-      }).on("change", function(e) {
-        return that.toggleTeam(e);
-      });
+      }).on("change", (function(_this) {
+        return function(e) {
+          return _this.toggleTeam(e);
+        };
+      })(this));
     };
 
     BubbleChart.prototype.toggleTeam = function(e) {
@@ -131,10 +131,10 @@
 
     BubbleChart.prototype.show_details = function(data, i, element) {
       var content;
-      content = "<span class=\"value\"> " + data.name + "</span><br/>";
-      content += "<span class=\"value\"> " + data.team + "</span><br/>";
-      content += "<span class=\"value\"> " + data.school + "</span><br/>";
-      content += "<span class=\"value\"> " + data.position + "</span>";
+      content = "" + data.name + "<br/>";
+      content += "" + data.team + "<br/>";
+      content += "" + data.school + "<br/>";
+      content += "" + data.position;
       return this.tooltip.showTooltip(content, d3.event);
     };
 

@@ -15,13 +15,14 @@ class BubbleChart
       .charge((d) -> -Math.pow(d.radius, 2.0) / 8 )
       .size([@width, @height])
 
+    # this is necessary so graph and model stay in sync
+    # http://stackoverflow.com/questions/9539294/adding-new-nodes-to-force-directed-layout
     @nodes = @force.nodes()
 
     this.do_teams()
 
   do_teams: ->
     @teams = []
-    that = this
 
     @data.forEach (d) => # from data, add all unique teams to @teams
       if @teams.indexOf(d.team) < 0
@@ -35,10 +36,10 @@ class BubbleChart
     $("#team-select").select2({
       placeholder: 'Select a Team',
       width: 'resolve'
-    }).on("change", (e) -> that.toggleTeam(e))
+    }).on("change", (e) => this.toggleTeam(e))
 
   # select2 passes in object e, which contains either .added or .removed based on action
-  # e.added.id && e.removed.id are the values of the options, 
+  # e.added.id && e.removed.id are the values of the options,
   # eg. team name or school name
   toggleTeam: (e) =>
     if typeof e.added != 'undefined'
@@ -74,8 +75,8 @@ class BubbleChart
     @circles = @vis.selectAll("circle")
       .data(@nodes, (d) -> d.id)
 
+    # create new circles as needed
     that = this
-
     @circles.enter().append("circle")
       .attr("r", 0)
       .attr("stroke-width", 3)
@@ -104,10 +105,10 @@ class BubbleChart
       d.y = d.y + (@height/2.0 - d.y) * (0.1) * alpha
 
   show_details: (data, i, element) =>
-    content = "<span class=\"value\"> #{data.name}</span><br/>"
-    content +="<span class=\"value\"> #{data.team}</span><br/>"
-    content +="<span class=\"value\"> #{data.school}</span><br/>"
-    content +="<span class=\"value\"> #{data.position}</span>"
+    content = "#{data.name}<br/>"
+    content +="#{data.team}<br/>"
+    content +="#{data.school}<br/>"
+    content +="#{data.position}"
     @tooltip.showTooltip(content,d3.event)
 
   hide_details: (data, i, element) =>
