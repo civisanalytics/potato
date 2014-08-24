@@ -1,8 +1,8 @@
 class BubbleChart
   constructor: (data) ->
     @data = data
-    @width = 940
-    @height = 700
+    @width = 960
+    @height = 750
 
     @tooltip = CustomTooltip("player_tooltip")
 
@@ -12,7 +12,7 @@ class BubbleChart
 
     @force = d3.layout.force()
       .gravity(-0.01)
-      .charge((d) -> -Math.pow(d.radius, 2.0) / 6 )
+      .charge((d) -> -Math.pow(d.radius, 2.0) * 1.5)
       .size([@width, @height])
 
     # this is necessary so graph and model stay in sync
@@ -22,6 +22,7 @@ class BubbleChart
     this.do_teams()
     this.do_schools()
     this.do_positions()
+    this.split_buttons()
 
   do_teams: ->
     teams = []
@@ -122,11 +123,54 @@ class BubbleChart
     this.update()
 
   remove_nodes: (field, val) =>
-    # this was the only array interator + removal I could get to work
+    # this was the only array iterator + removal I could get to work
     len = @nodes.length
     while (len--)
       if @nodes[len][field] == val
         @nodes.splice(len, 1)
+    this.update()
+
+  split_buttons: () =>
+    $('#split-school').on("click", (e) => this.split_by_school())
+
+  split_by_school: () =>
+    curr_schools = []
+
+    # first get number of unique schools
+    @circles.each (c) =>
+      if curr_schools.indexOf(c.school) < 0
+        curr_schools.push c.school
+
+    # then determine what spots all the schools should go to
+    num_rows = Math.round(Math.sqrt(curr_schools.length)) + 1
+    num_cols = curr_schools.length / (num_rows - 1)
+
+    curr_row = 0
+    curr_col = 0
+
+    # padding because the clumps tend to float off the screen
+    width_2 = @width - 200
+    height_2 = @height - 130
+
+    curr_schools.forEach (s, i) =>
+      curr_schools[i] = { school: s, tarx: 50 + (0.5 + curr_col) * (width_2 / num_cols), tary: 70 + (0.5 + curr_row) * (height_2 / num_rows)}
+      curr_col++
+      if curr_col >= num_cols
+        curr_col = 0
+        curr_row++
+
+    console.log(curr_schools)
+
+    # then update all circles tarx and tary appropriately
+    @circles.each (c) =>
+      curr_schools.forEach (s) =>
+        if s.school == c.school
+          c.tarx = s.tarx
+          c.tary = s.tary
+
+    console.log(@circles)
+
+    # then update
     this.update()
 
   update: () =>
@@ -159,8 +203,8 @@ class BubbleChart
   # move node towards the target defined in (tarx,tary)
   move_towards_target: (alpha) =>
     (d) =>
-      d.x = d.x + (d.tarx - d.x) * (0.1) * alpha
-      d.y = d.y + (d.tary - d.y) * (0.1) * alpha
+      d.x = d.x + (d.tarx - d.x) * (0.7) * alpha
+      d.y = d.y + (d.tary - d.y) * (0.7) * alpha
 
   show_details: (data, i, element) =>
     content = "<div class='tooltip-name'>#{data.name}</div>"

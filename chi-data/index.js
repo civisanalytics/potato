@@ -9,21 +9,24 @@
       this.show_details = __bind(this.show_details, this);
       this.move_towards_target = __bind(this.move_towards_target, this);
       this.update = __bind(this.update, this);
+      this.split_by_school = __bind(this.split_by_school, this);
+      this.split_buttons = __bind(this.split_buttons, this);
       this.remove_nodes = __bind(this.remove_nodes, this);
       this.add_nodes = __bind(this.add_nodes, this);
       this.toggleField = __bind(this.toggleField, this);
       this.data = data;
-      this.width = 940;
-      this.height = 700;
+      this.width = 960;
+      this.height = 750;
       this.tooltip = CustomTooltip("player_tooltip");
       this.vis = d3.select("#vis").append("svg").attr("width", this.width).attr("height", this.height);
       this.force = d3.layout.force().gravity(-0.01).charge(function(d) {
-        return -Math.pow(d.radius, 2.0) / 6;
+        return -Math.pow(d.radius, 2.0) * 1.5;
       }).size([this.width, this.height]);
       this.nodes = this.force.nodes();
       this.do_teams();
       this.do_schools();
       this.do_positions();
+      this.split_buttons();
     }
 
     BubbleChart.prototype.do_teams = function() {
@@ -170,6 +173,59 @@
       return this.update();
     };
 
+    BubbleChart.prototype.split_buttons = function() {
+      return $('#split-school').on("click", (function(_this) {
+        return function(e) {
+          return _this.split_by_school();
+        };
+      })(this));
+    };
+
+    BubbleChart.prototype.split_by_school = function() {
+      var curr_col, curr_row, curr_schools, height_2, num_cols, num_rows, width_2;
+      curr_schools = [];
+      this.circles.each((function(_this) {
+        return function(c) {
+          if (curr_schools.indexOf(c.school) < 0) {
+            return curr_schools.push(c.school);
+          }
+        };
+      })(this));
+      num_rows = Math.round(Math.sqrt(curr_schools.length)) + 1;
+      num_cols = curr_schools.length / (num_rows - 1);
+      curr_row = 0;
+      curr_col = 0;
+      width_2 = this.width - 200;
+      height_2 = this.height - 130;
+      curr_schools.forEach((function(_this) {
+        return function(s, i) {
+          curr_schools[i] = {
+            school: s,
+            tarx: 50 + (0.5 + curr_col) * (width_2 / num_cols),
+            tary: 70 + (0.5 + curr_row) * (height_2 / num_rows)
+          };
+          curr_col++;
+          if (curr_col >= num_cols) {
+            curr_col = 0;
+            return curr_row++;
+          }
+        };
+      })(this));
+      console.log(curr_schools);
+      this.circles.each((function(_this) {
+        return function(c) {
+          return curr_schools.forEach(function(s) {
+            if (s.school === c.school) {
+              c.tarx = s.tarx;
+              return c.tary = s.tary;
+            }
+          });
+        };
+      })(this));
+      console.log(this.circles);
+      return this.update();
+    };
+
     BubbleChart.prototype.update = function() {
       var that;
       this.circles = this.vis.selectAll("circle").data(this.nodes, function(d) {
@@ -204,8 +260,8 @@
     BubbleChart.prototype.move_towards_target = function(alpha) {
       return (function(_this) {
         return function(d) {
-          d.x = d.x + (d.tarx - d.x) * 0.1 * alpha;
-          return d.y = d.y + (d.tary - d.y) * 0.1 * alpha;
+          d.x = d.x + (d.tarx - d.x) * 0.7 * alpha;
+          return d.y = d.y + (d.tary - d.y) * 0.7 * alpha;
         };
       })(this);
     };
