@@ -132,6 +132,8 @@ class BubbleChart
 
   split_buttons: () =>
     $('#split-school').on("click", (e) => this.split_by_school())
+    $('#split-team').on("click", (e) => this.split_by_team())
+    $('#split-position').on("click", (e) => this.split_by_position())
 
   split_by_school: () =>
     curr_schools = []
@@ -159,8 +161,6 @@ class BubbleChart
         curr_col = 0
         curr_row++
 
-    console.log(curr_schools)
-
     # then update all circles tarx and tary appropriately
     @circles.each (c) =>
       curr_schools.forEach (s) =>
@@ -172,6 +172,79 @@ class BubbleChart
 
     # then update
     this.update()
+
+  split_by_team: () =>
+    curr_teams = []
+
+    # first get number of unique teams
+    @circles.each (c) =>
+      if curr_teams.indexOf(c.team) < 0
+        curr_teams.push c.team
+
+    # then determine what spots all the teams should go to
+    num_rows = Math.round(Math.sqrt(curr_teams.length)) + 1
+    num_cols = curr_teams.length / (num_rows - 1)
+
+    curr_row = 0
+    curr_col = 0
+
+    # padding because the clumps tend to float off the screen
+    width_2 = @width - 200
+    height_2 = @height - 130
+
+    curr_teams.forEach (s, i) =>
+      curr_teams[i] = { team: s, tarx: 50 + (0.5 + curr_col) * (width_2 / num_cols), tary: 70 + (0.5 + curr_row) * (height_2 / num_rows)}
+      curr_col++
+      if curr_col >= num_cols
+        curr_col = 0
+        curr_row++
+
+    # then update all circles tarx and tary appropriately
+    @circles.each (c) =>
+      curr_teams.forEach (s) =>
+        if s.team == c.team
+          c.tarx = s.tarx
+          c.tary = s.tary
+
+    # then update
+    this.update()
+
+  split_by_position: () =>
+    curr_positions = []
+
+    # first get number of unique positions
+    @circles.each (c) =>
+      if curr_positions.indexOf(c.position) < 0
+        curr_positions.push c.position
+
+    # then determine what spots all the positions should go to
+    num_rows = Math.round(Math.sqrt(curr_positions.length)) + 1
+    num_cols = curr_positions.length / (num_rows - 1)
+
+    curr_row = 0
+    curr_col = 0
+
+    # padding because the clumps tend to float off the screen
+    width_2 = @width - 200
+    height_2 = @height - 130
+
+    curr_positions.forEach (s, i) =>
+      curr_positions[i] = { position: s, tarx: 50 + (0.5 + curr_col) * (width_2 / num_cols), tary: 70 + (0.5 + curr_row) * (height_2 / num_rows)}
+      curr_col++
+      if curr_col >= num_cols
+        curr_col = 0
+        curr_row++
+
+    # then update all circles tarx and tary appropriately
+    @circles.each (c) =>
+      curr_positions.forEach (s) =>
+        if s.position == c.position
+          c.tarx = s.tarx
+          c.tary = s.tary
+
+    # then update
+    this.update()
+
 
   update: () =>
     @circles = @vis.selectAll("circle")
