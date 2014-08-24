@@ -53,8 +53,7 @@ class BubbleChart
 
     $("#school-select").select2({
       placeholder: 'Select a School',
-      width: 'resolve',
-      margin: '10px 0 0 0'
+      width: 'resolve'
     }).on("change", (e) => this.toggleField('school', e))
 
 

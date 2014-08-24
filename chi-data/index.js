@@ -65,8 +65,7 @@
       });
       return $("#school-select").select2({
         placeholder: 'Select a School',
-        width: 'resolve',
-        margin: '10px 0 0 0'
+        width: 'resolve'
       }).on("change", (function(_this) {
         return function(e) {
           return _this.toggleField('school', e);
