@@ -9,9 +9,7 @@
       this.show_details = __bind(this.show_details, this);
       this.move_towards_target = __bind(this.move_towards_target, this);
       this.update = __bind(this.update, this);
-      this.split_by_position = __bind(this.split_by_position, this);
-      this.split_by_team = __bind(this.split_by_team, this);
-      this.split_by_school = __bind(this.split_by_school, this);
+      this.split_by = __bind(this.split_by, this);
       this.split_buttons = __bind(this.split_buttons, this);
       this.remove_nodes = __bind(this.remove_nodes, this);
       this.add_nodes = __bind(this.add_nodes, this);
@@ -77,7 +75,7 @@
           return this.add_nodes(val[0], val[1]);
         }
       } else if (typeof e.removed !== 'undefined') {
-        val = e.added.id.split(':');
+        val = e.removed.id.split(':');
         return this.remove_nodes(val[0], val[1]);
       }
     };
@@ -120,41 +118,41 @@
     BubbleChart.prototype.split_buttons = function() {
       $('#split-school').on("click", (function(_this) {
         return function(e) {
-          return _this.split_by_school();
+          return _this.split_by('school');
         };
       })(this));
       $('#split-team').on("click", (function(_this) {
         return function(e) {
-          return _this.split_by_team();
+          return _this.split_by('team');
         };
       })(this));
       return $('#split-position').on("click", (function(_this) {
         return function(e) {
-          return _this.split_by_position();
+          return _this.split_by('position');
         };
       })(this));
     };
 
-    BubbleChart.prototype.split_by_school = function() {
-      var curr_col, curr_row, curr_schools, height_2, num_cols, num_rows, width_2;
-      curr_schools = [];
+    BubbleChart.prototype.split_by = function(split) {
+      var curr_col, curr_row, curr_vals, height_2, num_cols, num_rows, width_2;
+      curr_vals = [];
       this.circles.each((function(_this) {
         return function(c) {
-          if (curr_schools.indexOf(c.school) < 0) {
-            return curr_schools.push(c.school);
+          if (curr_vals.indexOf(c[split]) < 0) {
+            return curr_vals.push(c[split]);
           }
         };
       })(this));
-      num_rows = Math.round(Math.sqrt(curr_schools.length)) + 1;
-      num_cols = curr_schools.length / (num_rows - 1);
+      num_rows = Math.round(Math.sqrt(curr_vals.length)) + 1;
+      num_cols = curr_vals.length / (num_rows - 1);
       curr_row = 0;
       curr_col = 0;
       width_2 = this.width - 200;
       height_2 = this.height - 130;
-      curr_schools.forEach((function(_this) {
+      curr_vals.forEach((function(_this) {
         return function(s, i) {
-          curr_schools[i] = {
-            school: s,
+          curr_vals[i] = {
+            split: s,
             tarx: 50 + (0.5 + curr_col) * (width_2 / num_cols),
             tary: 70 + (0.5 + curr_row) * (height_2 / num_rows)
           };
@@ -167,94 +165,8 @@
       })(this));
       this.circles.each((function(_this) {
         return function(c) {
-          return curr_schools.forEach(function(s) {
-            if (s.school === c.school) {
-              c.tarx = s.tarx;
-              return c.tary = s.tary;
-            }
-          });
-        };
-      })(this));
-      return this.update();
-    };
-
-    BubbleChart.prototype.split_by_team = function() {
-      var curr_col, curr_row, curr_teams, height_2, num_cols, num_rows, width_2;
-      curr_teams = [];
-      this.circles.each((function(_this) {
-        return function(c) {
-          if (curr_teams.indexOf(c.team) < 0) {
-            return curr_teams.push(c.team);
-          }
-        };
-      })(this));
-      num_rows = Math.round(Math.sqrt(curr_teams.length)) + 1;
-      num_cols = curr_teams.length / (num_rows - 1);
-      curr_row = 0;
-      curr_col = 0;
-      width_2 = this.width - 200;
-      height_2 = this.height - 130;
-      curr_teams.forEach((function(_this) {
-        return function(s, i) {
-          curr_teams[i] = {
-            team: s,
-            tarx: 50 + (0.5 + curr_col) * (width_2 / num_cols),
-            tary: 70 + (0.5 + curr_row) * (height_2 / num_rows)
-          };
-          curr_col++;
-          if (curr_col >= num_cols) {
-            curr_col = 0;
-            return curr_row++;
-          }
-        };
-      })(this));
-      this.circles.each((function(_this) {
-        return function(c) {
-          return curr_teams.forEach(function(s) {
-            if (s.team === c.team) {
-              c.tarx = s.tarx;
-              return c.tary = s.tary;
-            }
-          });
-        };
-      })(this));
-      return this.update();
-    };
-
-    BubbleChart.prototype.split_by_position = function() {
-      var curr_col, curr_positions, curr_row, height_2, num_cols, num_rows, width_2;
-      curr_positions = [];
-      this.circles.each((function(_this) {
-        return function(c) {
-          if (curr_positions.indexOf(c.position) < 0) {
-            return curr_positions.push(c.position);
-          }
-        };
-      })(this));
-      num_rows = Math.round(Math.sqrt(curr_positions.length)) + 1;
-      num_cols = curr_positions.length / (num_rows - 1);
-      curr_row = 0;
-      curr_col = 0;
-      width_2 = this.width - 200;
-      height_2 = this.height - 130;
-      curr_positions.forEach((function(_this) {
-        return function(s, i) {
-          curr_positions[i] = {
-            position: s,
-            tarx: 50 + (0.5 + curr_col) * (width_2 / num_cols),
-            tary: 70 + (0.5 + curr_row) * (height_2 / num_rows)
-          };
-          curr_col++;
-          if (curr_col >= num_cols) {
-            curr_col = 0;
-            return curr_row++;
-          }
-        };
-      })(this));
-      this.circles.each((function(_this) {
-        return function(c) {
-          return curr_positions.forEach(function(s) {
-            if (s.position === c.position) {
+          return curr_vals.forEach(function(s) {
+            if (s.split === c[split]) {
               c.tarx = s.tarx;
               return c.tary = s.tary;
             }

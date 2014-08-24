@@ -20,7 +20,6 @@ class BubbleChart
     @nodes = @force.nodes()
 
     filters = ['position', 'school', 'team']
-
     this.create_filters(filters)
 
     this.split_buttons()
@@ -30,12 +29,14 @@ class BubbleChart
     filters.forEach (f, i) =>
       filters[i] = { type: f, vals: [] }
 
-    @data.forEach (d) => # now populate the filters from the dataset
+    # populate the filters from the dataset
+    @data.forEach (d) =>
       filters.forEach (f) =>
         if f.vals.indexOf(d[f.type]) < 0
           f.vals.push d[f.type]
 
-    filters.forEach (f) => # take these filters and add to select
+    # add the filters to the select
+    filters.forEach (f) =>
       d3.select("#filter-select").selectAll('option').data(f.vals).enter()
         .append("option")
         # unfortunately value is the only thing passed to select2
@@ -43,11 +44,11 @@ class BubbleChart
         .attr("value", (d) => f.type + ':' + d )
         .text((d) -> d)
 
+    # create the actual select2 obj and add a change listener
     $("#filter-select").select2({
       placeholder: 'Start typing anything',
       width: 'resolve'
     }).on("change", (e) => this.toggleField(e))
-
 
   # select2 passes in object e, which contains either .added or .removed based on action
   # e.added.id && e.removed.id contain strings of form 'filter-type:filter-val'
@@ -58,11 +59,10 @@ class BubbleChart
         this.add_nodes(val[0], val[1])
 #      else # a group was added
 #       this.remove_nodes('radius', 8) # hacky way to clear the board
-
 #        e.added.forEach (item) =>
 #          this.add_nodes(field, item.id)
     else if typeof e.removed != 'undefined'
-      val = e.added.id.split(':')
+      val = e.removed.id.split(':')
       this.remove_nodes(val[0], val[1])
 
   add_nodes: (field, val) =>
@@ -92,21 +92,21 @@ class BubbleChart
     this.update()
 
   split_buttons: () =>
-    $('#split-school').on("click", (e) => this.split_by_school())
-    $('#split-team').on("click", (e) => this.split_by_team())
-    $('#split-position').on("click", (e) => this.split_by_position())
+    $('#split-school').on("click", (e) => this.split_by('school'))
+    $('#split-team').on("click", (e) => this.split_by('team'))
+    $('#split-position').on("click", (e) => this.split_by('position'))
 
-  split_by_school: () =>
-    curr_schools = []
+  split_by: (split) =>
+    curr_vals = []
 
     # first get number of unique schools
     @circles.each (c) =>
-      if curr_schools.indexOf(c.school) < 0
-        curr_schools.push c.school
+      if curr_vals.indexOf(c[split]) < 0
+        curr_vals.push c[split]
 
     # then determine what spots all the schools should go to
-    num_rows = Math.round(Math.sqrt(curr_schools.length)) + 1
-    num_cols = curr_schools.length / (num_rows - 1)
+    num_rows = Math.round(Math.sqrt(curr_vals.length)) + 1
+    num_cols = curr_vals.length / (num_rows - 1)
 
     curr_row = 0
     curr_col = 0
@@ -115,8 +115,8 @@ class BubbleChart
     width_2 = @width - 200
     height_2 = @height - 130
 
-    curr_schools.forEach (s, i) =>
-      curr_schools[i] = { school: s, tarx: 50 + (0.5 + curr_col) * (width_2 / num_cols), tary: 70 + (0.5 + curr_row) * (height_2 / num_rows)}
+    curr_vals.forEach (s, i) =>
+      curr_vals[i] = { split: s, tarx: 50 + (0.5 + curr_col) * (width_2 / num_cols), tary: 70 + (0.5 + curr_row) * (height_2 / num_rows)}
       curr_col++
       if curr_col >= num_cols
         curr_col = 0
@@ -124,86 +124,13 @@ class BubbleChart
 
     # then update all circles tarx and tary appropriately
     @circles.each (c) =>
-      curr_schools.forEach (s) =>
-        if s.school == c.school
+      curr_vals.forEach (s) =>
+        if s.split == c[split]
           c.tarx = s.tarx
           c.tary = s.tary
 
     # then update
     this.update()
-
-  split_by_team: () =>
-    curr_teams = []
-
-    # first get number of unique teams
-    @circles.each (c) =>
-      if curr_teams.indexOf(c.team) < 0
-        curr_teams.push c.team
-
-    # then determine what spots all the teams should go to
-    num_rows = Math.round(Math.sqrt(curr_teams.length)) + 1
-    num_cols = curr_teams.length / (num_rows - 1)
-
-    curr_row = 0
-    curr_col = 0
-
-    # padding because the clumps tend to float off the screen
-    width_2 = @width - 200
-    height_2 = @height - 130
-
-    curr_teams.forEach (s, i) =>
-      curr_teams[i] = { team: s, tarx: 50 + (0.5 + curr_col) * (width_2 / num_cols), tary: 70 + (0.5 + curr_row) * (height_2 / num_rows)}
-      curr_col++
-      if curr_col >= num_cols
-        curr_col = 0
-        curr_row++
-
-    # then update all circles tarx and tary appropriately
-    @circles.each (c) =>
-      curr_teams.forEach (s) =>
-        if s.team == c.team
-          c.tarx = s.tarx
-          c.tary = s.tary
-
-    # then update
-    this.update()
-
-  split_by_position: () =>
-    curr_positions = []
-
-    # first get number of unique positions
-    @circles.each (c) =>
-      if curr_positions.indexOf(c.position) < 0
-        curr_positions.push c.position
-
-    # then determine what spots all the positions should go to
-    num_rows = Math.round(Math.sqrt(curr_positions.length)) + 1
-    num_cols = curr_positions.length / (num_rows - 1)
-
-    curr_row = 0
-    curr_col = 0
-
-    # padding because the clumps tend to float off the screen
-    width_2 = @width - 200
-    height_2 = @height - 130
-
-    curr_positions.forEach (s, i) =>
-      curr_positions[i] = { position: s, tarx: 50 + (0.5 + curr_col) * (width_2 / num_cols), tary: 70 + (0.5 + curr_row) * (height_2 / num_rows)}
-      curr_col++
-      if curr_col >= num_cols
-        curr_col = 0
-        curr_row++
-
-    # then update all circles tarx and tary appropriately
-    @circles.each (c) =>
-      curr_positions.forEach (s) =>
-        if s.position == c.position
-          c.tarx = s.tarx
-          c.tary = s.tary
-
-    # then update
-    this.update()
-
 
   update: () =>
     @circles = @vis.selectAll("circle")
