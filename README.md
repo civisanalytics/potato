@@ -8,7 +8,7 @@ TODO
 - [x] create a basic d3 force graph based off of http://vallandingham.me/bubble_charts_in_d3.html
 - [x] display from a selection of teams/schools/positions
 - [x] use select2
-- [ ] color nodes by NFL team colors
+- [x] color nodes by NFL team colors
 - [ ] switch between college and professional colors
 - [x] physically group by school/team/position (aka clumps)
 - [x] 'grouped selectors'
