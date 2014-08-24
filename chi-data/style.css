@@ -18,6 +18,9 @@ body {
 #team-select {
   width: 40%;
 }
+#school-select {
+  width: 40%;
+}
 
 .arizona_cardinals {
   fill: #870619;

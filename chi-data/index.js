@@ -11,7 +11,7 @@
       this.update = __bind(this.update, this);
       this.remove_nodes = __bind(this.remove_nodes, this);
       this.add_nodes = __bind(this.add_nodes, this);
-      this.toggleTeam = __bind(this.toggleTeam, this);
+      this.toggleField = __bind(this.toggleField, this);
       this.data = data;
       this.width = 940;
       this.height = 700;
@@ -22,6 +22,7 @@
       }).size([this.width, this.height]);
       this.nodes = this.force.nodes();
       this.do_teams();
+      this.do_schools();
     }
 
     BubbleChart.prototype.do_teams = function() {
@@ -43,16 +44,40 @@
         width: 'resolve'
       }).on("change", (function(_this) {
         return function(e) {
-          return _this.toggleTeam(e);
+          return _this.toggleField('team', e);
         };
       })(this));
     };
 
-    BubbleChart.prototype.toggleTeam = function(e) {
+    BubbleChart.prototype.do_schools = function() {
+      this.schools = [];
+      this.data.forEach((function(_this) {
+        return function(d) {
+          if (_this.schools.indexOf(d.school) < 0) {
+            return _this.schools.push(d.school);
+          }
+        };
+      })(this));
+      d3.select("#school-select").selectAll('option').data(this.schools).enter().append("option").attr("value", function(d) {
+        return d;
+      }).text(function(d) {
+        return d;
+      });
+      return $("#school-select").select2({
+        placeholder: 'Select a School',
+        width: 'resolve'
+      }).on("change", (function(_this) {
+        return function(e) {
+          return _this.toggleField('school', e);
+        };
+      })(this));
+    };
+
+    BubbleChart.prototype.toggleField = function(field, e) {
       if (typeof e.added !== 'undefined') {
-        return this.add_nodes('team', e.added.id);
+        return this.add_nodes(field, e.added.id);
       } else if (typeof e.removed !== 'undefined') {
-        return this.remove_nodes('team', e.removed.id);
+        return this.remove_nodes(field, e.removed.id);
       }
     };
 

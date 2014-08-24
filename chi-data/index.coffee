@@ -20,6 +20,7 @@ class BubbleChart
     @nodes = @force.nodes()
 
     this.do_teams()
+    this.do_schools()
 
   do_teams: ->
     @teams = []
@@ -36,16 +37,34 @@ class BubbleChart
     $("#team-select").select2({
       placeholder: 'Select a Team',
       width: 'resolve'
-    }).on("change", (e) => this.toggleTeam(e))
+    }).on("change", (e) => this.toggleField('team', e))
+
+  do_schools: ->
+    @schools = []
+
+    @data.forEach (d) => # from data, add all unique teams to @schools
+      if @schools.indexOf(d.school) < 0
+        @schools.push d.school
+
+    d3.select("#school-select").selectAll('option').data(@schools).enter()
+      .append("option")
+      .attr("value", (d) -> d)
+      .text((d) -> d)
+
+    $("#school-select").select2({
+      placeholder: 'Select a School',
+      width: 'resolve'
+    }).on("change", (e) => this.toggleField('school', e))
+
 
   # select2 passes in object e, which contains either .added or .removed based on action
   # e.added.id && e.removed.id are the values of the options,
   # eg. team name or school name
-  toggleTeam: (e) =>
+  toggleField: (field, e) =>
     if typeof e.added != 'undefined'
-      this.add_nodes('team', e.added.id)
+      this.add_nodes(field, e.added.id)
     else if typeof e.removed != 'undefined'
-      this.remove_nodes('team', e.removed.id)
+      this.remove_nodes(field, e.removed.id)
 
   add_nodes: (field, val) =>
     @data.forEach (d) =>
