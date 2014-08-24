@@ -30,6 +30,8 @@ class BubbleChart
       if teams.indexOf(d.team) < 0
         teams.push d.team
 
+    teams = teams.sort()
+
     d3.select("#team-select").selectAll('option').data(teams).enter()
       .append("option")
       .attr("value", (d) -> d)

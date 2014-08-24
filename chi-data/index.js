@@ -36,6 +36,7 @@
           }
         };
       })(this));
+      teams = teams.sort();
       d3.select("#team-select").selectAll('option').data(teams).enter().append("option").attr("value", function(d) {
         return d;
       }).text(function(d) {
