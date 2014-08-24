@@ -53,7 +53,8 @@ class BubbleChart
 
     $("#school-select").select2({
       placeholder: 'Select a School',
-      width: 'resolve'
+      width: 'resolve',
+      margin: '10px 0 0 0'
     }).on("change", (e) => this.toggleField('school', e))
 
 
@@ -71,7 +72,7 @@ class BubbleChart
       if d[field] == val
         node = {
           id: d.id
-          radius: 10
+          radius: 8
           name: d.name
           team: d.team
           school: d.school

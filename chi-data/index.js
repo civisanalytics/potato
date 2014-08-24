@@ -65,7 +65,8 @@
       });
       return $("#school-select").select2({
         placeholder: 'Select a School',
-        width: 'resolve'
+        width: 'resolve',
+        margin: '10px 0 0 0'
       }).on("change", (function(_this) {
         return function(e) {
           return _this.toggleField('school', e);
@@ -88,7 +89,7 @@
           if (d[field] === val) {
             node = {
               id: d.id,
-              radius: 10,
+              radius: 8,
               name: d.name,
               team: d.team,
               school: d.school,

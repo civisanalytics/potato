@@ -1,9 +1,28 @@
 body {
+  margin: 0;
+}
+
+#toolbar {
+  position: absolute;
+  height: 100%;
+  width: 360px;
+  top: 0;
+  padding: 15px;
+  background-color: #CCC;
+}
+
+#team-select {
+  width: 100%;
+}
+#school-select {
+  width: 100%;
+}
+#school-select-wrapper {
+  margin: 20px 0 20px 0;
 }
 
 #vis {
-  width: 940px;
-  margin: 0 auto;
+  margin: 0 0 0 400px;
 }
 
 #player_tooltip {
@@ -15,12 +34,7 @@ body {
   opacity: .9;
 }
 
-#team-select {
-  width: 40%;
-}
-#school-select {
-  width: 40%;
-}
+
 
 .arizona_cardinals {
   fill: #870619;
