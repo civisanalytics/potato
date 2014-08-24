@@ -66,7 +66,7 @@
       }).text(function(d) {
         return d;
       });
-      return $("#school-select").select2({
+      $("#school-select").select2({
         placeholder: 'Select a School',
         width: 'resolve'
       }).on("change", (function(_this) {
@@ -74,6 +74,22 @@
           return _this.toggleField('school', e);
         };
       })(this));
+      this.conferences = [
+        {
+          name: "SEC",
+          teams: ["LSU", "Alabama", "Florida", "Georgia", "Kentucky", "Missouri", "South Carolina", "Tennessee", "Vanderbilt", "Arkansas", "Auburn", "Mississippi", "Mississippi State", "Texas A&M;"]
+        }, {
+          name: "ACC",
+          teams: ["Boston College", "Clemson", "Duke", "Florida State", "Georgia Tech", "Louisville", "Miami (Fla.)", "North Carolina", "North Carolina State", "Pittsburgh", "Syracuse", "Virginia", "Virginia Tech", "Wake Forest"]
+        }
+      ];
+      return d3.select("#school-select-wrapper").selectAll('button').data(this.conferences).enter().append("button").attr("value", function(d) {
+        return d.name;
+      }).text(function(d) {
+        return d.name;
+      }).on("click", function(d) {
+        return $("#school-select").select2('val', d.teams, true);
+      });
     };
 
     BubbleChart.prototype.do_positions = function() {
@@ -103,7 +119,15 @@
 
     BubbleChart.prototype.toggleField = function(field, e) {
       if (typeof e.added !== 'undefined') {
-        return this.add_nodes(field, e.added.id);
+        if (typeof e.added.id !== 'undefined') {
+          return this.add_nodes(field, e.added.id);
+        } else {
+          return e.added.forEach((function(_this) {
+            return function(item) {
+              return _this.add_nodes(field, item.id);
+            };
+          })(this));
+        }
       } else if (typeof e.removed !== 'undefined') {
         return this.remove_nodes(field, e.removed.id);
       }

@@ -57,6 +57,17 @@ class BubbleChart
       width: 'resolve'
     }).on("change", (e) => this.toggleField('school', e))
 
+
+    @conferences = [ { name: "SEC", teams: [ "LSU", "Alabama", "Florida", "Georgia", "Kentucky", "Missouri", "South Carolina", "Tennessee", "Vanderbilt", "Arkansas", "Auburn", "Mississippi", "Mississippi State", "Texas A&M;" ] },
+      { name: "ACC", teams: [ "Boston College", "Clemson", "Duke", "Florida State", "Georgia Tech", "Louisville", "Miami (Fla.)", "North Carolina", "North Carolina State", "Pittsburgh", "Syracuse", "Virginia", "Virginia Tech", "Wake Forest" ] }
+    ]
+    # conferences
+    d3.select("#school-select-wrapper").selectAll('button').data(@conferences).enter()
+      .append("button")
+      .attr("value", (d) -> d.name)
+      .text((d) -> d.name)
+      .on("click", (d) -> $("#school-select").select2('val', d.teams, true))
+
   do_positions: ->
     positions = []
 
@@ -74,13 +85,16 @@ class BubbleChart
       width: 'resolve'
     }).on("change", (e) => this.toggleField('position', e))
 
-
   # select2 passes in object e, which contains either .added or .removed based on action
   # e.added.id && e.removed.id are the values of the options,
   # eg. team name or school name
   toggleField: (field, e) =>
     if typeof e.added != 'undefined'
-      this.add_nodes(field, e.added.id)
+      if typeof e.added.id != 'undefined'
+        this.add_nodes(field, e.added.id)
+      else # a group was added
+        e.added.forEach (item) =>
+          this.add_nodes(field, item.id)
     else if typeof e.removed != 'undefined'
       this.remove_nodes(field, e.removed.id)
 
