@@ -12,21 +12,22 @@
       this.remove_nodes = __bind(this.remove_nodes, this);
       this.add_nodes = __bind(this.add_nodes, this);
       this.toggleTeam = __bind(this.toggleTeam, this);
-      var that;
       this.data = data;
       this.width = 940;
       this.height = 700;
-      this.tooltip = CustomTooltip("nfl_tooltip", 130);
+      this.tooltip = CustomTooltip("player_tooltip", 130);
       this.vis = d3.select("#vis").append("svg").attr("width", this.width).attr("height", this.height);
       this.force = d3.layout.force().gravity(-0.01).charge(function(d) {
         return -Math.pow(d.radius, 2.0) / 8;
       }).size([this.width, this.height]);
       this.nodes = this.force.nodes();
-      this.center = {
-        x: this.width / 2,
-        y: this.height / 2
-      };
+      this.do_teams();
+    }
+
+    BubbleChart.prototype.do_teams = function() {
+      var that;
       this.teams = [];
+      that = this;
       this.data.forEach((function(_this) {
         return function(d) {
           if (_this.teams.indexOf(d.team) < 0) {
@@ -34,28 +35,18 @@
           }
         };
       })(this));
-      this.teams.forEach((function(_this) {
-        return function(t, i) {
-          return _this.teams[i] = {
-            name: t,
-            visible: false
-          };
-        };
-      })(this));
-      that = this;
-      this.select = d3.select("#team-select");
-      this.options = this.select.selectAll('option').data(this.teams).enter().append("option").attr("type", "button").attr("class", "button").attr("value", function(d) {
-        return d.name;
+      d3.select("#team-select").selectAll('option').data(this.teams).enter().append("option").attr("value", function(d) {
+        return d;
       }).text(function(d) {
-        return d.name;
+        return d;
       });
-      $("#team-select").select2({
+      return $("#team-select").select2({
         placeholder: 'Select a Team',
         width: 'resolve'
       }).on("change", function(e) {
         return that.toggleTeam(e);
       });
-    }
+    };
 
     BubbleChart.prototype.toggleTeam = function(e) {
       if (typeof e.added !== 'undefined') {
@@ -132,8 +123,8 @@
     BubbleChart.prototype.move_towards_center = function(alpha) {
       return (function(_this) {
         return function(d) {
-          d.x = d.x + (_this.center.x - d.x) * 0.1 * alpha;
-          return d.y = d.y + (_this.center.y - d.y) * 0.1 * alpha;
+          d.x = d.x + (_this.width / 2.0 - d.x) * 0.1 * alpha;
+          return d.y = d.y + (_this.height / 2.0 - d.y) * 0.1 * alpha;
         };
       })(this);
     };
