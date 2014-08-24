@@ -159,8 +159,6 @@ class BubbleChart
           c.tarx = s.tarx
           c.tary = s.tary
 
-    console.log(@circles)
-
     # then update
     this.update()
 
@@ -247,7 +245,7 @@ class BubbleChart
       .attr("r", 0)
       .attr("stroke-width", 3)
       .attr("id", (d) -> "bubble_#{d.id}")
-      .attr("class", (d) -> d.team.toLowerCase().replace(/\s/g, '_'))
+      .attr("class", (d) -> d.team.toLowerCase().replace(/\s/g, '_').replace('.',''))
       .on("mouseover", (d,i) -> that.show_details(d,i,this))
       .on("mouseout", (d,i) -> that.hide_details(d,i,this))
 

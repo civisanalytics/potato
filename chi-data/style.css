@@ -72,7 +72,7 @@ body {
   stroke: #DD4814;
 }
 .cincinnati_bengals {
-  fill: #000000;
+  fill: #FFFFFF;
   stroke: #FB4F14;
 }
 .cleveland_browns {
@@ -121,11 +121,11 @@ body {
 }
 .new_england_patriots {
   fill: #0D254C;
-  stroke: #C80815;
+  stroke: #D6D6D6;
 }
 .new_orleans_saints {
-  fill: #D2B887;
-  stroke: #000000;
+  fill: #000000;
+  stroke: #D2B887;
 }
 .new_york_giants {
   fill: #CA001A;
@@ -148,8 +148,8 @@ body {
   stroke: #F2C800;
 }
 .san_diego_chargers {
-  fill: #EEC607;
-  stroke: #5B92E5;
+  fill: #5B92E5;
+  stroke: #EEC607;
 }
 .san_francisco_49ers {
   fill: #AF1E2C;
@@ -165,7 +165,7 @@ body {
 }
 .tampa_bay_buccaneers {
   fill: #D60A0B;
-  stroke: #89765F;
+  stroke: #FF7A00;
 }
 .tennessee_titans {
   fill: #648FCC;

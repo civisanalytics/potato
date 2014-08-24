@@ -72,7 +72,7 @@
       }).text(function(d) {
         return d;
       });
-      $("#school-select").select2({
+      return $("#school-select").select2({
         placeholder: 'Select a School',
         width: 'resolve'
       }).on("change", (function(_this) {
@@ -217,7 +217,6 @@
           });
         };
       })(this));
-      console.log(this.circles);
       return this.update();
     };
 
@@ -316,7 +315,7 @@
       this.circles.enter().append("circle").attr("r", 0).attr("stroke-width", 3).attr("id", function(d) {
         return "bubble_" + d.id;
       }).attr("class", function(d) {
-        return d.team.toLowerCase().replace(/\s/g, '_');
+        return d.team.toLowerCase().replace(/\s/g, '_').replace('.', '');
       }).on("mouseover", function(d, i) {
         return that.show_details(d, i, this);
       }).on("mouseout", function(d, i) {
