@@ -7,7 +7,7 @@
     function BubbleChart(data) {
       this.hide_details = __bind(this.hide_details, this);
       this.show_details = __bind(this.show_details, this);
-      this.move_towards_center = __bind(this.move_towards_center, this);
+      this.move_towards_target = __bind(this.move_towards_target, this);
       this.update = __bind(this.update, this);
       this.remove_nodes = __bind(this.remove_nodes, this);
       this.add_nodes = __bind(this.add_nodes, this);
@@ -148,7 +148,9 @@
               school: d.school,
               position: d.position,
               x: Math.random() * 900,
-              y: Math.random() * 800
+              y: Math.random() * 800,
+              tarx: _this.width / 2.0,
+              tary: _this.height / 2.0
             };
             return _this.nodes.push(node);
           }
@@ -189,7 +191,7 @@
       this.circles.exit().remove();
       this.force.on("tick", (function(_this) {
         return function(e) {
-          return _this.circles.each(_this.move_towards_center(e.alpha)).attr("cx", function(d) {
+          return _this.circles.each(_this.move_towards_target(e.alpha)).attr("cx", function(d) {
             return d.x;
           }).attr("cy", function(d) {
             return d.y;
@@ -199,11 +201,11 @@
       return this.force.start();
     };
 
-    BubbleChart.prototype.move_towards_center = function(alpha) {
+    BubbleChart.prototype.move_towards_target = function(alpha) {
       return (function(_this) {
         return function(d) {
-          d.x = d.x + (_this.width / 2.0 - d.x) * 0.1 * alpha;
-          return d.y = d.y + (_this.height / 2.0 - d.y) * 0.1 * alpha;
+          d.x = d.x + (d.tarx - d.x) * 0.1 * alpha;
+          return d.y = d.y + (d.tary - d.y) * 0.1 * alpha;
         };
       })(this);
     };

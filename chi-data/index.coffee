@@ -115,6 +115,8 @@ class BubbleChart
           position: d.position
           x: Math.random() * 900
           y: Math.random() * 800
+          tarx: @width/2.0
+          tary: @height/2.0
         }
         @nodes.push node
     this.update()
@@ -144,21 +146,21 @@ class BubbleChart
     # Fancy transition to make bubbles appear to 'grow in'
     @circles.transition().duration(2000).attr("r", (d) -> d.radius)
 
-    # this is IMPORTANT otherwise removing ndoes won't work
+    # this is IMPORTANT otherwise removing nodes won't work
     @circles.exit().remove()
 
     @force.on "tick", (e) =>
-        @circles.each(this.move_towards_center(e.alpha))
-          .attr("cx", (d) -> d.x)
-          .attr("cy", (d) -> d.y)
+      @circles.each(this.move_towards_target(e.alpha))
+        .attr("cx", (d) -> d.x)
+        .attr("cy", (d) -> d.y)
 
     @force.start()
 
-  # forces nodes into a circlular clump
-  move_towards_center: (alpha) =>
+  # move node towards the target defined in (tarx,tary)
+  move_towards_target: (alpha) =>
     (d) =>
-      d.x = d.x + (@width/2.0 - d.x) * (0.1) * alpha
-      d.y = d.y + (@height/2.0 - d.y) * (0.1) * alpha
+      d.x = d.x + (d.tarx - d.x) * (0.1) * alpha
+      d.y = d.y + (d.tary - d.y) * (0.1) * alpha
 
   show_details: (data, i, element) =>
     content = "<div class='tooltip-name'>#{data.name}</div>"
