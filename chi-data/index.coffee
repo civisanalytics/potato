@@ -93,6 +93,9 @@ class BubbleChart
       if typeof e.added.id != 'undefined'
         this.add_nodes(field, e.added.id)
       else # a group was added
+
+        this.remove_nodes('radius', 8) # hacky way to clear the board
+
         e.added.forEach (item) =>
           this.add_nodes(field, item.id)
     else if typeof e.removed != 'undefined'

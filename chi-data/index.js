@@ -122,6 +122,7 @@
         if (typeof e.added.id !== 'undefined') {
           return this.add_nodes(field, e.added.id);
         } else {
+          this.remove_nodes('radius', 8);
           return e.added.forEach((function(_this) {
             return function(item) {
               return _this.add_nodes(field, item.id);
