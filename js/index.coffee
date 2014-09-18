@@ -57,13 +57,25 @@ class BubbleChart
       if typeof e.added.id != 'undefined'
         val = e.added.id.split(':')
         this.add_nodes(val[0], val[1])
+        this.add_filter(val[0], val[1])
 #      else # a group was added
 #       this.remove_nodes('radius', 8) # hacky way to clear the board
 #        e.added.forEach (item) =>
 #          this.add_nodes(field, item.id)
-    else if typeof e.removed != 'undefined'
-      val = e.removed.id.split(':')
-      this.remove_nodes(val[0], val[1])
+#    else if typeof e.removed != 'undefined'
+#      val = e.removed.id.split(':')
+#      this.remove_nodes(val[0], val[1])
+#
+  add_filter: (field, val) =>
+    rand = String(Math.random()).substring(2,12)
+    $("#filter-select-wrapper").append("<button id='"+rand+"'>"+val+"</button>")
+
+
+    button = $("#"+rand)
+    button.on("click", (e) =>
+      this.remove_nodes(field, val)
+      button.detach()
+    )
 
   add_nodes: (field, val) =>
     @data.forEach (d) =>

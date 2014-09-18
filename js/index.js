@@ -13,6 +13,7 @@
       this.split_buttons = __bind(this.split_buttons, this);
       this.remove_nodes = __bind(this.remove_nodes, this);
       this.add_nodes = __bind(this.add_nodes, this);
+      this.add_filter = __bind(this.add_filter, this);
       this.toggleField = __bind(this.toggleField, this);
       this.create_filters = __bind(this.create_filters, this);
       var filters;
@@ -72,12 +73,23 @@
       if (typeof e.added !== 'undefined') {
         if (typeof e.added.id !== 'undefined') {
           val = e.added.id.split(':');
-          return this.add_nodes(val[0], val[1]);
+          this.add_nodes(val[0], val[1]);
+          return this.add_filter(val[0], val[1]);
         }
-      } else if (typeof e.removed !== 'undefined') {
-        val = e.removed.id.split(':');
-        return this.remove_nodes(val[0], val[1]);
       }
+    };
+
+    BubbleChart.prototype.add_filter = function(field, val) {
+      var button, rand;
+      rand = String(Math.random()).substring(2, 12);
+      $("#filter-select-wrapper").append("<button id='" + rand + "'>" + val + "</button>");
+      button = $("#" + rand);
+      return button.on("click", (function(_this) {
+        return function(e) {
+          _this.remove_nodes(field, val);
+          return button.detach();
+        };
+      })(this));
     };
 
     BubbleChart.prototype.add_nodes = function(field, val) {
