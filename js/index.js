@@ -14,7 +14,6 @@
       this.remove_nodes = __bind(this.remove_nodes, this);
       this.add_nodes = __bind(this.add_nodes, this);
       this.add_filter = __bind(this.add_filter, this);
-      this.toggleField = __bind(this.toggleField, this);
       this.create_filters = __bind(this.create_filters, this);
       var filters;
       this.data = data;
@@ -63,20 +62,16 @@
         width: 'resolve'
       }).on("change", (function(_this) {
         return function(e) {
-          return _this.toggleField(e);
+          var val;
+          if (typeof e.added !== 'undefined') {
+            if (typeof e.added.id !== 'undefined') {
+              val = e.added.id.split(':');
+              _this.add_nodes(val[0], val[1]);
+              return _this.add_filter(val[0], val[1]);
+            }
+          }
         };
       })(this));
-    };
-
-    BubbleChart.prototype.toggleField = function(e) {
-      var val;
-      if (typeof e.added !== 'undefined') {
-        if (typeof e.added.id !== 'undefined') {
-          val = e.added.id.split(':');
-          this.add_nodes(val[0], val[1]);
-          return this.add_filter(val[0], val[1]);
-        }
-      }
     };
 
     BubbleChart.prototype.add_filter = function(field, val) {

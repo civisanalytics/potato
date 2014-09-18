@@ -48,28 +48,18 @@ class BubbleChart
     $("#filter-select").select2({
       placeholder: 'Start typing anything',
       width: 'resolve'
-    }).on("change", (e) => this.toggleField(e))
+    }).on("change", (e) =>
+      if typeof e.added != 'undefined'
+        if typeof e.added.id != 'undefined'
+          val = e.added.id.split(':')
+          this.add_nodes(val[0], val[1])
+          this.add_filter(val[0], val[1])
+    )
 
-  # select2 passes in object e, which contains either .added or .removed based on action
-  # e.added.id && e.removed.id contain strings of form 'filter-type:filter-val'
-  toggleField: (e) =>
-    if typeof e.added != 'undefined'
-      if typeof e.added.id != 'undefined'
-        val = e.added.id.split(':')
-        this.add_nodes(val[0], val[1])
-        this.add_filter(val[0], val[1])
-#      else # a group was added
-#       this.remove_nodes('radius', 8) # hacky way to clear the board
-#        e.added.forEach (item) =>
-#          this.add_nodes(field, item.id)
-#    else if typeof e.removed != 'undefined'
-#      val = e.removed.id.split(':')
-#      this.remove_nodes(val[0], val[1])
-#
   add_filter: (field, val) =>
+    # until I can figure out how to get the id based on the val
     rand = String(Math.random()).substring(2,12)
     $("#filter-select-wrapper").append("<button id='"+rand+"'>"+val+"</button>")
-
 
     button = $("#"+rand)
     button.on("click", (e) =>
