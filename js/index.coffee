@@ -21,7 +21,7 @@ class BubbleChart
 
     filters = ['position', 'school', 'team']
 
-    @curr_filters = {position: [], school: [], team: []}
+    @curr_filters = []
     this.create_filters(filters)
 
     this.split_buttons()
@@ -59,7 +59,7 @@ class BubbleChart
     )
 
   add_filter: (field, val) =>
-    @curr_filters[field].push(val)
+    @curr_filters.push(field+':'+val)
 
     # until I can figure out how to get the id based on the val
     rand = String(Math.random()).substring(2,12)
@@ -67,34 +67,41 @@ class BubbleChart
 
     button = $("#"+rand)
     button.on("click", (e) =>
-      this.remove_nodes(field, val)
+      this.remove_nodes(field+':'+val)
       button.detach()
     )
 
   add_nodes: (field, val) =>
     @data.forEach (d) =>
       if d[field] == val
-        node = {
-          id: d.id
-          radius: 8
-          name: d.name
-          values: ['team:'+d.team, 'school:'+d.school, 'position:'+d.position]
-          color: d.team
-          x: Math.random() * 900
-          y: Math.random() * 800
-          tarx: @width/2.0
-          tary: @height/2.0
-        }
-        @nodes.push node
+        if $.grep(@nodes, (e) => e.id == d.id).length == 0 # if it doesn't already exist in nodes
+          node = {
+            id: d.id
+            radius: 8
+            name: d.name
+            values: ['team:'+d.team, 'school:'+d.school, 'position:'+d.position]
+            color: d.team
+            x: Math.random() * 900
+            y: Math.random() * 800
+            tarx: @width/2.0
+            tary: @height/2.0
+          }
+          @nodes.push node
     this.update()
 
-  remove_nodes: (field, val) =>
+  remove_nodes: (val) =>
+    @curr_filters.splice(@curr_filters.indexOf(val), 1)
 
     # this was the only array iterator + removal I could get to work
     len = @nodes.length
     while (len--)
-      if $.inArray(field+':'+val, @nodes[len]['values']) > 0
-        @nodes.splice(len, 1)
+      if $.inArray(val, @nodes[len]['values']) > 0
+        if $(@curr_filters).filter(@nodes[len]['values']).length == 0
+          console.log 'removing node'
+          @nodes.splice(len, 1)
+
+    console.log @nodes
+    console.log @curr_filters
     this.update()
 
   split_buttons: () =>

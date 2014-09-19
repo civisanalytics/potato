@@ -26,11 +26,7 @@
       }).size([this.width, this.height]);
       this.nodes = this.force.nodes();
       filters = ['position', 'school', 'team'];
-      this.curr_filters = {
-        position: [],
-        school: [],
-        team: []
-      };
+      this.curr_filters = [];
       this.create_filters(filters);
       this.split_buttons();
     }
@@ -81,13 +77,13 @@
 
     BubbleChart.prototype.add_filter = function(field, val) {
       var button, rand;
-      this.curr_filters[field].push(val);
+      this.curr_filters.push(field + ':' + val);
       rand = String(Math.random()).substring(2, 12);
       $("#filter-select-wrapper").append("<button id='" + rand + "'>" + val + "</button>");
       button = $("#" + rand);
       return button.on("click", (function(_this) {
         return function(e) {
-          _this.remove_nodes(field, val);
+          _this.remove_nodes(field + ':' + val);
           return button.detach();
         };
       })(this));
@@ -98,32 +94,42 @@
         return function(d) {
           var node;
           if (d[field] === val) {
-            node = {
-              id: d.id,
-              radius: 8,
-              name: d.name,
-              values: ['team:' + d.team, 'school:' + d.school, 'position:' + d.position],
-              color: d.team,
-              x: Math.random() * 900,
-              y: Math.random() * 800,
-              tarx: _this.width / 2.0,
-              tary: _this.height / 2.0
-            };
-            return _this.nodes.push(node);
+            if ($.grep(_this.nodes, function(e) {
+              return e.id === d.id;
+            }).length === 0) {
+              node = {
+                id: d.id,
+                radius: 8,
+                name: d.name,
+                values: ['team:' + d.team, 'school:' + d.school, 'position:' + d.position],
+                color: d.team,
+                x: Math.random() * 900,
+                y: Math.random() * 800,
+                tarx: _this.width / 2.0,
+                tary: _this.height / 2.0
+              };
+              return _this.nodes.push(node);
+            }
           }
         };
       })(this));
       return this.update();
     };
 
-    BubbleChart.prototype.remove_nodes = function(field, val) {
+    BubbleChart.prototype.remove_nodes = function(val) {
       var len;
+      this.curr_filters.splice(this.curr_filters.indexOf(val), 1);
       len = this.nodes.length;
       while (len--) {
-        if ($.inArray(field + ':' + val, this.nodes[len]['values']) > 0) {
-          this.nodes.splice(len, 1);
+        if ($.inArray(val, this.nodes[len]['values']) > 0) {
+          if ($(this.curr_filters).filter(this.nodes[len]['values']).length === 0) {
+            console.log('removing node');
+            this.nodes.splice(len, 1);
+          }
         }
       }
+      console.log(this.nodes);
+      console.log(this.curr_filters);
       return this.update();
     };
 
