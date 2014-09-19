@@ -26,6 +26,11 @@
       }).size([this.width, this.height]);
       this.nodes = this.force.nodes();
       filters = ['position', 'school', 'team'];
+      this.curr_filters = {
+        position: [],
+        school: [],
+        team: []
+      };
       this.create_filters(filters);
       this.split_buttons();
     }
@@ -76,6 +81,7 @@
 
     BubbleChart.prototype.add_filter = function(field, val) {
       var button, rand;
+      this.curr_filters[field].push(val);
       rand = String(Math.random()).substring(2, 12);
       $("#filter-select-wrapper").append("<button id='" + rand + "'>" + val + "</button>");
       button = $("#" + rand);
@@ -96,9 +102,8 @@
               id: d.id,
               radius: 8,
               name: d.name,
-              team: d.team,
-              school: d.school,
-              position: d.position,
+              values: ['team:' + d.team, 'school:' + d.school, 'position:' + d.position],
+              color: d.team,
               x: Math.random() * 900,
               y: Math.random() * 800,
               tarx: _this.width / 2.0,
@@ -115,7 +120,7 @@
       var len;
       len = this.nodes.length;
       while (len--) {
-        if (this.nodes[len][field] === val) {
+        if ($.inArray(field + ':' + val, this.nodes[len]['values']) > 0) {
           this.nodes.splice(len, 1);
         }
       }
@@ -192,7 +197,7 @@
       this.circles.enter().append("circle").attr("r", 0).attr("stroke-width", 3).attr("id", function(d) {
         return "bubble_" + d.id;
       }).attr("class", function(d) {
-        return d.team.toLowerCase().replace(/\s/g, '_').replace('.', '');
+        return d.color.toLowerCase().replace(/\s/g, '_').replace('.', '');
       }).on("mouseover", function(d, i) {
         return that.show_details(d, i, this);
       }).on("mouseout", function(d, i) {
@@ -224,11 +229,14 @@
     };
 
     BubbleChart.prototype.show_details = function(data, i, element) {
-      var content;
+      var content, vals;
       content = "<div class='tooltip-name'>" + data.name + "</div>";
-      content += "" + data.team + "<br/>";
-      content += "" + data.school + "<br/>";
-      content += "" + data.position;
+      vals = data.values;
+      vals.forEach((function(_this) {
+        return function(v) {
+          return content += "" + (v.split(':')[1]) + "<br/>";
+        };
+      })(this));
       return this.tooltip.showTooltip(content, d3.event);
     };
 

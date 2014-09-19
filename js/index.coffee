@@ -20,6 +20,8 @@ class BubbleChart
     @nodes = @force.nodes()
 
     filters = ['position', 'school', 'team']
+
+    @curr_filters = {position: [], school: [], team: []}
     this.create_filters(filters)
 
     this.split_buttons()
@@ -57,6 +59,8 @@ class BubbleChart
     )
 
   add_filter: (field, val) =>
+    @curr_filters[field].push(val)
+
     # until I can figure out how to get the id based on the val
     rand = String(Math.random()).substring(2,12)
     $("#filter-select-wrapper").append("<button id='"+rand+"'>"+val+"</button>")
@@ -74,9 +78,8 @@ class BubbleChart
           id: d.id
           radius: 8
           name: d.name
-          team: d.team
-          school: d.school
-          position: d.position
+          values: ['team:'+d.team, 'school:'+d.school, 'position:'+d.position]
+          color: d.team
           x: Math.random() * 900
           y: Math.random() * 800
           tarx: @width/2.0
@@ -86,10 +89,11 @@ class BubbleChart
     this.update()
 
   remove_nodes: (field, val) =>
+
     # this was the only array iterator + removal I could get to work
     len = @nodes.length
     while (len--)
-      if @nodes[len][field] == val
+      if $.inArray(field+':'+val, @nodes[len]['values']) > 0
         @nodes.splice(len, 1)
     this.update()
 
@@ -144,7 +148,7 @@ class BubbleChart
       .attr("r", 0)
       .attr("stroke-width", 3)
       .attr("id", (d) -> "bubble_#{d.id}")
-      .attr("class", (d) -> d.team.toLowerCase().replace(/\s/g, '_').replace('.',''))
+      .attr("class", (d) -> d.color.toLowerCase().replace(/\s/g, '_').replace('.',''))
       .on("mouseover", (d,i) -> that.show_details(d,i,this))
       .on("mouseout", (d,i) -> that.hide_details(d,i,this))
 
@@ -169,9 +173,9 @@ class BubbleChart
 
   show_details: (data, i, element) =>
     content = "<div class='tooltip-name'>#{data.name}</div>"
-    content +="#{data.team}<br/>"
-    content +="#{data.school}<br/>"
-    content +="#{data.position}"
+    vals = data.values
+    vals.forEach (v) =>
+      content +="#{v.split(':')[1]}<br/>"
     @tooltip.showTooltip(content,d3.event)
 
   hide_details: (data, i, element) =>
