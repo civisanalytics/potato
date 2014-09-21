@@ -5,6 +5,7 @@
 
   BubbleChart = (function() {
     function BubbleChart(data) {
+      this.safe_string = __bind(this.safe_string, this);
       this.hide_details = __bind(this.hide_details, this);
       this.show_details = __bind(this.show_details, this);
       this.move_towards_target = __bind(this.move_towards_target, this);
@@ -15,7 +16,6 @@
       this.add_nodes = __bind(this.add_nodes, this);
       this.add_filter = __bind(this.add_filter, this);
       this.create_filters = __bind(this.create_filters, this);
-      var filters;
       this.data = data;
       this.width = 960;
       this.height = 750;
@@ -25,39 +25,40 @@
         return -Math.pow(d.radius, 2.0) * 1.5;
       }).size([this.width, this.height]);
       this.nodes = this.force.nodes();
-      filters = ['position', 'school', 'team'];
       this.curr_filters = [];
-      this.create_filters(filters);
+      this.create_filters();
       this.split_buttons();
     }
 
-    BubbleChart.prototype.create_filters = function(filters) {
-      filters.forEach((function(_this) {
-        return function(f, i) {
-          return filters[i] = {
-            type: f,
-            vals: []
-          };
-        };
-      })(this));
+    BubbleChart.prototype.create_filters = function() {
+      var filters;
+      filters = [];
       this.data.forEach((function(_this) {
         return function(d) {
-          return filters.forEach(function(f) {
-            if (f.vals.indexOf(d[f.type]) < 0) {
-              return f.vals.push(d[f.type]);
+          return $.each(d, function(k, v) {
+            var filter_exists, filter_obj;
+            if (k !== 'id' && k !== 'name') {
+              filter_obj = {
+                filter: k,
+                value: v
+              };
+              filter_exists = $.grep(filters, function(e) {
+                return e.filter === k && e.value === v;
+              });
+              if (filter_exists.length === 0) {
+                return filters.push(filter_obj);
+              }
             }
           });
         };
       })(this));
-      filters.forEach((function(_this) {
-        return function(f) {
-          return d3.select("#filter-select").selectAll('option').data(f.vals).enter().append("option").attr("value", function(d) {
-            return f.type + ':' + d;
-          }).text(function(d) {
-            return d;
-          });
+      d3.select("#filter-select").selectAll('option').data(filters).enter().append("option").attr("value", (function(_this) {
+        return function(d) {
+          return d.filter + ":" + d.value;
         };
-      })(this));
+      })(this)).text(function(d) {
+        return d.value;
+      });
       return $("#filter-select").select2({
         placeholder: 'Start typing anything',
         width: 'resolve'
@@ -248,6 +249,10 @@
 
     BubbleChart.prototype.hide_details = function(data, i, element) {
       return this.tooltip.hideTooltip();
+    };
+
+    BubbleChart.prototype.safe_string = function(input) {
+      return input.toLowerCase().replace(/\s/g, '_').replace('.', '');
     };
 
     return BubbleChart;

@@ -19,32 +19,31 @@ class BubbleChart
     # http://stackoverflow.com/questions/9539294/adding-new-nodes-to-force-directed-layout
     @nodes = @force.nodes()
 
-    filters = ['position', 'school', 'team']
-
     @curr_filters = []
-    this.create_filters(filters)
+    this.create_filters()
 
     this.split_buttons()
 
-  create_filters: (filters) =>
-    # prep filter array to hold all unique values for each filter
-    filters.forEach (f, i) =>
-      filters[i] = { type: f, vals: [] }
+  create_filters: () =>
+    filters = []
 
     # populate the filters from the dataset
     @data.forEach (d) =>
-      filters.forEach (f) =>
-        if f.vals.indexOf(d[f.type]) < 0
-          f.vals.push d[f.type]
+      $.each d, (k, v) =>
+        if k != 'id' && k != 'name'
+          filter_obj = {filter: k, value: v}
+          filter_exists = $.grep filters, (e) =>
+            return e.filter == k && e.value == v
+          if filter_exists.length == 0
+            filters.push(filter_obj)
 
     # add the filters to the select
-    filters.forEach (f) =>
-      d3.select("#filter-select").selectAll('option').data(f.vals).enter()
-        .append("option")
-        # unfortunately value is the only thing passed to select2
-        # so we have to hack together this string param
-        .attr("value", (d) => f.type + ':' + d )
-        .text((d) -> d)
+    d3.select("#filter-select").selectAll('option').data(filters).enter()
+      .append("option")
+      # unfortunately value is the only thing passed to select2
+      # so we have to hack together this string param
+      .attr("value", (d) => d.filter + ":" + d.value)
+      .text((d) -> d.value)
 
     # create the actual select2 obj and add a change listener
     $("#filter-select").select2({
@@ -187,6 +186,9 @@ class BubbleChart
 
   hide_details: (data, i, element) =>
     @tooltip.hideTooltip()
+
+  safe_string: (input) =>
+    input.toLowerCase().replace(/\s/g, '_').replace('.','')
 
 root = exports ? this
 
