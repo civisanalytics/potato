@@ -58,7 +58,7 @@ class BubbleChart
     )
 
   add_filter: (field, val) =>
-    @curr_filters.push(field+':'+val)
+    @curr_filters.push({filter: field, value: val})
 
     # until I can figure out how to get the id based on the val
     rand = String(Math.random()).substring(2,12)
@@ -66,7 +66,7 @@ class BubbleChart
 
     button = $("#"+rand)
     button.on("click", (e) =>
-      this.remove_nodes(field+':'+val)
+      this.remove_nodes(field, val)
       button.detach()
     )
 
@@ -78,7 +78,11 @@ class BubbleChart
             id: d.id
             radius: 8
             name: d.name
-            values: ['team:'+d.team, 'school:'+d.school, 'position:'+d.position]
+            values: {
+              team: d.team,
+              school: d.school,
+              position: d.position
+            }
             color: d.team
             x: Math.random() * 900
             y: Math.random() * 800
@@ -88,19 +92,24 @@ class BubbleChart
           @nodes.push node
     this.update()
 
-  remove_nodes: (val) =>
-    @curr_filters.splice(@curr_filters.indexOf(val), 1)
+  remove_nodes: (field, val) =>
+    # remove this filter from the @curr_filters
+    @curr_filters = $.grep @curr_filters, (e) =>
+      return e['filter'] != field && e['value'] != val
 
     # this was the only array iterator + removal I could get to work
     len = @nodes.length
     while (len--)
-      if $.inArray(val, @nodes[len]['values']) > 0
-        if $(@curr_filters).filter(@nodes[len]['values']).length == 0
-          console.log 'removing node'
+      if @nodes[len]['values'][field] == val # node with offending value found
+        # now check that it doesnt have other values that would allow it to stay
+        should_remove = true
+        @curr_filters.forEach (k) =>
+          if @nodes[len]['values'][k['filter']] == k['value']
+            should_remove = false
+        # we can now remove it
+        if should_remove == true
           @nodes.splice(len, 1)
 
-    console.log @nodes
-    console.log @curr_filters
     this.update()
 
   split_buttons: () =>
@@ -111,12 +120,12 @@ class BubbleChart
   split_by: (split) =>
     curr_vals = []
 
-    # first get number of unique schools
+    # first get number of unique values in the filter
     @circles.each (c) =>
-      if curr_vals.indexOf(c[split]) < 0
-        curr_vals.push c[split]
+      if curr_vals.indexOf(c['values'][split]) < 0
+        curr_vals.push c['values'][split]
 
-    # then determine what spots all the schools should go to
+    # then determine what spots all the values should go to
     num_rows = Math.round(Math.sqrt(curr_vals.length)) + 1
     num_cols = curr_vals.length / (num_rows - 1)
 
@@ -179,9 +188,8 @@ class BubbleChart
 
   show_details: (data, i, element) =>
     content = "<div class='tooltip-name'>#{data.name}</div>"
-    vals = data.values
-    vals.forEach (v) =>
-      content +="#{v.split(':')[1]}<br/>"
+    $.each data.values, (k, v) ->
+      content +="#{v}<br/>"
     @tooltip.showTooltip(content,d3.event)
 
   hide_details: (data, i, element) =>

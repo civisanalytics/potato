@@ -78,13 +78,16 @@
 
     BubbleChart.prototype.add_filter = function(field, val) {
       var button, rand;
-      this.curr_filters.push(field + ':' + val);
+      this.curr_filters.push({
+        filter: field,
+        value: val
+      });
       rand = String(Math.random()).substring(2, 12);
       $("#filter-select-wrapper").append("<button id='" + rand + "'>" + val + "</button>");
       button = $("#" + rand);
       return button.on("click", (function(_this) {
         return function(e) {
-          _this.remove_nodes(field + ':' + val);
+          _this.remove_nodes(field, val);
           return button.detach();
         };
       })(this));
@@ -102,7 +105,11 @@
                 id: d.id,
                 radius: 8,
                 name: d.name,
-                values: ['team:' + d.team, 'school:' + d.school, 'position:' + d.position],
+                values: {
+                  team: d.team,
+                  school: d.school,
+                  position: d.position
+                },
                 color: d.team,
                 x: Math.random() * 900,
                 y: Math.random() * 800,
@@ -117,20 +124,29 @@
       return this.update();
     };
 
-    BubbleChart.prototype.remove_nodes = function(val) {
-      var len;
-      this.curr_filters.splice(this.curr_filters.indexOf(val), 1);
+    BubbleChart.prototype.remove_nodes = function(field, val) {
+      var len, should_remove;
+      this.curr_filters = $.grep(this.curr_filters, (function(_this) {
+        return function(e) {
+          return e['filter'] !== field && e['value'] !== val;
+        };
+      })(this));
       len = this.nodes.length;
       while (len--) {
-        if ($.inArray(val, this.nodes[len]['values']) > 0) {
-          if ($(this.curr_filters).filter(this.nodes[len]['values']).length === 0) {
-            console.log('removing node');
+        if (this.nodes[len]['values'][field] === val) {
+          should_remove = true;
+          this.curr_filters.forEach((function(_this) {
+            return function(k) {
+              if (_this.nodes[len]['values'][k['filter']] === k['value']) {
+                return should_remove = false;
+              }
+            };
+          })(this));
+          if (should_remove === true) {
             this.nodes.splice(len, 1);
           }
         }
       }
-      console.log(this.nodes);
-      console.log(this.curr_filters);
       return this.update();
     };
 
@@ -157,8 +173,8 @@
       curr_vals = [];
       this.circles.each((function(_this) {
         return function(c) {
-          if (curr_vals.indexOf(c[split]) < 0) {
-            return curr_vals.push(c[split]);
+          if (curr_vals.indexOf(c['values'][split]) < 0) {
+            return curr_vals.push(c['values'][split]);
           }
         };
       })(this));
@@ -236,14 +252,11 @@
     };
 
     BubbleChart.prototype.show_details = function(data, i, element) {
-      var content, vals;
+      var content;
       content = "<div class='tooltip-name'>" + data.name + "</div>";
-      vals = data.values;
-      vals.forEach((function(_this) {
-        return function(v) {
-          return content += "" + (v.split(':')[1]) + "<br/>";
-        };
-      })(this));
+      $.each(data.values, function(k, v) {
+        return content += "" + v + "<br/>";
+      });
       return this.tooltip.showTooltip(content, d3.event);
     };
 
