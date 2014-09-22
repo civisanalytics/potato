@@ -27,9 +27,9 @@ TODO
   - cincinatti bengals and cleveland browns
   - san diego and jacksonville
 - [ ] click and drag RTS style rectangle selector
-- [ ] nodes will 'fall off' the boundary of the screen occasionally
-- [ ] headers when grouped (so if you group by team, show the team names in grey above each group)
-- [ ] some weird behavior occurs when you select a team and a school, but then remove one. (ends up showing A - B - (A && B), where B was the group removed)
+- [x] nodes will 'fall off' the boundary of the screen occasionally
+- [x] headers when grouped (so if you group by team, show the team names in grey above each group)
+- [x] some weird behavior occurs when you select a team and a school, but then remove one. (ends up showing A - B - (A && B), where B was the group removed)
 
 Random things that might be possible in the future
 - include continuous variables such as height/weight/salary/age and sort the vis somehow
