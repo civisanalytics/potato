@@ -104,20 +104,20 @@
     BubbleChart.prototype.add_nodes = function(field, val) {
       this.data.forEach((function(_this) {
         return function(d) {
-          var node;
+          var node, vals;
           if (d[field] === val) {
             if ($.grep(_this.nodes, function(e) {
               return e.id === d.id;
             }).length === 0) {
+              vals = {};
+              $.each(_this.filter_names, function(k, f) {
+                return vals[f] = d[f];
+              });
               node = {
                 id: d.id,
                 radius: 8,
                 name: d.name,
-                values: {
-                  team: d.team,
-                  school: d.school,
-                  position: d.position
-                },
+                values: vals,
                 color: d.team,
                 x: Math.random() * 900,
                 y: Math.random() * 800,
@@ -194,6 +194,7 @@
       curr_col = 0;
       width_2 = this.width - 200;
       height_2 = this.height - 130;
+      this.vis.selectAll(".split-labels").remove();
       curr_vals.forEach((function(_this) {
         return function(s, i) {
           curr_vals[i] = {
@@ -201,6 +202,7 @@
             tarx: 50 + (0.5 + curr_col) * (width_2 / num_cols),
             tary: 70 + (0.5 + curr_row) * (height_2 / num_rows)
           };
+          _this.vis.append("text").attr("x", curr_vals[i].tarx - 50).attr("y", curr_vals[i].tary).attr("class", 'split-labels').text(s);
           curr_col++;
           if (curr_col >= num_cols) {
             curr_col = 0;

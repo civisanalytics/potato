@@ -30,6 +30,13 @@ a {
   background-color: #CCC;
 }
 
+.split-labels {
+  fill: #CCC;
+  font-size: 1.8em;
+  z-index: -1;
+
+}
+
 .selector {
   width: 100%;
 }

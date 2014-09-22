@@ -79,15 +79,16 @@ class BubbleChart
     @data.forEach (d) =>
       if d[field] == val
         if $.grep(@nodes, (e) => e.id == d.id).length == 0 # if it doesn't already exist in nodes
+
+          vals = {} # create a hash with the appropriate filters
+          $.each @filter_names, (k, f) =>
+            vals[f] = d[f]
+
           node = {
             id: d.id
             radius: 8
             name: d.name
-            values: {
-              team: d.team,
-              school: d.school,
-              position: d.position
-            }
+            values: vals
             color: d.team
             x: Math.random() * 900
             y: Math.random() * 800
@@ -146,8 +147,19 @@ class BubbleChart
     width_2 = @width - 200
     height_2 = @height - 130
 
+    # remove any currently present split labels
+    @vis.selectAll(".split-labels").remove()
+
     curr_vals.forEach (s, i) =>
       curr_vals[i] = { split: s, tarx: 50 + (0.5 + curr_col) * (width_2 / num_cols), tary: 70 + (0.5 + curr_row) * (height_2 / num_rows)}
+
+      # now do the text labels
+      @vis.append("text")
+        .attr("x", curr_vals[i].tarx - 50)
+        .attr("y", curr_vals[i].tary)
+        .attr("class", 'split-labels')
+        .text(s)
+
       curr_col++
       if curr_col >= num_cols
         curr_col = 0
