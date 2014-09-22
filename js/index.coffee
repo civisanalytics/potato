@@ -1,8 +1,8 @@
 class BubbleChart
   constructor: (data) ->
     @data = data
-    @width = 960
-    @height = 750
+    @width = 1180
+    @height = 800
 
     @tooltip = CustomTooltip("player_tooltip")
 
@@ -52,8 +52,9 @@ class BubbleChart
 
     # create the actual select2 obj and add a change listener
     $("#filter-select").select2({
-      placeholder: 'Start typing anything',
-      width: 'resolve'
+      placeholder: 'Type here to get started',
+      width: '300px',
+      dropdownCssClass: "customdrop"
     }).on("change", (e) =>
       if typeof e.added != 'undefined'
         if typeof e.added.id != 'undefined'
@@ -121,7 +122,7 @@ class BubbleChart
   split_buttons: () =>
     filters = []
     $.each @filter_names, (k, f) =>
-      filters.push {text: 'Split by ' + f, value: f}
+      filters.push {text: f, value: f}
 
     d3.select("#split-buttons").selectAll('button').data(filters).enter()
       .append("button")

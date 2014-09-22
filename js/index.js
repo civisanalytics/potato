@@ -17,8 +17,8 @@
       this.add_filter = __bind(this.add_filter, this);
       this.create_filters = __bind(this.create_filters, this);
       this.data = data;
-      this.width = 960;
-      this.height = 750;
+      this.width = 1180;
+      this.height = 800;
       this.tooltip = CustomTooltip("player_tooltip");
       this.vis = d3.select("#vis").append("svg").attr("width", this.width).attr("height", this.height);
       this.force = d3.layout.force().gravity(-0.01).charge(function(d) {
@@ -68,8 +68,9 @@
         return d.value;
       });
       return $("#filter-select").select2({
-        placeholder: 'Start typing anything',
-        width: 'resolve'
+        placeholder: 'Type here to get started',
+        width: '300px',
+        dropdownCssClass: "customdrop"
       }).on("change", (function(_this) {
         return function(e) {
           var val;
@@ -164,7 +165,7 @@
       $.each(this.filter_names, (function(_this) {
         return function(k, f) {
           return filters.push({
-            text: 'Split by ' + f,
+            text: f,
             value: f
           });
         };

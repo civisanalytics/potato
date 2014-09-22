@@ -23,18 +23,56 @@ a {
 
 #toolbar {
   position: absolute;
-  height: 100%;
-  width: 350px;
+  width: 100%;
   top: 0;
   padding: 15px;
   background-color: #CCC;
+}
+
+.pull-left {
+  float: left;
+}
+.pull-right {
+  float: right;
+}
+
+#title {
+  font-weight: bold;
+  font-size: 2em;
+  float: left;
+  margin-right: 20px;
+}
+
+button {
+  border: none;
+  outline: none;
+  padding: 8px;
+  border-radius: 5px;
+  cursor: pointer;
+  background-color: #FFF;
+  transition: background 0.2s ease-in-out;
+  -webkit-transition: background 0.2s ease-in-out;
+  -moz-transition: background 0.2s ease-easein-out;
+  -ms-transition: background 0.2s ease-in-out;
+  -o-transition: borderackground 0.2s ease-in-out;
+}
+
+button:hover {
+  background-color: #eee;
+}
+
+#filter-select-wrapper {
+  margin: 5px 15px 0 0;
+}
+
+#split-buttons {
+  margin: 5px 0 0 0;
 }
 
 .split-labels {
   fill: #CCC;
   font-size: 1.8em;
   z-index: -1;
-
 }
 
 .selector {
@@ -46,7 +84,7 @@ a {
 }
 
 #vis {
-  margin: 0 0 0 400px;
+  margin: 100px 0 0 0;
 }
 
 #player_tooltip {
