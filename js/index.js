@@ -32,6 +32,14 @@
 
     BubbleChart.prototype.create_filters = function() {
       var filters;
+      this.filter_names = [];
+      $.each(this.data[0], (function(_this) {
+        return function(d) {
+          if (d !== 'id' && d !== 'name') {
+            return _this.filter_names.push(d);
+          }
+        };
+      })(this));
       filters = [];
       this.data.forEach((function(_this) {
         return function(d) {
@@ -151,19 +159,21 @@
     };
 
     BubbleChart.prototype.split_buttons = function() {
-      $('#split-school').on("click", (function(_this) {
-        return function(e) {
-          return _this.split_by('school');
+      var filters;
+      filters = [];
+      $.each(this.filter_names, (function(_this) {
+        return function(k, f) {
+          return filters.push({
+            text: 'Split by ' + f,
+            value: f
+          });
         };
       })(this));
-      $('#split-team').on("click", (function(_this) {
-        return function(e) {
-          return _this.split_by('team');
-        };
-      })(this));
-      return $('#split-position').on("click", (function(_this) {
-        return function(e) {
-          return _this.split_by('position');
+      return d3.select("#split-buttons").selectAll('button').data(filters).enter().append("button").text(function(d) {
+        return d.text;
+      }).on("click", (function(_this) {
+        return function(d) {
+          return _this.split_by(d.value);
         };
       })(this));
     };
@@ -201,7 +211,7 @@
       this.circles.each((function(_this) {
         return function(c) {
           return curr_vals.forEach(function(s) {
-            if (s.split === c[split]) {
+            if (s.split === c['values'][split]) {
               c.tarx = s.tarx;
               return c.tary = s.tary;
             }

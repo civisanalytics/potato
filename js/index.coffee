@@ -25,6 +25,11 @@ class BubbleChart
     this.split_buttons()
 
   create_filters: () =>
+    @filter_names = []
+    $.each @data[0], (d) =>
+      if d != 'id' && d != 'name'
+        @filter_names.push d
+
     filters = []
 
     # populate the filters from the dataset
@@ -113,9 +118,14 @@ class BubbleChart
     this.update()
 
   split_buttons: () =>
-    $('#split-school').on("click", (e) => this.split_by('school'))
-    $('#split-team').on("click", (e) => this.split_by('team'))
-    $('#split-position').on("click", (e) => this.split_by('position'))
+    filters = []
+    $.each @filter_names, (k, f) =>
+      filters.push {text: 'Split by ' + f, value: f}
+
+    d3.select("#split-buttons").selectAll('button').data(filters).enter()
+      .append("button")
+      .text((d) -> d.text)
+      .on("click", (d) => this.split_by(d.value))
 
   split_by: (split) =>
     curr_vals = []
@@ -146,7 +156,7 @@ class BubbleChart
     # then update all circles tarx and tary appropriately
     @circles.each (c) =>
       curr_vals.forEach (s) =>
-        if s.split == c[split]
+        if s.split == c['values'][split]
           c.tarx = s.tarx
           c.tary = s.tary
 
