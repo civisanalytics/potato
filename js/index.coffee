@@ -71,7 +71,7 @@ class BubbleChart
 
     # until I can figure out how to get the id based on the val
     rand = String(Math.random()).substring(2,12)
-    $("#filter-select-wrapper").append("<button id='"+rand+"'>"+val+"</button>")
+    $("#filter-select-buttons").append("<button id='"+rand+"'>"+val+"</button>")
 
     button = $("#"+rand)
     button.on("click", (e) =>

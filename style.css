@@ -22,7 +22,6 @@ a {
 }
 
 #toolbar {
-  position: absolute;
   width: 100%;
   top: 0;
   padding: 15px;
@@ -37,7 +36,7 @@ a {
 }
 
 #title {
-  font-weight: bold;
+  display: inline-block;
   font-size: 2em;
   float: left;
   margin-right: 20px;
@@ -72,7 +71,13 @@ button:hover {
 }
 
 #filter-select-wrapper {
+  display: inline-block;
   margin: 5px 15px 0 0;
+}
+
+#filter-select-buttons {
+  display: inline-block;
+  vertical-align: top;
 }
 
 #split-buttons {
@@ -91,10 +96,6 @@ button:hover {
 
 #school-select-wrapper {
   margin: 20px 0 20px 0;
-}
-
-#vis {
-  margin: 60px 0 0 0;
 }
 
 #player_tooltip {
