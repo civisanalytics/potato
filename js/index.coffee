@@ -27,9 +27,11 @@ class BubbleChart
 
   create_filters: () =>
     @filter_names = []
+    i = 1
     $.each @data[0], (d) =>
       if d != 'id' && d != 'name'
-        @filter_names.push d
+        @filter_names.push {value: d, color: 'color-' + i }
+        i += 1
 
     filters = []
 
@@ -76,6 +78,8 @@ class BubbleChart
       this.remove_nodes(field, val)
       button.detach()
     )
+    button_color = $.grep(@filter_names, (e) => e.value == field)[0].color
+    button.addClass(button_color)
 
   add_nodes: (field, val) =>
     @data.forEach (d) =>
@@ -84,7 +88,7 @@ class BubbleChart
 
           vals = {} # create a hash with the appropriate filters
           $.each @filter_names, (k, f) =>
-            vals[f] = d[f]
+            vals[f.value] = d[f.value]
 
           node = {
             id: d.id
@@ -121,13 +125,10 @@ class BubbleChart
     this.update()
 
   split_buttons: () =>
-    filters = []
-    $.each @filter_names, (k, f) =>
-      filters.push {text: f, value: f}
-
-    d3.select("#split-buttons").selectAll('button').data(filters).enter()
+    d3.select("#split-buttons").selectAll('button').data(@filter_names).enter()
       .append("button")
-      .text((d) -> d.text)
+      .text((d) -> d.value)
+      .attr("class", (d) -> d.color)
       .on("click", (d) => this.split_by(d.value))
 
   split_by: (split) =>

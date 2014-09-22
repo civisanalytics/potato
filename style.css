@@ -61,6 +61,16 @@ button:hover {
   background-color: #eee;
 }
 
+.color-1 {
+  background-color: #AEC6CF;
+}
+.color-2 {
+  background-color: #CAFFD8;
+}
+.color-3 {
+  background-color: #F7F9D0;
+}
+
 #filter-select-wrapper {
   margin: 5px 15px 0 0;
 }

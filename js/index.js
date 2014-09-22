@@ -31,12 +31,17 @@
     }
 
     BubbleChart.prototype.create_filters = function() {
-      var filters;
+      var filters, i;
       this.filter_names = [];
+      i = 1;
       $.each(this.data[0], (function(_this) {
         return function(d) {
           if (d !== 'id' && d !== 'name') {
-            return _this.filter_names.push(d);
+            _this.filter_names.push({
+              value: d,
+              color: 'color-' + i
+            });
+            return i += 1;
           }
         };
       })(this));
@@ -86,7 +91,7 @@
     };
 
     BubbleChart.prototype.add_filter = function(field, val) {
-      var button, rand;
+      var button, button_color, rand;
       this.curr_filters.push({
         filter: field,
         value: val
@@ -94,12 +99,18 @@
       rand = String(Math.random()).substring(2, 12);
       $("#filter-select-wrapper").append("<button id='" + rand + "'>" + val + "</button>");
       button = $("#" + rand);
-      return button.on("click", (function(_this) {
+      button.on("click", (function(_this) {
         return function(e) {
           _this.remove_nodes(field, val);
           return button.detach();
         };
       })(this));
+      button_color = $.grep(this.filter_names, (function(_this) {
+        return function(e) {
+          return e.value === field;
+        };
+      })(this))[0].color;
+      return button.addClass(button_color);
     };
 
     BubbleChart.prototype.add_nodes = function(field, val) {
@@ -112,7 +123,7 @@
             }).length === 0) {
               vals = {};
               $.each(_this.filter_names, function(k, f) {
-                return vals[f] = d[f];
+                return vals[f.value] = d[f.value];
               });
               node = {
                 id: d.id,
@@ -160,18 +171,10 @@
     };
 
     BubbleChart.prototype.split_buttons = function() {
-      var filters;
-      filters = [];
-      $.each(this.filter_names, (function(_this) {
-        return function(k, f) {
-          return filters.push({
-            text: f,
-            value: f
-          });
-        };
-      })(this));
-      return d3.select("#split-buttons").selectAll('button').data(filters).enter().append("button").text(function(d) {
-        return d.text;
+      return d3.select("#split-buttons").selectAll('button').data(this.filter_names).enter().append("button").text(function(d) {
+        return d.value;
+      }).attr("class", function(d) {
+        return d.color;
       }).on("click", (function(_this) {
         return function(d) {
           return _this.split_by(d.value);
