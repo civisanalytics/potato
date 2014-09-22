@@ -17,10 +17,10 @@
       this.add_filter = __bind(this.add_filter, this);
       this.create_filters = __bind(this.create_filters, this);
       this.data = data;
-      this.width = 1180;
+      this.width = 1350;
       this.height = 800;
       this.tooltip = CustomTooltip("player_tooltip");
-      this.vis = d3.select("#vis").append("svg").attr("width", this.width).attr("height", this.height);
+      this.vis = d3.select("#vis").append("svg").attr("viewBox", "0 0 " + this.width + " " + this.height);
       this.force = d3.layout.force().gravity(-0.01).charge(function(d) {
         return -Math.pow(d.radius, 2.0) * 1.5;
       }).size([this.width, this.height]);
@@ -193,7 +193,7 @@
       num_cols = curr_vals.length / (num_rows - 1);
       curr_row = 0;
       curr_col = 0;
-      width_2 = this.width - 200;
+      width_2 = this.width - 250;
       height_2 = this.height - 130;
       this.vis.selectAll(".split-labels").remove();
       curr_vals.forEach((function(_this) {

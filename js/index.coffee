@@ -1,14 +1,15 @@
 class BubbleChart
   constructor: (data) ->
     @data = data
-    @width = 1180
+    @width = 1350
     @height = 800
 
     @tooltip = CustomTooltip("player_tooltip")
 
     @vis = d3.select("#vis").append("svg")
-      .attr("width", @width)
-      .attr("height", @height)
+       .attr("viewBox", "0 0 #{@width} #{@height}")
+#      .attr("width", @width)
+#      .attr("height", @height)
 
     @force = d3.layout.force()
       .gravity(-0.01)
@@ -145,7 +146,7 @@ class BubbleChart
     curr_col = 0
 
     # padding because the clumps tend to float off the screen
-    width_2 = @width - 200
+    width_2 = @width - 250
     height_2 = @height - 130
 
     # remove any currently present split labels
