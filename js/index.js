@@ -25,6 +25,7 @@
         return -Math.pow(d.radius, 2.0) * 1.5;
       }).size([this.width, this.height]);
       this.nodes = this.force.nodes();
+      this.labels = [];
       this.curr_filters = [];
       this.create_filters();
       this.split_buttons();
@@ -184,6 +185,9 @@
 
     BubbleChart.prototype.split_by = function(split) {
       var curr_col, curr_row, curr_vals, height_2, num_cols, num_rows, width_2;
+      while (this.labels.length > 0) {
+        this.labels.pop();
+      }
       curr_vals = [];
       this.circles.each((function(_this) {
         return function(c) {
@@ -198,15 +202,22 @@
       curr_col = 0;
       width_2 = this.width - 250;
       height_2 = this.height - 130;
-      this.vis.selectAll(".split-labels").remove();
       curr_vals.forEach((function(_this) {
         return function(s, i) {
+          var label;
           curr_vals[i] = {
             split: s,
             tarx: 50 + (0.5 + curr_col) * (width_2 / num_cols),
             tary: 70 + (0.5 + curr_row) * (height_2 / num_rows)
           };
-          _this.vis.append("text").attr("x", curr_vals[i].tarx - 50).attr("y", curr_vals[i].tary).attr("class", 'split-labels').text(s);
+          label = {
+            text: s,
+            x: curr_vals[i].tarx,
+            y: curr_vals[i].tary,
+            tarx: curr_vals[i].tarx,
+            tary: curr_vals[i].tary
+          };
+          _this.labels.push(label);
           curr_col++;
           if (curr_col >= num_cols) {
             curr_col = 0;
@@ -246,6 +257,16 @@
         return d.radius;
       });
       this.circles.exit().remove();
+      this.vis.selectAll(".split-labels").remove();
+      this.text = this.vis.selectAll(".split-labels").data(this.labels);
+      this.text.enter().append("text").attr("x", function(d) {
+        return d.x;
+      }).attr("y", function(d) {
+        return d.y;
+      }).attr("class", 'split-labels').text(function(d) {
+        return d.text;
+      });
+      this.text.exit().remove();
       this.force.on("tick", (function(_this) {
         return function(e) {
           return _this.circles.each(_this.move_towards_target(e.alpha)).attr("cx", function(d) {

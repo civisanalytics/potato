@@ -20,6 +20,8 @@ class BubbleChart
     # http://stackoverflow.com/questions/9539294/adding-new-nodes-to-force-directed-layout
     @nodes = @force.nodes()
 
+    @labels = []
+
     @curr_filters = []
     this.create_filters()
 
@@ -132,6 +134,10 @@ class BubbleChart
       .on("click", (d) => this.split_by(d.value))
 
   split_by: (split) =>
+    # reset the @labels array
+    while @labels.length > 0
+      @labels.pop()
+
     curr_vals = []
 
     # first get number of unique values in the filter
@@ -150,18 +156,19 @@ class BubbleChart
     width_2 = @width - 250
     height_2 = @height - 130
 
-    # remove any currently present split labels
-    @vis.selectAll(".split-labels").remove()
-
+    # calculate positions for each filter group
     curr_vals.forEach (s, i) =>
       curr_vals[i] = { split: s, tarx: 50 + (0.5 + curr_col) * (width_2 / num_cols), tary: 70 + (0.5 + curr_row) * (height_2 / num_rows)}
 
-      # now do the text labels
-      @vis.append("text")
-        .attr("x", curr_vals[i].tarx - 50)
-        .attr("y", curr_vals[i].tary)
-        .attr("class", 'split-labels')
-        .text(s)
+      label = {
+        text: s
+        x: curr_vals[i].tarx
+        y: curr_vals[i].tary
+        tarx: curr_vals[i].tarx
+        tary: curr_vals[i].tary
+      }
+
+      @labels.push label
 
       curr_col++
       if curr_col >= num_cols
@@ -179,6 +186,7 @@ class BubbleChart
     this.update()
 
   update: () =>
+
     @circles = @vis.selectAll("circle")
       .data(@nodes, (d) -> d.id)
 
@@ -197,6 +205,21 @@ class BubbleChart
 
     # this is IMPORTANT otherwise removing nodes won't work
     @circles.exit().remove()
+
+    # remove any currently present split labels
+    @vis.selectAll(".split-labels").remove()
+
+    @text = @vis.selectAll(".split-labels")
+      .data(@labels)
+
+    # now do the text labels
+    @text.enter().append("text")
+      .attr("x", (d) -> d.x)
+      .attr("y", (d) -> d.y)
+      .attr("class", 'split-labels')
+      .text((d) -> d.text)
+
+    @text.exit().remove()
 
     @force.on "tick", (e) =>
       @circles.each(this.move_towards_target(e.alpha))
