@@ -9,6 +9,7 @@
       this.hide_details = __bind(this.hide_details, this);
       this.show_details = __bind(this.show_details, this);
       this.move_towards_target = __bind(this.move_towards_target, this);
+      this.adjust_label_pos = __bind(this.adjust_label_pos, this);
       this.update = __bind(this.update, this);
       this.split_by = __bind(this.split_by, this);
       this.split_buttons = __bind(this.split_buttons, this);
@@ -211,7 +212,8 @@
             tary: 70 + (0.5 + curr_row) * (height_2 / num_rows)
           };
           label = {
-            text: s,
+            val: s,
+            split: split,
             x: curr_vals[i].tarx,
             y: curr_vals[i].tary,
             tarx: curr_vals[i].tarx,
@@ -264,19 +266,51 @@
       }).attr("y", function(d) {
         return d.y;
       }).attr("class", 'split-labels').text(function(d) {
-        return d.text;
+        return d.val;
       });
       this.text.exit().remove();
       this.force.on("tick", (function(_this) {
         return function(e) {
-          return _this.circles.each(_this.move_towards_target(e.alpha)).attr("cx", function(d) {
+          _this.circles.each(_this.move_towards_target(e.alpha)).attr("cx", function(d) {
             return d.x;
           }).attr("cy", function(d) {
+            return d.y;
+          });
+          _this.text.each(_this.adjust_label_pos());
+          return _this.text.each(_this.move_towards_target(e.alpha)).attr("x", function(d) {
+            return d.x;
+          }).attr("y", function(d) {
             return d.y;
           });
         };
       })(this));
       return this.force.start();
+    };
+
+    BubbleChart.prototype.adjust_label_pos = function() {
+      return (function(_this) {
+        return function(d) {
+          var max_x, min_x, min_y;
+          min_y = 10000;
+          min_x = 10000;
+          max_x = 0;
+          _this.circles.each(function(c) {
+            if (d.val === c['values'][d.split]) {
+              if ((c.y - c.radius) < min_y) {
+                min_y = c.y - c.radius;
+              }
+              if ((c.x - c.radius) < min_x) {
+                min_x = c.x - c.radius;
+              }
+              if ((c.x + c.radius) > max_x) {
+                return max_x = c.x + c.radius;
+              }
+            }
+          });
+          d.tary = min_y - 10;
+          return d.tarx = (max_x - min_x) / 2.0 + min_x;
+        };
+      })(this);
     };
 
     BubbleChart.prototype.move_towards_target = function(alpha) {

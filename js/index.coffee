@@ -161,7 +161,8 @@ class BubbleChart
       curr_vals[i] = { split: s, tarx: 50 + (0.5 + curr_col) * (width_2 / num_cols), tary: 70 + (0.5 + curr_row) * (height_2 / num_rows)}
 
       label = {
-        text: s
+        val: s
+        split: split
         x: curr_vals[i].tarx
         y: curr_vals[i].tary
         tarx: curr_vals[i].tarx
@@ -217,7 +218,7 @@ class BubbleChart
       .attr("x", (d) -> d.x)
       .attr("y", (d) -> d.y)
       .attr("class", 'split-labels')
-      .text((d) -> d.text)
+      .text((d) -> d.val)
 
     @text.exit().remove()
 
@@ -225,8 +226,29 @@ class BubbleChart
       @circles.each(this.move_towards_target(e.alpha))
         .attr("cx", (d) -> d.x)
         .attr("cy", (d) -> d.y)
+      @text.each(this.adjust_label_pos())
+      @text.each(this.move_towards_target(e.alpha))
+        .attr("x", (d) -> d.x)
+        .attr("y", (d) -> d.y)
 
     @force.start()
+
+  adjust_label_pos: () =>
+    (d) =>
+      min_y = 10000
+      min_x = 10000
+      max_x = 0
+      @circles.each (c) =>
+        if d.val == c['values'][d.split]
+          if (c.y - c.radius) < min_y
+            min_y = (c.y - c.radius)
+          if (c.x - c.radius) < min_x
+            min_x = (c.x - c.radius)
+          if (c.x + c.radius) > max_x
+            max_x = (c.x + c.radius)
+
+      d.tary = min_y - 10
+      d.tarx = (max_x - min_x) / 2.0 + min_x
 
   # move node towards the target defined in (tarx,tary)
   move_towards_target: (alpha) =>
