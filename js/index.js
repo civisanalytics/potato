@@ -20,8 +20,8 @@
       this.add_filter = __bind(this.add_filter, this);
       this.create_filters = __bind(this.create_filters, this);
       this.data = data;
-      this.width = 1350;
-      this.height = 800;
+      this.width = $(window).width();
+      this.height = $(window).height() - 105;
       this.tooltip = CustomTooltip("player_tooltip");
       this.vis = d3.select("#vis").append("svg").attr("viewBox", "0 0 " + this.width + " " + this.height);
       this.force = d3.layout.force().gravity(-0.01).charge(function(d) {
@@ -201,15 +201,15 @@
       num_cols = curr_vals.length / (num_rows - 1);
       curr_row = 0;
       curr_col = 0;
-      width_2 = this.width - 260;
-      height_2 = this.height - 130;
+      width_2 = this.width * 0.7;
+      height_2 = this.height * 0.8;
       curr_vals.forEach((function(_this) {
         return function(s, i) {
           var label;
           curr_vals[i] = {
             split: s,
-            tarx: 60 + (0.5 + curr_col) * (width_2 / num_cols),
-            tary: 90 + (0.5 + curr_row) * (height_2 / num_rows)
+            tarx: (_this.width * 0.1) + (0.5 + curr_col) * (width_2 / num_cols),
+            tary: (_this.height * 0.2) + (0.5 + curr_row) * (height_2 / num_rows)
           };
           label = {
             val: s,

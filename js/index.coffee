@@ -1,15 +1,13 @@
 class BubbleChart
   constructor: (data) ->
     @data = data
-    @width = 1350
-    @height = 800
+    @width = $(window).width()
+    @height = $(window).height() - 105
 
     @tooltip = CustomTooltip("player_tooltip")
 
     @vis = d3.select("#vis").append("svg")
        .attr("viewBox", "0 0 #{@width} #{@height}")
-#      .attr("width", @width)
-#      .attr("height", @height)
 
     @force = d3.layout.force()
       .gravity(-0.01)
@@ -159,12 +157,12 @@ class BubbleChart
     curr_col = 0
 
     # padding because the clumps tend to float off the screen
-    width_2 = @width - 260
-    height_2 = @height - 130
+    width_2 = @width * 0.7
+    height_2 = @height * 0.8
 
     # calculate positions for each filter group
     curr_vals.forEach (s, i) =>
-      curr_vals[i] = { split: s, tarx: 60 + (0.5 + curr_col) * (width_2 / num_cols), tary: 90 + (0.5 + curr_row) * (height_2 / num_rows)}
+      curr_vals[i] = { split: s, tarx: (@width*0.1) + (0.5 + curr_col) * (width_2 / num_cols), tary: (@height*0.2) + (0.5 + curr_row) * (height_2 / num_rows)}
 
       label = {
         val: s
