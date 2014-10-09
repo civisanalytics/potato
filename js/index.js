@@ -405,7 +405,22 @@
     render_vis = function(csv) {
       return chart = new BubbleChart(csv);
     };
-    return d3.csv("data/football/players.csv", render_vis);
+    return $("#file-uploader").on('change', (function(_this) {
+      return function(e) {
+        var file, fileReader;
+        file = e.target.files[0];
+        if (file.type === 'text/csv') {
+          fileReader = new FileReader();
+          fileReader.onload = function(e) {
+            render_vis(d3.csv.parse(fileReader.result));
+            $("#filter-select-wrapper").css("visibility", "visible");
+            $("#modifier-buttons").css("visibility", "visible");
+            return $(".fileContainer").hide();
+          };
+          return fileReader.readAsText(file);
+        }
+      };
+    })(this));
   });
 
 }).call(this);

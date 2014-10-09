@@ -25,7 +25,6 @@ a {
   width: 100%;
   top: 0;
   padding: 15px;
-  background-color: #CCC;
 }
 
 .pull-left {
@@ -43,7 +42,7 @@ a {
 }
 
 button {
-  border: none;
+  border: 1px solid #ccc;
   outline: none;
   padding: 8px;
   border-radius: 5px;
@@ -60,14 +59,36 @@ button:hover {
   background-color: #eee;
 }
 
-.color-1 {
-  background-color: #AEC6CF;
+.fileContainer {
+  overflow: hidden;
+  position: fixed;
+  background: #CCC;
+  border-radius: .5em;
+  padding: 100px 0 100px;
+  top: 50%;
+  left: 50%;
+  width: 500px;
+  margin: -150px 0 0 -250px;
+  text-align: center;
+  font-size: 2em;
 }
-.color-2 {
-  background-color: #CAFFD8;
+
+.fileContainer:hover {
+  background-color: #ddd;
 }
-.color-3 {
-  background-color: #F7F9D0;
+
+.fileContainer [type=file] {
+  display: block;
+  font-size: 999px;
+  filter: alpha(opacity=0);
+  min-height: 100%;
+  min-width: 100%;
+  opacity: 0;
+  position: absolute;
+  right: 0;
+  text-align: right;
+  top: 0;
+  cursor: pointer;
 }
 
 #filter-select-wrapper {
