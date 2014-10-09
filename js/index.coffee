@@ -26,6 +26,7 @@ class BubbleChart
     this.create_filters()
 
     this.split_buttons()
+    this.color_buttons()
 
   create_filters: () =>
     @filter_names = []
@@ -81,7 +82,8 @@ class BubbleChart
       button.detach()
     )
     button_color = $.grep(@filter_names, (e) => e.value == field)[0].color
-    button.addClass(button_color)
+    #TODO temporarily remove the button colors
+#    button.addClass(button_color)
 
   add_nodes: (field, val) =>
     @data.forEach (d) =>
@@ -94,10 +96,10 @@ class BubbleChart
 
           node = {
             id: d.id
-            radius: 8
+            radius: 5
             name: d.name
             values: vals
-            color: d.team
+            color: "#000"
             x: Math.random() * 900
             y: Math.random() * 800
             tarx: @width/2.0
@@ -130,7 +132,8 @@ class BubbleChart
     d3.select("#split-buttons").selectAll('button').data(@filter_names).enter()
       .append("button")
       .text((d) -> d.value)
-      .attr("class", (d) -> d.color)
+      #TODO temporarily remove color
+#      .attr("class", (d) -> d.color)
       .on("click", (d) => this.split_by(d.value))
 
   split_by: (split) =>
@@ -158,7 +161,7 @@ class BubbleChart
 
     # calculate positions for each filter group
     curr_vals.forEach (s, i) =>
-      curr_vals[i] = { split: s, tarx: 50 + (0.5 + curr_col) * (width_2 / num_cols), tary: 70 + (0.5 + curr_row) * (height_2 / num_rows)}
+      curr_vals[i] = { split: s, tarx: 60 + (0.5 + curr_col) * (width_2 / num_cols), tary: 80 + (0.5 + curr_row) * (height_2 / num_rows)}
 
       label = {
         val: s
@@ -186,8 +189,65 @@ class BubbleChart
     # then update
     this.update()
 
-  update: () =>
+  color_buttons: () =>
+    d3.select("#color-buttons").selectAll('button').data(@filter_names).enter()
+      .append("button")
+      .text((d) -> d.value)
+      #TODO temporarily remove color
+#      .attr("class", (d) -> d.color)
+      .on("click", (d) => this.color_by(d.value))
 
+  color_by: (split) =>
+    # remove the current legend
+    d3.select("#color-legend").selectAll("*").remove()
+    curr_vals = []
+
+    # first get number of unique values in the filter
+    @circles.each (c) =>
+      if curr_vals.indexOf(c['values'][split]) < 0
+        curr_vals.push c['values'][split]
+
+    num_colors = curr_vals.length
+
+    colors = d3.scale.category10()
+    colors.domain(curr_vals)
+
+    console.log(colors.domain())
+
+    l_size = 30
+
+    # update the legend
+    legend = d3.select("#color-legend").append("svg:svg")
+      .attr("width", 100)
+      .attr("height", colors.domain().length * l_size)
+      .style("padding", "20px 0 0 20px")
+
+    g = legend.selectAll("g")
+      .data(colors.domain())
+      .enter().append("svg:g")
+
+    g.append("svg:rect")
+      .attr("y", (d, i) -> i * l_size)
+      .attr("rx", l_size * 0.5)
+      .attr("ry", l_size * 0.5)
+      .attr("width", l_size * 0.5)
+      .attr("height", l_size * 0.5)
+      .style("fill", (d) => colors(d))
+
+    g.append("text")
+      .attr("x", 20)
+      .attr("y", (d, i) -> i * l_size + 12)
+      .text((d) -> d)
+
+    # then update all circle colors appropriately
+    @circles.each (c) =>
+      curr_vals.forEach (s) =>
+        if s == c['values'][split]
+          c.color = String(colors(s))
+
+    @circles.attr("fill", (d) -> d.color)
+
+  update: () =>
     @circles = @vis.selectAll("circle")
       .data(@nodes, (d) -> d.id)
 
@@ -197,7 +257,8 @@ class BubbleChart
       .attr("r", 0)
       .attr("stroke-width", 3)
       .attr("id", (d) -> "bubble_#{d.id}")
-      .attr("class", (d) -> d.color.toLowerCase().replace(/\s/g, '_').replace('.',''))
+#      .attr("class", (d) -> d.color.toLowerCase().replace(/\s/g, '_').replace('.',''))
+      .attr("fill", (d) -> d.color)
       .on("mouseover", (d,i) -> that.show_details(d,i,this))
       .on("mouseout", (d,i) -> that.hide_details(d,i,this))
 

@@ -11,6 +11,8 @@
       this.move_towards_target = __bind(this.move_towards_target, this);
       this.adjust_label_pos = __bind(this.adjust_label_pos, this);
       this.update = __bind(this.update, this);
+      this.color_by = __bind(this.color_by, this);
+      this.color_buttons = __bind(this.color_buttons, this);
       this.split_by = __bind(this.split_by, this);
       this.split_buttons = __bind(this.split_buttons, this);
       this.remove_nodes = __bind(this.remove_nodes, this);
@@ -30,6 +32,7 @@
       this.curr_filters = [];
       this.create_filters();
       this.split_buttons();
+      this.color_buttons();
     }
 
     BubbleChart.prototype.create_filters = function() {
@@ -107,12 +110,11 @@
           return button.detach();
         };
       })(this));
-      button_color = $.grep(this.filter_names, (function(_this) {
+      return button_color = $.grep(this.filter_names, (function(_this) {
         return function(e) {
           return e.value === field;
         };
       })(this))[0].color;
-      return button.addClass(button_color);
     };
 
     BubbleChart.prototype.add_nodes = function(field, val) {
@@ -129,10 +131,10 @@
               });
               node = {
                 id: d.id,
-                radius: 8,
+                radius: 5,
                 name: d.name,
                 values: vals,
-                color: d.team,
+                color: "#000",
                 x: Math.random() * 900,
                 y: Math.random() * 800,
                 tarx: _this.width / 2.0,
@@ -175,8 +177,6 @@
     BubbleChart.prototype.split_buttons = function() {
       return d3.select("#split-buttons").selectAll('button').data(this.filter_names).enter().append("button").text(function(d) {
         return d.value;
-      }).attr("class", function(d) {
-        return d.color;
       }).on("click", (function(_this) {
         return function(d) {
           return _this.split_by(d.value);
@@ -208,8 +208,8 @@
           var label;
           curr_vals[i] = {
             split: s,
-            tarx: 50 + (0.5 + curr_col) * (width_2 / num_cols),
-            tary: 70 + (0.5 + curr_row) * (height_2 / num_rows)
+            tarx: 60 + (0.5 + curr_col) * (width_2 / num_cols),
+            tary: 80 + (0.5 + curr_row) * (height_2 / num_rows)
           };
           label = {
             val: s,
@@ -240,6 +240,60 @@
       return this.update();
     };
 
+    BubbleChart.prototype.color_buttons = function() {
+      return d3.select("#color-buttons").selectAll('button').data(this.filter_names).enter().append("button").text(function(d) {
+        return d.value;
+      }).on("click", (function(_this) {
+        return function(d) {
+          return _this.color_by(d.value);
+        };
+      })(this));
+    };
+
+    BubbleChart.prototype.color_by = function(split) {
+      var colors, curr_vals, g, l_size, legend, num_colors;
+      d3.select("#color-legend").selectAll("*").remove();
+      curr_vals = [];
+      this.circles.each((function(_this) {
+        return function(c) {
+          if (curr_vals.indexOf(c['values'][split]) < 0) {
+            return curr_vals.push(c['values'][split]);
+          }
+        };
+      })(this));
+      num_colors = curr_vals.length;
+      colors = d3.scale.category10();
+      colors.domain(curr_vals);
+      console.log(colors.domain());
+      l_size = 30;
+      legend = d3.select("#color-legend").append("svg:svg").attr("width", 100).attr("height", colors.domain().length * l_size).style("padding", "20px 0 0 20px");
+      g = legend.selectAll("g").data(colors.domain()).enter().append("svg:g");
+      g.append("svg:rect").attr("y", function(d, i) {
+        return i * l_size;
+      }).attr("rx", l_size * 0.5).attr("ry", l_size * 0.5).attr("width", l_size * 0.5).attr("height", l_size * 0.5).style("fill", (function(_this) {
+        return function(d) {
+          return colors(d);
+        };
+      })(this));
+      g.append("text").attr("x", 20).attr("y", function(d, i) {
+        return i * l_size + 12;
+      }).text(function(d) {
+        return d;
+      });
+      this.circles.each((function(_this) {
+        return function(c) {
+          return curr_vals.forEach(function(s) {
+            if (s === c['values'][split]) {
+              return c.color = String(colors(s));
+            }
+          });
+        };
+      })(this));
+      return this.circles.attr("fill", function(d) {
+        return d.color;
+      });
+    };
+
     BubbleChart.prototype.update = function() {
       var that;
       this.circles = this.vis.selectAll("circle").data(this.nodes, function(d) {
@@ -248,8 +302,8 @@
       that = this;
       this.circles.enter().append("circle").attr("r", 0).attr("stroke-width", 3).attr("id", function(d) {
         return "bubble_" + d.id;
-      }).attr("class", function(d) {
-        return d.color.toLowerCase().replace(/\s/g, '_').replace('.', '');
+      }).attr("fill", function(d) {
+        return d.color;
       }).on("mouseover", function(d, i) {
         return that.show_details(d, i, this);
       }).on("mouseout", function(d, i) {

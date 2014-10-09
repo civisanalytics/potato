@@ -84,6 +84,10 @@ button:hover {
   margin: 5px 0 0 0;
 }
 
+.marker {
+  font-size: 3em;
+}
+
 .split-labels {
   fill: #CCC;
   font-size: 1.8em;
@@ -111,6 +115,10 @@ button:hover {
 .tooltip-name {
   text-align: center;
   margin-bottom: 5px;
+}
+
+#color-legend {
+  position:absolute;
 }
 
 
