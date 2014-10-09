@@ -36,20 +36,20 @@ class BubbleChart
         @filter_names.push {value: d, color: 'color-' + i }
         i += 1
 
-    filters = []
+    @filters = []
 
     # populate the filters from the dataset
     @data.forEach (d) =>
       $.each d, (k, v) =>
         if k != 'id' && k != 'name'
           filter_obj = {filter: k, value: v}
-          filter_exists = $.grep filters, (e) =>
+          filter_exists = $.grep @filters, (e) =>
             return e.filter == k && e.value == v
           if filter_exists.length == 0
-            filters.push(filter_obj)
+            @filters.push(filter_obj)
 
     # add the filters to the select
-    d3.select("#filter-select").selectAll('option').data(filters).enter()
+    d3.select("#filter-select").selectAll('option').data(@filters).enter()
       .append("option")
       # unfortunately value is the only thing passed to select2
       # so we have to hack together this string param
@@ -67,6 +67,9 @@ class BubbleChart
           val = e.added.id.split(':')
           this.add_nodes(val[0], val[1])
           this.add_filter(val[0], val[1])
+
+#          @filters = $.grep(@filters, (e) => e.filter != val[0] || e.value != val[1])
+#          d3.select("#filter-select").selectAll('option').data(@filters).exit().remove()
     )
 
   add_filter: (field, val) =>
