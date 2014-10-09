@@ -218,7 +218,7 @@ class BubbleChart
 
     # update the legend
     legend = d3.select("#color-legend").append("svg:svg")
-      .attr("width", 100)
+      .attr("width", 150)
       .attr("height", colors.domain().length * l_size)
       .style("padding", "20px 0 0 20px")
 

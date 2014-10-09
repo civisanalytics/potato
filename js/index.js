@@ -266,7 +266,7 @@
       colors.domain(curr_vals);
       console.log(colors.domain());
       l_size = 30;
-      legend = d3.select("#color-legend").append("svg:svg").attr("width", 100).attr("height", colors.domain().length * l_size).style("padding", "20px 0 0 20px");
+      legend = d3.select("#color-legend").append("svg:svg").attr("width", 150).attr("height", colors.domain().length * l_size).style("padding", "20px 0 0 20px");
       g = legend.selectAll("g").data(colors.domain()).enter().append("svg:g");
       g.append("svg:rect").attr("y", function(d, i) {
         return i * l_size;
