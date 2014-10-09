@@ -73,11 +73,22 @@ button:hover {
 #filter-select-wrapper {
   display: inline-block;
   margin: 5px 15px 0 0;
+  vertical-align: top;
+  visibility: hidden;
 }
 
 #filter-select-buttons {
   display: inline-block;
   vertical-align: top;
+}
+
+#modifier-buttons {
+  display: inline-block;
+  visibility: hidden;
+}
+
+#s2id_filter-select {
+  display: block;
 }
 
 #split-buttons {

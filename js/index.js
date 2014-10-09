@@ -36,7 +36,7 @@
     }
 
     BubbleChart.prototype.create_filters = function() {
-      var filters, i;
+      var i;
       this.filter_names = [];
       i = 1;
       $.each(this.data[0], (function(_this) {
@@ -50,7 +50,7 @@
           }
         };
       })(this));
-      filters = [];
+      this.filters = [];
       this.data.forEach((function(_this) {
         return function(d) {
           return $.each(d, function(k, v) {
@@ -60,17 +60,17 @@
                 filter: k,
                 value: v
               };
-              filter_exists = $.grep(filters, function(e) {
+              filter_exists = $.grep(_this.filters, function(e) {
                 return e.filter === k && e.value === v;
               });
               if (filter_exists.length === 0) {
-                return filters.push(filter_obj);
+                return _this.filters.push(filter_obj);
               }
             }
           });
         };
       })(this));
-      d3.select("#filter-select").selectAll('option').data(filters).enter().append("option").attr("value", (function(_this) {
+      d3.select("#filter-select").selectAll('option').data(this.filters).enter().append("option").attr("value", (function(_this) {
         return function(d) {
           return d.filter + ":" + d.value;
         };
@@ -78,7 +78,7 @@
         return d.value;
       });
       return $("#filter-select").select2({
-        placeholder: 'Type here to get started',
+        placeholder: 'Select a filter',
         width: '300px',
         dropdownCssClass: "customdrop"
       }).on("change", (function(_this) {
@@ -201,7 +201,7 @@
       num_cols = curr_vals.length / (num_rows - 1);
       curr_row = 0;
       curr_col = 0;
-      width_2 = this.width - 250;
+      width_2 = this.width - 260;
       height_2 = this.height - 130;
       curr_vals.forEach((function(_this) {
         return function(s, i) {
@@ -209,7 +209,7 @@
           curr_vals[i] = {
             split: s,
             tarx: 60 + (0.5 + curr_col) * (width_2 / num_cols),
-            tary: 80 + (0.5 + curr_row) * (height_2 / num_rows)
+            tary: 90 + (0.5 + curr_row) * (height_2 / num_rows)
           };
           label = {
             val: s,

@@ -58,7 +58,7 @@ class BubbleChart
 
     # create the actual select2 obj and add a change listener
     $("#filter-select").select2({
-      placeholder: 'Type here to get started',
+      placeholder: 'Select a filter',
       width: '300px',
       dropdownCssClass: "customdrop"
     }).on("change", (e) =>
@@ -156,12 +156,12 @@ class BubbleChart
     curr_col = 0
 
     # padding because the clumps tend to float off the screen
-    width_2 = @width - 250
+    width_2 = @width - 260
     height_2 = @height - 130
 
     # calculate positions for each filter group
     curr_vals.forEach (s, i) =>
-      curr_vals[i] = { split: s, tarx: 60 + (0.5 + curr_col) * (width_2 / num_cols), tary: 80 + (0.5 + curr_row) * (height_2 / num_rows)}
+      curr_vals[i] = { split: s, tarx: 60 + (0.5 + curr_col) * (width_2 / num_cols), tary: 90 + (0.5 + curr_row) * (height_2 / num_rows)}
 
       label = {
         val: s
