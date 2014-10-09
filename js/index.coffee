@@ -337,16 +337,4 @@ $ ->
   render_vis = (csv) ->
     chart = new BubbleChart csv
 
-  d3.csv "data/players.csv", render_vis
-
-  render_conf = (csv) ->
-    conferences = []
-    d3.csv.parseRows(csv).forEach (r) =>
-      conferences.push { name: r[0], teams: r.slice(1) }
-    d3.select("#school-select-wrapper").selectAll('button').data(conferences).enter()
-      .append("button")
-      .attr("value", (d) -> d.name)
-      .text((d) -> d.name)
-      .on("click", (d) -> $("#school-select").select2('val', d.teams, true))
-
-  d3.text "data/conferences.csv", render_conf
+  d3.csv "data/football/players.csv", render_vis
