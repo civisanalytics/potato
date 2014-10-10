@@ -144,9 +144,13 @@ class BubbleChart
     d3.select("#split-buttons").selectAll('button').data(@filter_names).enter()
       .append("button")
       .text((d) -> d.value)
-      #TODO temporarily remove color
-#      .attr("class", (d) -> d.color)
-      .on("click", (d) => this.split_by(d.value))
+      .attr("class", 'split-button')
+      .attr("id", (d) -> 'split-' + d.value)
+      .on("click", (d) =>
+        $(".split-button").removeClass('active')
+        $("#split-"+d.value).addClass('active')
+        this.split_by(d.value)
+      )
 
   split_by: (split) =>
     # reset the @labels array
@@ -206,9 +210,13 @@ class BubbleChart
     d3.select("#color-buttons").selectAll('button').data(@filter_names).enter()
       .append("button")
       .text((d) -> d.value)
-      #TODO temporarily remove color
-#      .attr("class", (d) -> d.color)
-      .on("click", (d) => this.color_by(d.value))
+      .attr("class", 'color-button')
+      .attr("id", (d) -> 'color-' + d.value)
+      .on("click", (d) =>
+        $(".color-button").removeClass('active')
+        $("#color-"+d.value).addClass('active')
+        this.color_by(d.value)
+      )
 
   color_by: (split) =>
     # remove the current legend

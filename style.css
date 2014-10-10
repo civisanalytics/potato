@@ -59,6 +59,17 @@ button:hover {
   background-color: #eee;
 }
 
+button.active {
+  background-color: #aaa;
+}
+
+.split-button {
+  margin-right: 5px;
+}
+.color-button {
+  margin-right: 5px;
+}
+
 .fileContainer {
   position: fixed;
   background: #CCC;
@@ -117,7 +128,7 @@ button:hover {
 }
 
 #split-buttons {
-  margin: 5px 0 0 7px;
+  margin: 5px 0 5px 7px;
 }
 
 .marker {

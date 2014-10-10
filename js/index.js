@@ -187,8 +187,12 @@
       $("#split-buttons").text("Split By: ");
       return d3.select("#split-buttons").selectAll('button').data(this.filter_names).enter().append("button").text(function(d) {
         return d.value;
+      }).attr("class", 'split-button').attr("id", function(d) {
+        return 'split-' + d.value;
       }).on("click", (function(_this) {
         return function(d) {
+          $(".split-button").removeClass('active');
+          $("#split-" + d.value).addClass('active');
           return _this.split_by(d.value);
         };
       })(this));
@@ -254,8 +258,12 @@
       $("#color-buttons").text("Color By: ");
       return d3.select("#color-buttons").selectAll('button').data(this.filter_names).enter().append("button").text(function(d) {
         return d.value;
+      }).attr("class", 'color-button').attr("id", function(d) {
+        return 'color-' + d.value;
       }).on("click", (function(_this) {
         return function(d) {
+          $(".color-button").removeClass('active');
+          $("#color-" + d.value).addClass('active');
           return _this.color_by(d.value);
         };
       })(this));
