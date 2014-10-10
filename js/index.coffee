@@ -24,7 +24,8 @@ class BubbleChart
     this.create_filters()
 
     this.split_buttons()
-    this.color_buttons()
+    if data.length != 2886
+      this.color_buttons()
 
   create_filters: () =>
     @filter_names = []
@@ -95,12 +96,21 @@ class BubbleChart
           $.each @filter_names, (k, f) =>
             vals[f.value] = d[f.value]
 
+          curr_class = ''
+          curr_r = 5
+
+          # TODO temp hack to allow for NFL dataset
+          if d['team']
+            curr_class = d.team
+            curr_r = 8
+
           node = {
             id: d.id
-            radius: 5
+            radius: curr_r
             name: d.name
             values: vals
             color: "#000"
+            class: curr_class
             x: Math.random() * 900
             y: Math.random() * 800
             tarx: @width/2.0
@@ -130,6 +140,7 @@ class BubbleChart
     this.update()
 
   split_buttons: () =>
+    $("#split-buttons").text("Split By: ")
     d3.select("#split-buttons").selectAll('button').data(@filter_names).enter()
       .append("button")
       .text((d) -> d.value)
@@ -191,6 +202,7 @@ class BubbleChart
     this.update()
 
   color_buttons: () =>
+    $("#color-buttons").text("Color By: ")
     d3.select("#color-buttons").selectAll('button').data(@filter_names).enter()
       .append("button")
       .text((d) -> d.value)
@@ -258,10 +270,15 @@ class BubbleChart
       .attr("r", 0)
       .attr("stroke-width", 3)
       .attr("id", (d) -> "bubble_#{d.id}")
-#      .attr("class", (d) -> d.color.toLowerCase().replace(/\s/g, '_').replace('.',''))
       .attr("fill", (d) -> d.color)
       .on("mouseover", (d,i) -> that.show_details(d,i,this))
       .on("mouseout", (d,i) -> that.hide_details(d,i,this))
+      .attr("class", (d) ->
+        if d.class.length > 0
+          d.class.toLowerCase().replace(/\s/g, '_').replace('.','')
+        else
+          ''
+      )
 
     # Fancy transition to make bubbles appear to 'grow in'
     @circles.transition().duration(2000).attr("r", (d) -> d.radius)

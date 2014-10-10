@@ -32,7 +32,9 @@
       this.curr_filters = [];
       this.create_filters();
       this.split_buttons();
-      this.color_buttons();
+      if (data.length !== 2886) {
+        this.color_buttons();
+      }
     }
 
     BubbleChart.prototype.create_filters = function() {
@@ -120,7 +122,7 @@
     BubbleChart.prototype.add_nodes = function(field, val) {
       this.data.forEach((function(_this) {
         return function(d) {
-          var node, vals;
+          var curr_class, curr_r, node, vals;
           if (d[field] === val) {
             if ($.grep(_this.nodes, function(e) {
               return e.id === d.id;
@@ -129,12 +131,19 @@
               $.each(_this.filter_names, function(k, f) {
                 return vals[f.value] = d[f.value];
               });
+              curr_class = '';
+              curr_r = 5;
+              if (d['team']) {
+                curr_class = d.team;
+                curr_r = 8;
+              }
               node = {
                 id: d.id,
-                radius: 5,
+                radius: curr_r,
                 name: d.name,
                 values: vals,
                 color: "#000",
+                "class": curr_class,
                 x: Math.random() * 900,
                 y: Math.random() * 800,
                 tarx: _this.width / 2.0,
@@ -175,6 +184,7 @@
     };
 
     BubbleChart.prototype.split_buttons = function() {
+      $("#split-buttons").text("Split By: ");
       return d3.select("#split-buttons").selectAll('button').data(this.filter_names).enter().append("button").text(function(d) {
         return d.value;
       }).on("click", (function(_this) {
@@ -241,6 +251,7 @@
     };
 
     BubbleChart.prototype.color_buttons = function() {
+      $("#color-buttons").text("Color By: ");
       return d3.select("#color-buttons").selectAll('button').data(this.filter_names).enter().append("button").text(function(d) {
         return d.value;
       }).on("click", (function(_this) {
@@ -308,6 +319,12 @@
         return that.show_details(d, i, this);
       }).on("mouseout", function(d, i) {
         return that.hide_details(d, i, this);
+      }).attr("class", function(d) {
+        if (d["class"].length > 0) {
+          return d["class"].toLowerCase().replace(/\s/g, '_').replace('.', '');
+        } else {
+          return '';
+        }
       });
       this.circles.transition().duration(2000).attr("r", function(d) {
         return d.radius;
