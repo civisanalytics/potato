@@ -403,22 +403,27 @@
     var chart, render_vis;
     chart = null;
     render_vis = function(csv) {
+      $("#filter-select-wrapper").css("visibility", "visible");
+      $("#modifier-buttons").css("visibility", "visible");
+      $(".fileContainer").hide();
       return chart = new BubbleChart(csv);
     };
-    return $("#file-uploader").on('change', (function(_this) {
+    $("#file-uploader").on('change', (function(_this) {
       return function(e) {
         var file, fileReader;
         file = e.target.files[0];
         if (file.type === 'text/csv') {
           fileReader = new FileReader();
           fileReader.onload = function(e) {
-            render_vis(d3.csv.parse(fileReader.result));
-            $("#filter-select-wrapper").css("visibility", "visible");
-            $("#modifier-buttons").css("visibility", "visible");
-            return $(".fileContainer").hide();
+            return render_vis(d3.csv.parse(fileReader.result));
           };
           return fileReader.readAsText(file);
         }
+      };
+    })(this));
+    return $("#nfl-dataset").on('click', (function(_this) {
+      return function(e) {
+        return d3.csv("data/football/players.csv", render_vis);
       };
     })(this));
   });

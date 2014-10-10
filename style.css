@@ -60,7 +60,6 @@ button:hover {
 }
 
 .fileContainer {
-  overflow: hidden;
   position: fixed;
   background: #CCC;
   border-radius: .5em;
@@ -89,6 +88,11 @@ button:hover {
   text-align: right;
   top: 0;
   cursor: pointer;
+}
+
+#nfl-dataset {
+  position: relative;
+  top: 150px;
 }
 
 #filter-select-wrapper {

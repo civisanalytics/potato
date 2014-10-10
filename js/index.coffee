@@ -336,6 +336,9 @@ $ ->
   chart = null
 
   render_vis = (csv) ->
+    $("#filter-select-wrapper").css("visibility", "visible")
+    $("#modifier-buttons").css("visibility", "visible")
+    $(".fileContainer").hide()
     chart = new BubbleChart csv
 
   $("#file-uploader").on 'change', (e) =>
@@ -345,8 +348,7 @@ $ ->
       fileReader = new FileReader()
       fileReader.onload = (e) =>
         render_vis(d3.csv.parse(fileReader.result))
-        $("#filter-select-wrapper").css("visibility", "visible")
-        $("#modifier-buttons").css("visibility", "visible")
-        $(".fileContainer").hide()
-
       fileReader.readAsText(file)
+
+  $("#nfl-dataset").on 'click', (e) =>
+    d3.csv "data/football/players.csv", render_vis
