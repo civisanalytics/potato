@@ -140,7 +140,7 @@ class BubbleChart
     this.update()
 
   split_buttons: () =>
-    $("#split-buttons").text("Split By: ")
+    $("#modifier-buttons").append("<div id='split-buttons'>Split By: </div>")
     d3.select("#split-buttons").selectAll('button').data(@filter_names).enter()
       .append("button")
       .text((d) -> d.value)
@@ -206,7 +206,7 @@ class BubbleChart
     this.update()
 
   color_buttons: () =>
-    $("#color-buttons").text("Color By: ")
+    $("#modifier-buttons").append("<div id='color-buttons'>Color By: </div>")
     d3.select("#color-buttons").selectAll('button').data(@filter_names).enter()
       .append("button")
       .text((d) -> d.value)

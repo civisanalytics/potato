@@ -136,7 +136,7 @@ button.active {
 }
 
 .split-labels {
-  fill: #CCC;
+  fill: #999;
   font-size: 1.8em;
   z-index: -1;
   text-anchor: middle;

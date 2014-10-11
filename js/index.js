@@ -184,7 +184,7 @@
     };
 
     BubbleChart.prototype.split_buttons = function() {
-      $("#split-buttons").text("Split By: ");
+      $("#modifier-buttons").append("<div id='split-buttons'>Split By: </div>");
       return d3.select("#split-buttons").selectAll('button').data(this.filter_names).enter().append("button").text(function(d) {
         return d.value;
       }).attr("class", 'split-button').attr("id", function(d) {
@@ -255,7 +255,7 @@
     };
 
     BubbleChart.prototype.color_buttons = function() {
-      $("#color-buttons").text("Color By: ");
+      $("#modifier-buttons").append("<div id='color-buttons'>Color By: </div>");
       return d3.select("#color-buttons").selectAll('button').data(this.filter_names).enter().append("button").text(function(d) {
         return d.value;
       }).attr("class", 'color-button').attr("id", function(d) {
