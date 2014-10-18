@@ -48,11 +48,11 @@ class BubbleChart
           if filter_exists.length == 0
             @filters.push(filter_obj)
 
-    b_filters = new Bloodhound({
+    b_filters = new Bloodhound {
       datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value')
       queryTokenizer: Bloodhound.tokenizers.whitespace
       local: @filters
-    });
+    }
 
     # kicks off the loading/processing of `local` and `prefetch`
     b_filters.initialize();
@@ -66,10 +66,11 @@ class BubbleChart
       name: 'filters'
       displayKey: 'value'
       source: b_filters.ttAdapter()
-    }).on('typeahead:selected typeahead:autocompleted', (e, d) =>
-      this.add_nodes(d['filter'], d['value'])
+      #      templates: {
+        #        suggestion: Handlebars.compile('{{value}} <span class="tt-suggestion-filter">{{filter}}</span>')
+      #}
+    }).on 'typeahead:selected typeahead:autocompleted', (e, d) =>
       this.add_filter(d['filter'], d['value'])
-    )
 
   add_filter: (field, val) =>
     @curr_filters.push({filter: field, value: val})
@@ -83,6 +84,7 @@ class BubbleChart
       this.remove_nodes(field, val)
       button.detach()
     )
+    this.add_nodes(field, val)
 
   add_nodes: (field, val) =>
     @data.forEach (d) =>
@@ -238,9 +240,6 @@ class BubbleChart
     colors = d3.scale.category10()
     colors.domain(curr_vals)
 
-    this.update_color_legend(colors)
-
-  update_color_legend: (colors) =>
     # remove the current legend
     d3.select("#color-legend").selectAll("*").remove()
 

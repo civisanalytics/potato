@@ -135,13 +135,19 @@ button.active {
 }
 
 .tt-suggestion {
-  line-height: 5px;
+  line-height: 4px;
   padding: 1px 10px;
 }
 
 .tt-suggestion.tt-cursor {
-  background-color: #ccc;
+  cursor: pointer;
+  background-color: #eee;
 }
+/*
+.tt-suggestion-filter {
+  color: #ccc;
+}
+*/
 
 #filter-select-buttons {
   display: inline-block;

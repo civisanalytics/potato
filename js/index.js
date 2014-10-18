@@ -11,7 +11,6 @@
       this.move_towards_target = __bind(this.move_towards_target, this);
       this.adjust_label_pos = __bind(this.adjust_label_pos, this);
       this.update = __bind(this.update, this);
-      this.update_color_legend = __bind(this.update_color_legend, this);
       this.color_by = __bind(this.color_by, this);
       this.color_buttons = __bind(this.color_buttons, this);
       this.split_by = __bind(this.split_by, this);
@@ -87,7 +86,6 @@
         source: b_filters.ttAdapter()
       }).on('typeahead:selected typeahead:autocompleted', (function(_this) {
         return function(e, d) {
-          _this.add_nodes(d['filter'], d['value']);
           return _this.add_filter(d['filter'], d['value']);
         };
       })(this));
@@ -102,12 +100,13 @@
       rand = String(Math.random()).substring(2, 12);
       $("#filter-select-buttons").append("<button id='" + rand + "'>" + val + "</button>");
       button = $("#" + rand);
-      return button.on("click", (function(_this) {
+      button.on("click", (function(_this) {
         return function(e) {
           _this.remove_nodes(field, val);
           return button.detach();
         };
       })(this));
+      return this.add_nodes(field, val);
     };
 
     BubbleChart.prototype.add_nodes = function(field, val) {
@@ -271,7 +270,7 @@
     };
 
     BubbleChart.prototype.color_by = function(split) {
-      var colors, curr_vals, num_colors;
+      var colors, curr_vals, g, l_size, legend, num_colors;
       curr_vals = [];
       this.circles.each((function(_this) {
         return function(c) {
@@ -283,11 +282,6 @@
       num_colors = curr_vals.length;
       colors = d3.scale.category10();
       colors.domain(curr_vals);
-      return this.update_color_legend(colors);
-    };
-
-    BubbleChart.prototype.update_color_legend = function(colors) {
-      var g, l_size, legend;
       d3.select("#color-legend").selectAll("*").remove();
       l_size = 30;
       legend = d3.select("#color-legend").append("svg").attr("width", 150).attr("height", colors.domain().length * l_size).style("padding", "20px 0 0 20px");
