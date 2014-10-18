@@ -77,15 +77,12 @@ class BubbleChart
   add_filter: (field, val) =>
     @curr_filters.push({filter: field, value: val})
 
-    # until I can figure out how to get the id based on the val
-    rand = String(Math.random()).substring(2,12)
-    $("#filter-select-buttons").append("<button id='"+rand+"'>"+val+"</button>")
-
-    button = $("#"+rand)
-    button.on("click", (e) =>
+    filter_button = $("<button>"+val+"</button>")
+    filter_button.on("click", (e) =>
       this.remove_nodes(field, val)
-      button.detach()
+      filter_button.detach()
     )
+    $("#filter-select-buttons").append(filter_button)
     this.add_nodes(field, val)
 
   add_nodes: (field, val) =>
@@ -110,7 +107,7 @@ class BubbleChart
             radius: curr_r
             name: d.name
             values: vals
-            color: "#000"
+            color: "#777"
             class: curr_class
             x: Math.random() * 900
             y: Math.random() * 800
@@ -178,7 +175,7 @@ class BubbleChart
     curr_col = 0
 
     # padding because the clumps tend to float off the screen
-    width_2 = @width * 0.7
+    width_2 = @width * 0.75
     height_2 = @height * 0.8
 
     # calculate positions for each filter group

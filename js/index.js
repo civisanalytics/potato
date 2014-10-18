@@ -93,20 +93,19 @@
     };
 
     BubbleChart.prototype.add_filter = function(field, val) {
-      var button, rand;
+      var filter_button;
       this.curr_filters.push({
         filter: field,
         value: val
       });
-      rand = String(Math.random()).substring(2, 12);
-      $("#filter-select-buttons").append("<button id='" + rand + "'>" + val + "</button>");
-      button = $("#" + rand);
-      button.on("click", (function(_this) {
+      filter_button = $("<button>" + val + "</button>");
+      filter_button.on("click", (function(_this) {
         return function(e) {
           _this.remove_nodes(field, val);
-          return button.detach();
+          return filter_button.detach();
         };
       })(this));
+      $("#filter-select-buttons").append(filter_button);
       return this.add_nodes(field, val);
     };
 
@@ -134,7 +133,7 @@
                 radius: curr_r,
                 name: d.name,
                 values: vals,
-                color: "#000",
+                color: "#777",
                 "class": curr_class,
                 x: Math.random() * 900,
                 y: Math.random() * 800,
@@ -211,7 +210,7 @@
       num_cols = curr_vals.length / (num_rows - 1);
       curr_row = 0;
       curr_col = 0;
-      width_2 = this.width * 0.7;
+      width_2 = this.width * 0.75;
       height_2 = this.height * 0.8;
       curr_vals.forEach((function(_this) {
         return function(s, i) {

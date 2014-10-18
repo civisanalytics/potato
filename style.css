@@ -53,6 +53,7 @@ button {
   -moz-transition: background 0.2s ease-easein-out;
   -ms-transition: background 0.2s ease-in-out;
   -o-transition: borderackground 0.2s ease-in-out;
+  margin-right: 5px;
 }
 
 button:hover {
