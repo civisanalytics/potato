@@ -79,14 +79,16 @@
       return $('#filter-select .typeahead').typeahead({
         hint: true,
         highlight: true,
-        minLength: 1
+        minLength: 1,
+        autoselect: true
       }, {
         name: 'filters',
         displayKey: 'value',
         source: b_filters.ttAdapter()
       }).on('typeahead:selected typeahead:autocompleted', (function(_this) {
         return function(e, d) {
-          return _this.add_filter(d['filter'], d['value']);
+          _this.add_filter(d['filter'], d['value']);
+          return $('.typeahead').typeahead('val', '');
         };
       })(this));
     };

@@ -61,6 +61,7 @@ class BubbleChart
       hint: true
       highlight: true
       minLength: 1
+      autoselect: true
     },
     {
       name: 'filters'
@@ -71,6 +72,7 @@ class BubbleChart
       #}
     }).on 'typeahead:selected typeahead:autocompleted', (e, d) =>
       this.add_filter(d['filter'], d['value'])
+      $('.typeahead').typeahead('val', '')
 
   add_filter: (field, val) =>
     @curr_filters.push({filter: field, value: val})
