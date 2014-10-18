@@ -38,53 +38,62 @@
     }
 
     BubbleChart.prototype.create_filters = function() {
-      var b_filters;
+      var b_groups;
+      this.filters = {};
       this.filter_names = [];
       $.each(this.data[0], (function(_this) {
         return function(d) {
           if (d !== 'id' && d !== 'name') {
-            return _this.filter_names.push({
+            _this.filter_names.push({
               value: d
             });
+            return _this.filters[d] = [];
           }
         };
       })(this));
-      this.filters = [];
       this.data.forEach((function(_this) {
         return function(d) {
           return $.each(d, function(k, v) {
-            var filter_exists, filter_obj;
+            var filter_exists;
             if (k !== 'id' && k !== 'name') {
-              filter_obj = {
-                filter: k,
-                value: v
-              };
-              filter_exists = $.grep(_this.filters, function(e) {
+              filter_exists = $.grep(_this.filters[k], function(e) {
                 return e.filter === k && e.value === v;
               });
               if (filter_exists.length === 0) {
-                return _this.filters.push(filter_obj);
+                return _this.filters[k].push({
+                  filter: k,
+                  value: v
+                });
               }
             }
           });
         };
       })(this));
-      b_filters = new Bloodhound({
-        datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
-        queryTokenizer: Bloodhound.tokenizers.whitespace,
-        local: this.filters
-      });
-      b_filters.initialize();
+      b_groups = [];
+      $.each(this.filters, (function(_this) {
+        return function(k, v) {
+          var b_group;
+          b_group = new Bloodhound({
+            datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
+            queryTokenizer: Bloodhound.tokenizers.whitespace,
+            local: v
+          });
+          b_group.initialize();
+          return b_groups.push({
+            name: k,
+            displayKey: 'value',
+            source: b_group.ttAdapter(),
+            templates: {
+              header: '<h3 class="filter-header">' + k + '</h3>'
+            }
+          });
+        };
+      })(this));
       return $('#filter-select .typeahead').typeahead({
         hint: true,
-        highlight: true,
         minLength: 1,
         autoselect: true
-      }, {
-        name: 'filters',
-        displayKey: 'value',
-        source: b_filters.ttAdapter()
-      }).on('typeahead:selected typeahead:autocompleted', (function(_this) {
+      }, b_groups).on('typeahead:selected typeahead:autocompleted', (function(_this) {
         return function(e, d) {
           _this.add_filter(d['filter'], d['value']);
           return $('.typeahead').typeahead('val', '');

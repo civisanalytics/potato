@@ -29,48 +29,51 @@ class BubbleChart
 
   # the logic behind taking the csv and determining what the categorical data is
   create_filters: () =>
+    @filters = {}
     @filter_names = []
     $.each @data[0], (d) =>
       # columns named id or name are treated specially
       # TODO, this is for the nfl data set mostly and probably a bad idea?
       if d != 'id' && d != 'name'
         @filter_names.push {value: d}
-
-    @filters = []
+        @filters[d] = []
 
     # populate the filters from the dataset
     @data.forEach (d) =>
       $.each d, (k, v) =>
         if k != 'id' && k != 'name'
-          filter_obj = {filter: k, value: v}
-          filter_exists = $.grep @filters, (e) =>
+          filter_exists = $.grep @filters[k], (e) =>
             return e.filter == k && e.value == v
           if filter_exists.length == 0
-            @filters.push(filter_obj)
+            @filters[k].push({filter: k, value: v})
 
-    b_filters = new Bloodhound {
-      datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value')
-      queryTokenizer: Bloodhound.tokenizers.whitespace
-      local: @filters
-    }
+    b_groups = []
 
-    # kicks off the loading/processing of `local` and `prefetch`
-    b_filters.initialize();
+    $.each @filters, (k, v) =>
+
+      b_group = new Bloodhound {
+        datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value')
+        queryTokenizer: Bloodhound.tokenizers.whitespace
+        local: v
+      }
+
+      # kicks off the loading/processing of `local` and `prefetch`
+      b_group.initialize();
+
+      b_groups.push({
+        name: k
+        displayKey: 'value'
+        source: b_group.ttAdapter()
+        templates: {
+          header: '<h3 class="filter-header">'+k+'</h3>'
+        }
+      })
 
     $('#filter-select .typeahead').typeahead({
       hint: true
-      highlight: true
       minLength: 1
       autoselect: true
-    },
-    {
-      name: 'filters'
-      displayKey: 'value'
-      source: b_filters.ttAdapter()
-      #      templates: {
-        #        suggestion: Handlebars.compile('{{value}} <span class="tt-suggestion-filter">{{filter}}</span>')
-      #}
-    }).on 'typeahead:selected typeahead:autocompleted', (e, d) =>
+    }, b_groups).on 'typeahead:selected typeahead:autocompleted', (e, d) =>
       this.add_filter(d['filter'], d['value'])
       $('.typeahead').typeahead('val', '')
 

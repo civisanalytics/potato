@@ -136,13 +136,23 @@ button.active {
 }
 
 .tt-suggestion {
-  line-height: 4px;
+  line-height: 3px;
   padding: 1px 10px;
 }
 
 .tt-suggestion.tt-cursor {
   cursor: pointer;
   background-color: #eee;
+}
+
+.filter-header {
+  display:inline-block;
+  cursor: default;
+  color: #ccc;
+  font-weight: normal;
+  margin: 10px 0 0 0;
+  padding: 0 5px 0 5px;
+
 }
 /*
 .tt-suggestion-filter {
