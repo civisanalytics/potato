@@ -15,7 +15,6 @@
       this.color_buttons = __bind(this.color_buttons, this);
       this.split_by = __bind(this.split_by, this);
       this.split_buttons = __bind(this.split_buttons, this);
-      this.reset_splits = __bind(this.reset_splits, this);
       this.remove_nodes = __bind(this.remove_nodes, this);
       this.add_nodes = __bind(this.add_nodes, this);
       this.add_filter = __bind(this.add_filter, this);
@@ -112,6 +111,7 @@
     };
 
     BubbleChart.prototype.add_nodes = function(field, val) {
+      var split_id;
       this.data.forEach((function(_this) {
         return function(d) {
           var curr_class, curr_r, node, vals;
@@ -146,7 +146,11 @@
           }
         };
       })(this));
-      return this.update();
+      this.update();
+      split_id = $(".split-button.active").attr('id');
+      if (split_id !== void 0) {
+        return this.split_by(split_id.split('-')[1]);
+      }
     };
 
     BubbleChart.prototype.remove_nodes = function(field, val) {
@@ -172,17 +176,7 @@
           }
         }
       }
-      if (this.nodes.length === 0) {
-        this.reset_splits();
-      }
       return this.update();
-    };
-
-    BubbleChart.prototype.reset_splits = function() {
-      while (this.labels.length > 0) {
-        this.labels.pop();
-      }
-      return $(".split-button").removeClass('active');
     };
 
     BubbleChart.prototype.split_buttons = function() {

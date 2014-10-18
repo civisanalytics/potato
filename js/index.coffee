@@ -120,6 +120,11 @@ class BubbleChart
           @nodes.push node
     this.update()
 
+    # apply any existing splits
+    split_id = $(".split-button.active").attr('id')
+    if split_id != undefined
+      this.split_by(split_id.split('-')[1])
+
   remove_nodes: (field, val) =>
     # remove this filter from the @curr_filters
     @curr_filters = $.grep @curr_filters, (e) =>
@@ -138,16 +143,7 @@ class BubbleChart
         if should_remove == true
           @nodes.splice(len, 1)
 
-    # if we've removed all nodes on the screen, clear all split data
-    if @nodes.length == 0
-      this.reset_splits()
-
     this.update()
-
-  reset_splits: () =>
-    while @labels.length > 0
-      @labels.pop()
-    $(".split-button").removeClass('active')
 
   split_buttons: () =>
     $("#modifier-buttons").append("<div id='split-buttons'>Split By: </div>")
