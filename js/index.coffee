@@ -48,28 +48,27 @@ class BubbleChart
           if filter_exists.length == 0
             @filters.push(filter_obj)
 
-    # add the filters to the select
-    d3.select("#filter-select").selectAll('option').data(@filters).enter()
-      .append("option")
-      # unfortunately value is the only thing passed to select2
-      # so we have to hack together this string param
-      .attr("value", (d) => d.filter + ":" + d.value)
-      .text((d) -> d.value)
+    b_filters = new Bloodhound({
+      datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value')
+      queryTokenizer: Bloodhound.tokenizers.whitespace
+      local: @filters
+    });
 
-    # create the actual select2 obj and add a change listener
-    $("#filter-select").select2({
-      placeholder: 'Select a filter',
-      width: '300px',
-      dropdownCssClass: "customdrop"
-    }).on("change", (e) =>
-      if typeof e.added != 'undefined'
-        if typeof e.added.id != 'undefined'
-          val = e.added.id.split(':')
-          this.add_nodes(val[0], val[1])
-          this.add_filter(val[0], val[1])
+    # kicks off the loading/processing of `local` and `prefetch`
+    b_filters.initialize();
 
-#          @filters = $.grep(@filters, (e) => e.filter != val[0] || e.value != val[1])
-#          d3.select("#filter-select").selectAll('option').data(@filters).exit().remove()
+    $('#filter-select .typeahead').typeahead({
+      hint: true
+      highlight: true
+      minLength: 1
+    },
+    {
+      name: 'filters'
+      displayKey: 'value'
+      source: b_filters.ttAdapter()
+    }).on('typeahead:selected typeahead:autocompleted', (e, d) =>
+      this.add_nodes(d['filter'], d['value'])
+      this.add_filter(d['filter'], d['value'])
     )
 
   add_filter: (field, val) =>

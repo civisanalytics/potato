@@ -39,6 +39,7 @@
     }
 
     BubbleChart.prototype.create_filters = function() {
+      var b_filters;
       this.filter_names = [];
       $.each(this.data[0], (function(_this) {
         return function(d) {
@@ -69,27 +70,24 @@
           });
         };
       })(this));
-      d3.select("#filter-select").selectAll('option').data(this.filters).enter().append("option").attr("value", (function(_this) {
-        return function(d) {
-          return d.filter + ":" + d.value;
-        };
-      })(this)).text(function(d) {
-        return d.value;
+      b_filters = new Bloodhound({
+        datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
+        queryTokenizer: Bloodhound.tokenizers.whitespace,
+        local: this.filters
       });
-      return $("#filter-select").select2({
-        placeholder: 'Select a filter',
-        width: '300px',
-        dropdownCssClass: "customdrop"
-      }).on("change", (function(_this) {
-        return function(e) {
-          var val;
-          if (typeof e.added !== 'undefined') {
-            if (typeof e.added.id !== 'undefined') {
-              val = e.added.id.split(':');
-              _this.add_nodes(val[0], val[1]);
-              return _this.add_filter(val[0], val[1]);
-            }
-          }
+      b_filters.initialize();
+      return $('#filter-select .typeahead').typeahead({
+        hint: true,
+        highlight: true,
+        minLength: 1
+      }, {
+        name: 'filters',
+        displayKey: 'value',
+        source: b_filters.ttAdapter()
+      }).on('typeahead:selected typeahead:autocompleted', (function(_this) {
+        return function(e, d) {
+          _this.add_nodes(d['filter'], d['value']);
+          return _this.add_filter(d['filter'], d['value']);
         };
       })(this));
     };

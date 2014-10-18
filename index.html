@@ -3,8 +3,6 @@
 <head>
   <title>Dots!</title>
   <link rel="stylesheet" type="text/css" href="style.css">
-  <!-- <link rel="stylesheet" type="text/css" href="http://cdn.jsdelivr.net/select2/3.4.8/select2.css"> -->
-  <link rel="stylesheet" type="text/css" href="js/select2/select2.css">
 </head>
 
 <body>
@@ -17,9 +15,9 @@
   <div id='toolbar'>
     <div id='title'>Dots!</div>
     <div id='filter-select-wrapper'>
-      <select class='selector' id='filter-select'>
-        <option></option>
-      </select>
+      <div id='filter-select'>
+        <input class="typeahead" type="text" placeholder="Explore your Data">
+      </div>
       <div id='filter-select-buttons'></div>
     </div>
     <div id='modifier-buttons'></div>
@@ -42,8 +40,7 @@
   <script src="js/jQuery/jquery.min.js"></script>
   <!-- <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script> -->
   <script src="js/d3/d3.v2.min.js" charset="utf-8"></script>
-  <!-- <script src="http://cdn.jsdelivr.net/select2/3.4.8/select2.js"></script> -->
-  <script src="js/select2/select2.js"></script>
+  <script src="js/typeahead.bundle.min.js"></script>
   <script src="js/CustomTooltip.js"></script>
   <script src="js/index.js"></script>
 </body>
