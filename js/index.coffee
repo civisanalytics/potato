@@ -134,7 +134,16 @@ class BubbleChart
         if should_remove == true
           @nodes.splice(len, 1)
 
+    # if we've removed all nodes on the screen, clear all split data
+    if @nodes.length == 0
+      this.reset_splits()
+
     this.update()
+
+  reset_splits: () =>
+    while @labels.length > 0
+      @labels.pop()
+    $(".split-button").removeClass('active')
 
   split_buttons: () =>
     $("#modifier-buttons").append("<div id='split-buttons'>Split By: </div>")

@@ -16,6 +16,7 @@
       this.color_buttons = __bind(this.color_buttons, this);
       this.split_by = __bind(this.split_by, this);
       this.split_buttons = __bind(this.split_buttons, this);
+      this.reset_splits = __bind(this.reset_splits, this);
       this.remove_nodes = __bind(this.remove_nodes, this);
       this.add_nodes = __bind(this.add_nodes, this);
       this.add_filter = __bind(this.add_filter, this);
@@ -170,7 +171,17 @@
           }
         }
       }
+      if (this.nodes.length === 0) {
+        this.reset_splits();
+      }
       return this.update();
+    };
+
+    BubbleChart.prototype.reset_splits = function() {
+      while (this.labels.length > 0) {
+        this.labels.pop();
+      }
+      return $(".split-button").removeClass('active');
     };
 
     BubbleChart.prototype.split_buttons = function() {
