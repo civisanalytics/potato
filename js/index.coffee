@@ -4,7 +4,7 @@ class BubbleChart
     @width = $(window).width()
     @height = $(window).height() - 105
 
-    @tooltip = CustomTooltip("player_tooltip")
+    @tooltip = CustomTooltip("node_tooltip")
 
     @vis = d3.select("#vis").append("svg")
        .attr("viewBox", "0 0 #{@width} #{@height}")
@@ -27,13 +27,14 @@ class BubbleChart
     if data.length != 2886
       this.color_buttons()
 
+  # the logic behind taking the csv and determining what the categorical data is
   create_filters: () =>
     @filter_names = []
-    i = 1
     $.each @data[0], (d) =>
+      # columns named id or name are treated specially
+      # TODO, this is for the nfl data set mostly and probably a bad idea?
       if d != 'id' && d != 'name'
-        @filter_names.push {value: d, color: 'color-' + i }
-        i += 1
+        @filter_names.push {value: d}
 
     @filters = []
 
@@ -83,9 +84,6 @@ class BubbleChart
       this.remove_nodes(field, val)
       button.detach()
     )
-    button_color = $.grep(@filter_names, (e) => e.value == field)[0].color
-    #TODO temporarily remove the button colors
-#    button.addClass(button_color)
 
   add_nodes: (field, val) =>
     @data.forEach (d) =>
@@ -99,7 +97,7 @@ class BubbleChart
           curr_class = ''
           curr_r = 5
 
-          # TODO temp hack to allow for NFL dataset
+          # TODO temp hack for NFL dataset
           if d['team']
             curr_class = d.team
             curr_r = 8
@@ -219,8 +217,7 @@ class BubbleChart
       )
 
   color_by: (split) =>
-    # remove the current legend
-    d3.select("#color-legend").selectAll("*").remove()
+
     curr_vals = []
 
     # first get number of unique values in the filter
@@ -233,21 +230,25 @@ class BubbleChart
     colors = d3.scale.category10()
     colors.domain(curr_vals)
 
-    console.log(colors.domain())
+    this.update_color_legend(colors)
+
+  update_color_legend: (colors) =>
+    # remove the current legend
+    d3.select("#color-legend").selectAll("*").remove()
 
     l_size = 30
 
     # update the legend
-    legend = d3.select("#color-legend").append("svg:svg")
+    legend = d3.select("#color-legend").append("svg")
       .attr("width", 150)
       .attr("height", colors.domain().length * l_size)
       .style("padding", "20px 0 0 20px")
 
     g = legend.selectAll("g")
       .data(colors.domain())
-      .enter().append("svg:g")
+      .enter().append("g")
 
-    g.append("svg:rect")
+    g.append("rect")
       .attr("y", (d, i) -> i * l_size)
       .attr("rx", l_size * 0.5)
       .attr("ry", l_size * 0.5)
@@ -362,7 +363,6 @@ $ ->
 
   render_vis = (csv) ->
     $("#filter-select-wrapper").css("visibility", "visible")
-    $("#modifier-buttons").css("visibility", "visible")
     $(".fileContainer").hide()
     chart = new BubbleChart csv
 

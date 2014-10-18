@@ -11,6 +11,7 @@
       this.move_towards_target = __bind(this.move_towards_target, this);
       this.adjust_label_pos = __bind(this.adjust_label_pos, this);
       this.update = __bind(this.update, this);
+      this.update_color_legend = __bind(this.update_color_legend, this);
       this.color_by = __bind(this.color_by, this);
       this.color_buttons = __bind(this.color_buttons, this);
       this.split_by = __bind(this.split_by, this);
@@ -22,7 +23,7 @@
       this.data = data;
       this.width = $(window).width();
       this.height = $(window).height() - 105;
-      this.tooltip = CustomTooltip("player_tooltip");
+      this.tooltip = CustomTooltip("node_tooltip");
       this.vis = d3.select("#vis").append("svg").attr("viewBox", "0 0 " + this.width + " " + this.height);
       this.force = d3.layout.force().gravity(-0.01).charge(function(d) {
         return -Math.pow(d.radius, 2.0) * 1.5;
@@ -38,17 +39,13 @@
     }
 
     BubbleChart.prototype.create_filters = function() {
-      var i;
       this.filter_names = [];
-      i = 1;
       $.each(this.data[0], (function(_this) {
         return function(d) {
           if (d !== 'id' && d !== 'name') {
-            _this.filter_names.push({
-              value: d,
-              color: 'color-' + i
+            return _this.filter_names.push({
+              value: d
             });
-            return i += 1;
           }
         };
       })(this));
@@ -98,7 +95,7 @@
     };
 
     BubbleChart.prototype.add_filter = function(field, val) {
-      var button, button_color, rand;
+      var button, rand;
       this.curr_filters.push({
         filter: field,
         value: val
@@ -106,17 +103,12 @@
       rand = String(Math.random()).substring(2, 12);
       $("#filter-select-buttons").append("<button id='" + rand + "'>" + val + "</button>");
       button = $("#" + rand);
-      button.on("click", (function(_this) {
+      return button.on("click", (function(_this) {
         return function(e) {
           _this.remove_nodes(field, val);
           return button.detach();
         };
       })(this));
-      return button_color = $.grep(this.filter_names, (function(_this) {
-        return function(e) {
-          return e.value === field;
-        };
-      })(this))[0].color;
     };
 
     BubbleChart.prototype.add_nodes = function(field, val) {
@@ -270,8 +262,7 @@
     };
 
     BubbleChart.prototype.color_by = function(split) {
-      var colors, curr_vals, g, l_size, legend, num_colors;
-      d3.select("#color-legend").selectAll("*").remove();
+      var colors, curr_vals, num_colors;
       curr_vals = [];
       this.circles.each((function(_this) {
         return function(c) {
@@ -283,11 +274,16 @@
       num_colors = curr_vals.length;
       colors = d3.scale.category10();
       colors.domain(curr_vals);
-      console.log(colors.domain());
+      return this.update_color_legend(colors);
+    };
+
+    BubbleChart.prototype.update_color_legend = function(colors) {
+      var g, l_size, legend;
+      d3.select("#color-legend").selectAll("*").remove();
       l_size = 30;
-      legend = d3.select("#color-legend").append("svg:svg").attr("width", 150).attr("height", colors.domain().length * l_size).style("padding", "20px 0 0 20px");
-      g = legend.selectAll("g").data(colors.domain()).enter().append("svg:g");
-      g.append("svg:rect").attr("y", function(d, i) {
+      legend = d3.select("#color-legend").append("svg").attr("width", 150).attr("height", colors.domain().length * l_size).style("padding", "20px 0 0 20px");
+      g = legend.selectAll("g").data(colors.domain()).enter().append("g");
+      g.append("rect").attr("y", function(d, i) {
         return i * l_size;
       }).attr("rx", l_size * 0.5).attr("ry", l_size * 0.5).attr("width", l_size * 0.5).attr("height", l_size * 0.5).style("fill", (function(_this) {
         return function(d) {
@@ -429,7 +425,6 @@
     chart = null;
     render_vis = function(csv) {
       $("#filter-select-wrapper").css("visibility", "visible");
-      $("#modifier-buttons").css("visibility", "visible");
       $(".fileContainer").hide();
       return chart = new BubbleChart(csv);
     };

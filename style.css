@@ -120,7 +120,6 @@ button.active {
 
 #modifier-buttons {
   display: inline-block;
-  visibility: hidden;
 }
 
 #s2id_filter-select {
@@ -150,7 +149,7 @@ button.active {
   margin: 20px 0 20px 0;
 }
 
-#player_tooltip {
+#node_tooltip {
   border-radius: 10px;
   padding: 10px;
   position: absolute;
