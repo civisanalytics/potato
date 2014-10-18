@@ -113,6 +113,36 @@ button.active {
   visibility: hidden;
 }
 
+.tt-input,
+.tt-hint {
+  width:300px;
+  height:40px;
+  font-size: 16px;
+  text-indent: 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+.tt-dropdown-menu {
+  min-width:300px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background-color: #FFF;
+}
+
+.tt-hint {
+  color: #ccc;
+}
+
+.tt-suggestion {
+  line-height: 5px;
+  padding: 1px 10px;
+}
+
+.tt-suggestion.tt-cursor {
+  background-color: #ccc;
+}
+
 #filter-select-buttons {
   display: inline-block;
   vertical-align: top;
@@ -120,10 +150,6 @@ button.active {
 
 #modifier-buttons {
   display: inline-block;
-}
-
-#s2id_filter-select {
-  display: block;
 }
 
 #split-buttons {
