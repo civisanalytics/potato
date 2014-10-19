@@ -248,7 +248,7 @@
           var label;
           curr_vals[i] = {
             split: s,
-            tarx: (_this.width * 0.1) + (0.5 + curr_col) * (width_2 / num_cols),
+            tarx: (_this.width * 0.05) + (0.5 + curr_col) * (width_2 / num_cols),
             tary: (_this.height * 0.2) + (0.5 + curr_row) * (height_2 / num_rows)
           };
           label = {
@@ -453,7 +453,7 @@
     chart = null;
     render_vis = function(csv) {
       $("#filter-select-wrapper").css("visibility", "visible");
-      $(".fileContainer").hide();
+      $(".load-screen").hide();
       return chart = new BubbleChart(csv);
     };
     $("#file-uploader").on('change', (function(_this) {
