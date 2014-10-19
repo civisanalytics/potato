@@ -28,7 +28,7 @@ class BubbleChart
     this.create_filters()
 
     this.split_buttons()
-    if data.length != 2886
+    if data.length != 1993
       this.color_buttons()
 
   # the logic behind taking the csv and determining what the categorical data is
@@ -389,6 +389,6 @@ $ ->
       fileReader.readAsText(file)
 
   $("#nfl-dataset").on 'click', (e) =>
-    d3.csv "data/football/players.csv", render_vis
+    d3.csv "data/football/players_2.csv", render_vis
   $("#billionaire-dataset").on 'click', (e) =>
     d3.csv "data/billion/bloomberg.csv", render_vis

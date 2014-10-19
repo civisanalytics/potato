@@ -2,11 +2,9 @@ from bs4 import BeautifulSoup
 from urllib2 import urlopen
 import string
 
-print 'id,name,team,position,school'
+print 'name,team,position,school'
 
 base_url = 'http://espn.go.com/nfl/college/_/letter/'
-
-player_id = 0
 
 for letter in string.lowercase:
     html = urlopen(base_url + letter).read()
@@ -21,7 +19,7 @@ for letter in string.lowercase:
             # new college
             college = row.string
         elif ('oddrow' in row['class'] or 'evenrow' in row['class']):
-            player = [str(player_id)]
+            player = []
             for col in row.find_all('td'):
                 #if col.string == None: #wtf?
                 #  col.string = 'none'
@@ -33,4 +31,3 @@ for letter in string.lowercase:
                 if 'No active players.' not in player:
                     player.append(college)
                     print str(','.join(player))
-                    player_id += 1

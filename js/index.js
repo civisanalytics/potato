@@ -37,7 +37,7 @@
       this.curr_filters = [];
       this.create_filters();
       this.split_buttons();
-      if (data.length !== 2886) {
+      if (data.length !== 1993) {
         this.color_buttons();
       }
     }
@@ -455,7 +455,7 @@
     })(this));
     $("#nfl-dataset").on('click', (function(_this) {
       return function(e) {
-        return d3.csv("data/football/players.csv", render_vis);
+        return d3.csv("data/football/players_2.csv", render_vis);
       };
     })(this));
     return $("#billionaire-dataset").on('click', (function(_this) {
