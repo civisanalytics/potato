@@ -460,7 +460,7 @@
     })(this));
     return $("#billionaire-dataset").on('click', (function(_this) {
       return function(e) {
-        return d3.csv("data/billion/bloomberg.csv", render_vis);
+        return d3.csv("data/billion/billionaire.csv", render_vis);
       };
     })(this));
   });
