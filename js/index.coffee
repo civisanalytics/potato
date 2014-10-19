@@ -139,12 +139,9 @@ class BubbleChart
       this.split_by(split_id.split('-')[1])
 
   remove_nodes: (field, val) =>
-    console.log(@curr_filters)
     # remove this filter from the @curr_filters
     @curr_filters = $.grep @curr_filters, (e) =>
       return e['filter'] != field || e['value'] != val
-
-    console.log(@curr_filters)
 
     # this was the only array iterator + removal I could get to work
     len = @nodes.length

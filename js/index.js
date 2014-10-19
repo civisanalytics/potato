@@ -184,13 +184,11 @@
 
     BubbleChart.prototype.remove_nodes = function(field, val) {
       var len, should_remove;
-      console.log(this.curr_filters);
       this.curr_filters = $.grep(this.curr_filters, (function(_this) {
         return function(e) {
           return e['filter'] !== field || e['value'] !== val;
         };
       })(this));
-      console.log(this.curr_filters);
       len = this.nodes.length;
       while (len--) {
         if (this.nodes[len]['values'][field] === val) {
