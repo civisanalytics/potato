@@ -226,6 +226,7 @@
       curr_col = 0;
       width_2 = this.width * 0.75;
       height_2 = this.height * 0.8;
+      curr_vals.sort();
       curr_vals.forEach((function(_this) {
         return function(s, i) {
           var label;
@@ -289,8 +290,7 @@
         };
       })(this));
       num_colors = curr_vals.length;
-      colors = d3.scale.category10();
-      colors.domain(curr_vals);
+      colors = d3.scale.ordinal().domain(curr_vals).range(['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf', '#aec7e8', '#ffbb78', '#98df8a', '#ff9896', '#c5b0d5', '#c49c94', '#f7b6d2', '#c7c7c7', '#dbdb8d', '#9edae5']);
       d3.select("#color-legend").selectAll("*").remove();
       l_size = 30;
       legend = d3.select("#color-legend").append("svg").attr("width", 150).attr("height", colors.domain().length * l_size).style("padding", "20px 0 0 20px");

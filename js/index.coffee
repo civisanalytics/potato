@@ -185,6 +185,8 @@ class BubbleChart
     width_2 = @width * 0.75
     height_2 = @height * 0.8
 
+    curr_vals.sort()
+
     # calculate positions for each filter group
     curr_vals.forEach (s, i) =>
       curr_vals[i] = { split: s, tarx: (@width*0.1) + (0.5 + curr_col) * (width_2 / num_cols), tary: (@height*0.2) + (0.5 + curr_row) * (height_2 / num_rows)}
@@ -239,8 +241,10 @@ class BubbleChart
 
     num_colors = curr_vals.length
 
-    colors = d3.scale.category10()
-    colors.domain(curr_vals)
+    colors = d3.scale.ordinal()
+      .domain(curr_vals)
+      .range(['#1f77b4','#ff7f0e','#2ca02c','#d62728','#9467bd','#8c564b','#e377c2','#7f7f7f','#bcbd22','#17becf',
+              '#aec7e8','#ffbb78','#98df8a','#ff9896','#c5b0d5','#c49c94','#f7b6d2','#c7c7c7','#dbdb8d','#9edae5'])
 
     # remove the current legend
     d3.select("#color-legend").selectAll("*").remove()
