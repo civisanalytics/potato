@@ -28,7 +28,7 @@ class BubbleChart
     this.create_filters()
 
     this.split_buttons()
-    if data.length != 1993
+    if data.length != 1933
       this.color_buttons()
 
   # the logic behind taking the csv and determining what the categorical data is
@@ -95,7 +95,7 @@ class BubbleChart
   add_nodes: (field, val) =>
     @data.forEach (d) =>
       if d[field] == val
-        if $.grep(@nodes, (e) => e.node_id == d.node_id).length == 0 # if it doesn't already exist in nodes
+        if $.grep(@nodes, (e) => e.id == d.node_id).length == 0 # if it doesn't already exist in nodes
 
           vals = {} # create a hash with the appropriate filters
           $.each @filter_names, (k, f) =>

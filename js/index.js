@@ -37,7 +37,7 @@
       this.curr_filters = [];
       this.create_filters();
       this.split_buttons();
-      if (data.length !== 1993) {
+      if (data.length !== 1933) {
         this.color_buttons();
       }
     }
@@ -130,7 +130,7 @@
           var curr_class, curr_r, node, vals;
           if (d[field] === val) {
             if ($.grep(_this.nodes, function(e) {
-              return e.node_id === d.node_id;
+              return e.id === d.node_id;
             }).length === 0) {
               vals = {};
               $.each(_this.filter_names, function(k, f) {
