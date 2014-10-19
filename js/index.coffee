@@ -386,3 +386,5 @@ $ ->
 
   $("#nfl-dataset").on 'click', (e) =>
     d3.csv "data/football/players.csv", render_vis
+  $("#billionaire-dataset").on 'click', (e) =>
+    d3.csv "data/billion/bloomberg.csv", render_vis

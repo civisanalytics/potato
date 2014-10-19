@@ -75,7 +75,7 @@ button.active {
   position: fixed;
   background: #CCC;
   border-radius: .5em;
-  padding: 100px 0 100px;
+  padding: 100px 0 20px;
   top: 50%;
   left: 50%;
   width: 500px;
@@ -102,9 +102,12 @@ button.active {
   cursor: pointer;
 }
 
-#nfl-dataset {
+#demo {
   position: relative;
-  top: 150px;
+  top: 125px;
+}
+#demo-text {
+  font-size: 0.7em;
 }
 
 #filter-select-wrapper {

@@ -1,0 +1,281 @@
+name,age,children,marital-status,country,gender,industry,source
+charlene-de-carvalho-heineken,60,5,Married,Netherlands,Female,Food & Beverage,Inherited
+beny-steinmetz,58,4,Married,Israel,Male,Metals & Mining,Self-made
+lee-shau-kee,86,5,Divorced,Hong Kong,Male,Real Estate,Self-made
+ermirio-de-moraes,82,7,Married,Brazil,Male,Metals & Mining,Inherited
+david-thomson,57,4,Divorced,Canada,Male,Media,Inherited
+bidzina-ivanishvili,58,4,Married,Georgia,Male,Diversified,Self-made
+budi-hartono,,3,Married,Indonesia,Male,Manufacturing,Inherited
+silvio-berlusconi,78,5,Married,Italy,Male,Media,Self-made
+robert-kuok,91,8,Married,Malaysia,Male,Diversified,Self-made
+andrey-melnichenko,42,0,Married,Russia,Male,Diversified,Self-made
+patrizio-bertelli,68,2,Married,Italy,Male,Retail,Self-made
+pierre-omidyar,47,0,Married,United States,Male,Technology,Self-made
+paul-allen,61,0,Single,United States,Male,Technology,Self-made
+gina-rinehart,60,4,Widowed,Australia,Female,Metals & Mining,Inherited
+pony-ma,43,1,Married,China,Male,Technology,Self-made
+marcel-telles,64,2,Married,Brazil,Male,Finance,Self-made
+susanne-klatten,52,3,Married,Germany,Female,Manufacturing,Inherited
+harold-simmons,83,6,Married,United States,Male,Manufacturing,Self-made
+henry-sy-sr,90,6,Married,Philippines,Male,Diversified,Self-made
+jorn-rausing,,0,,Sweden,Male,Manufacturing,Inherited
+si-newhouse,87,0,Married,United States,Male,Media,Inherited
+kjeld-kristiansen,66,3,Married,Denmark,Male,Manufacturing,Inherited
+abby-johnson,52,2,Married,United States,Female,Finance,Inherited
+antonia-axson-johnson,71,4,Married,Sweden,Female,Manufacturing,Inherited
+liliane-bettencourt,92,1,Widowed,France,Female,Retail,Inherited
+gerald-grosvenor,62,4,Married,United Kingdom,Male,Real Estate,Inherited
+john-paulson,58,2,Married,United States,Male,Finance,Self-made
+richard-kinder,70,1,Married,United States,Male,Energy,Self-made
+leonardo-del-vecchio,79,6,Married,Italy,Male,Retail,Self-made
+michele-ferrero,89,1,Married,Italy,Male,Food & Beverage,Self-made
+nicky-oppenheimer,69,1,Married,South Africa,Male,Diversified,Inherited
+viktor-vekselberg,57,2,Married,Russia,Male,Diversified,Self-made
+steve-cohen,58,7,Married,United States,Male,Finance,Self-made
+eike-batista,57,2,Divorced,Brazil,Male,Energy,Self-made
+kirsten-rausing,62,0,Single,Sweden,Female,Manufacturing,Inherited
+john-fredriksen,70,2,Widowed,Cyprus,Male,Diversified,Self-made
+hans-rausing,88,3,Married,Sweden,Male,Diversified,Inherited
+jorge-paulo-lemann,75,6,Married,Brazil,Male,Finance,Self-made
+donald-newhouse,,3,Married,United States,Male,Media,Inherited
+ralph-lauren,75,3,Married,United States,Male,Retail,Self-made
+azim-premji,69,2,Married,India,Male,Technology,Self-made
+august-von-finck,,4,Married,Germany,Male,Diversified,Self-made
+chung-mong-koo,76,4,Widowed,South Korea,Male,Manufacturing,Inherited
+yongxing-liu,,1,Married,China,Male,Diversified,Self-made
+len-blavatnik,57,0,Married,United States,Male,Diversified,Self-made
+johann-rupert,64,3,Married,South Africa,Male,Diversified,Inherited
+joao-marinho,61,0,,Brazil,Male,Media,Inherited
+theo-albrecht-jr,,1,Married,Germany,Male,Retail,Inherited
+lim-kok-thay,63,3,Married,Malaysia,Male,Service,Inherited
+phil-anschutz,74,3,Married,United States,Male,Telecommunications,Self-made
+sergey-brin,41,2,Married,United States,Male,Technology,Self-made
+john-mars,79,3,Married,United States,Male,Food & Beverage,Inherited
+vladimir-evtushenkov,66,2,Married,Russia,Male,Diversified,Self-made
+iskander-makhmudov,50,1,Married,Russia,Male,Diversified,Self-made
+gennady-timchenko,61,3,Married,Russia,Male,Diversified,Self-made
+li-ka-shing,86,2,Widowed,Hong Kong,Male,Real Estate,Self-made
+john-menard-jr,,6,Divorced,United States,Male,Retail,Self-made
+sunil-mittal,57,3,,India,Male,Telecommunications,Self-made
+lee-kun-hee,72,3,Married,South Korea,Male,Technology,Inherited
+ricardo-salinas,59,6,Married,Mexico,Male,Diversified,Self-made
+masayoshi-son,57,2,Married,Japan,Male,Telecommunications,Self-made
+roman-abramovich,48,7,Single,Russia,Male,Diversified,Self-made
+george-kaiser,71,3,Married,United States,Male,Energy,Self-made
+iris-fontbona,,3,Widowed,Chile,Female,Metals & Mining,Inherited
+tang-yiu,,0,,Hong Kong,Male,Retail,Self-made
+mohammed-al-amoudi,,8,Married,Saudi Arabia,Male,Energy,Self-made
+wang-jianlin,60,1,Married,China,Male,Real Estate,Self-made
+laurene-jobs,50,3,Widowed,United States,Female,Media,Inherited
+maria-helena-moraes,84,4,Widowed,Brazil,Female,Diversified,Inherited
+phil-knight,76,2,Married,United States,Male,Retail,Self-made
+dieter-schwarz,75,2,Married,Germany,Male,Retail,Self-made
+sheldon-adelson,81,5,Married,United States,Male,Service,Self-made
+carlos-slim,74,6,Widowed,Mexico,Male,Diversified,Self-made
+teh-hong-piow,84,4,Married,Malaysia,Male,Finance,Self-made
+eka-widjaja,,8,Married,Indonesia,Male,Diversified,Self-made
+ivan-glasenberg,57,2,Married,Australia,Male,Metals & Mining,Self-made
+jacqueline-mars,74,3,Divorced,United States,Female,Food & Beverage,Inherited
+lakshmi-mittal,64,2,Married,India,Male,Metals & Mining,Self-made
+sergey-galitskiy,47,1,Married,Russia,Male,Retail,Self-made
+paolo-rocca,62,0,,Italy,Male,Metals & Mining,Inherited
+mikhail-prokhorov,49,0,Single,Russia,Male,Diversified,Self-made
+jim-goodnight,71,3,Married,United States,Male,Technology,Self-made
+david-koch,74,3,Married,United States,Male,Diversified,Self-made
+micky-arison,65,2,Married,United States,Male,Service,Inherited
+larry-page,41,1,Married,United States,Male,Technology,Self-made
+vladimir-lisin,58,3,Married,Russia,Male,Metals & Mining,Self-made
+cheng-yu-tung,89,4,Married,Hong Kong,Male,Retail,Self-made
+jack-taylor,92,2,Divorced,United States,Male,Service,Self-made
+patrick-soon-shiong,,2,Married,United States,Male,Medical,Self-made
+bill-gates,59,3,Married,United States,Male,Technology,Self-made
+harold-hamm,68,5,Married,United States,Male,Energy,Self-made
+hasso-plattner,70,2,Separated,Germany,Male,Technology,Self-made
+jose-marinho,58,0,,Brazil,Male,Media,Inherited
+rupert-murdoch,83,6,Married,United States,Male,Media,Self-made
+steve-schwarzman,67,2,Married,United States,Male,Finance,Self-made
+reinhold-wuerth,79,3,Married,Germany,Male,Manufacturing,Self-made
+sulaiman-al-rajhi,,23,Married,Saudi Arabia,Male,Finance,Self-made
+jim-walton,66,4,Married,United States,Male,Retail,Inherited
+alwaleed-al-saud,59,2,Married,Saudi Arabia,Male,Diversified,Self-made
+francois-pinault,78,3,Married,France,Male,Retail,Self-made
+lui-che-woo,,5,Married,Hong Kong,Male,Service,Self-made
+carlos-da-veiga,66,0,Married,Brazil,Male,Finance,Self-made
+alejandro-santo-domingo,37,0,Single,Colombia,Male,Food & Beverage,Inherited
+pallonji-mistry,85,4,Married,India,Male,Manufacturing,Inherited
+ron-perelman,71,7,Married,United States,Male,Diversified,Self-made
+dilip-shanghvi,,2,Married,India,Male,Medical,Self-made
+german-khan,53,3,Married,Russia,Male,Diversified,Self-made
+ray-hunt,,2,Married,United States,Male,Energy,Inherited
+bernard-arnault,65,5,Married,France,Male,Retail,Self-made
+walter-faria,59,1,Married,Brazil,Male,Food & Beverage,Self-made
+oleg-deripaska,46,2,Married,Russia,Male,Metals & Mining,Self-made
+klaus-tschira,,2,Married,Germany,Male,Technology,Self-made
+charoen-sirivadhanabhakdi,70,5,Married,Thailand,Male,Food & Beverage,Self-made
+vladimir-potanin,53,3,Married,Russia,Male,Metals & Mining,Self-made
+tadashi-yanai,65,2,Married,Japan,Male,Retail,Self-made
+aliko-dangote,57,3,Married,Nigeria,Male,Diversified,Self-made
+jeff-bezos,50,4,Married,United States,Male,Technology,Self-made
+anil-ambani,55,2,Married,India,Male,Energy,Inherited
+alice-walton,65,0,Divorced,United States,Female,Retail,Inherited
+steve-ballmer,58,3,Married,United States,Male,Technology,Self-made
+anne-cox-chambers,94,3,Married,United States,Female,Media,Inherited
+elaine-marshall,,2,Widowed,United States,Female,Diversified,Inherited
+antonio-del-valle,76,5,,Mexico,Male,Manufacturing,Self-made
+wee-cho-yaw,85,5,Married,Singapore,Male,Finance,Self-made
+ingvar-kamprad,88,4,Widowed,Sweden,Male,Retail,Self-made
+dietrich-mateschitz,70,1,Single,Austria,Male,Food & Beverage,Self-made
+dirce-camargo,,3,Widowed,Brazil,Female,Manufacturing,Inherited
+tsai-wan-tsai,85,4,Married,Taiwan,Male,Finance,Self-made
+raymond-kwok,61,3,Married,Hong Kong,Male,Real Estate,Inherited
+luis-sarmiento,81,5,Married,Colombia,Male,Finance,Self-made
+galen-weston,74,2,Married,Canada,Male,Retail,Inherited
+roberto-marinho,67,0,Married,Brazil,Male,Media,Inherited
+rinat-akhmetov,48,2,Married,Ukraine,Male,Diversified,Self-made
+leonid-mikhelson,59,1,Married,Russia,Male,Energy,Self-made
+johanna-quandt,88,2,Widowed,Germany,Female,Manufacturing,Inherited
+nassef-sawiris,53,4,Married,Egypt,Male,Manufacturing,Self-made
+shiv-nadar,69,1,Married,India,Male,Technology,Self-made
+hansjoerg-wyss,,1,Single,Switzerland,Male,Medical,Self-made
+peter-woo,68,3,Married,Hong Kong,Male,Real Estate,Inherited
+alisher-usmanov,61,0,Married,Russia,Male,Diversified,Self-made
+michael-hartono,,0,,Indonesia,Male,Manufacturing,Inherited
+miuccia-prada,66,2,Married,Italy,Female,Retail,Inherited
+joseph-safra,76,4,Married,Brazil,Male,Finance,Self-made
+savitri-jindal,64,9,Widowed,India,Female,Metals & Mining,Inherited
+amancio-ortega,78,3,Married,Spain,Male,Retail,Self-made
+dmitry-rybolovlev,47,2,Separated,Russia,Male,Manufacturing,Self-made
+christy-walton,,1,Widowed,United States,Female,Retail,Inherited
+vagit-alekperov,64,1,Married,Russia,Male,Energy,Self-made
+thomas-peterffy,70,3,Divorced,United States,Male,Finance,Self-made
+dhanin-chearavanont,75,5,Married,Thailand,Male,Diversified,Self-made
+thomas-kwok,63,4,Married,Hong Kong,Male,Real Estate,Inherited
+rob-walton,70,3,Married,United States,Male,Retail,Inherited
+stefan-persson,67,3,Married,Sweden,Male,Retail,Self-made
+finn-rausing,,0,,Sweden,Male,Manufacturing,Inherited
+xavier-niel,47,0,Single,France,Male,Technology,Self-made
+petr-kellner,50,4,Married,Czech Republic,Male,Finance,Self-made
+tsai-eng-meng,57,0,Married,Taiwan,Male,Food & Beverage,Self-made
+michael-otto,71,2,Married,Germany,Male,Retail,Inherited
+larry-ellison,70,2,Divorced,United States,Male,Technology,Self-made
+sara-mota-de-larrea,,2,Widowed,Mexico,Female,Metals & Mining,Inherited
+ananda-krishnan,76,3,Married,Malaysia,Male,Diversified,Self-made
+michael-kadoorie,,3,Married,Hong Kong,Male,Energy,Inherited
+warren-buffett,84,3,Married,United States,Male,Finance,Self-made
+k-p-singh,83,3,Married,India,Male,Real Estate,Inherited
+george-soros,84,5,Married,United States,Male,Finance,Self-made
+charles-koch,79,2,Married,United States,Male,Diversified,Self-made
+alexey-kuzmichev,52,1,Married,Russia,Male,Diversified,Self-made
+klaus-michael-kuehne,77,0,Married,Germany,Male,Diversified,Inherited
+carlos-ardila,84,4,Married,Colombia,Male,Food & Beverage,Self-made
+leonid-fedun,58,2,Married,Russia,Male,Energy,Self-made
+karl-albrecht,94,2,Married,Germany,Male,Retail,Self-made
+donald-bren,82,7,Married,United States,Male,Real Estate,Self-made
+leon-black,63,4,Married,United States,Male,Finance,Self-made
+ned-johnson-iii,84,3,Married,United States,Male,Finance,Inherited
+leonard-lauder,81,2,Widowed,United States,Male,Manufacturing,Inherited
+charles-butt,76,0,Single,United States,Male,Retail,Self-made
+stefan-quandt,48,1,Married,Germany,Male,Manufacturing,Inherited
+forrest-mars-jr,83,7,Divorced,United States,Male,Food & Beverage,Inherited
+eric-schmidt,59,2,Married,United States,Male,Technology,Self-made
+jim-simons,76,3,Married,United States,Male,Finance,Self-made
+mark-zuckerberg,30,0,Married,United States,Male,Technology,Self-made
+ray-dalio,65,4,Married,United States,Male,Finance,Self-made
+berthold-albrecht,,5,Married,Germany,Male,Retail,Inherited
+michael-dell,49,4,Married,United States,Male,Technology,Self-made
+antonio-de-moraes,86,8,Married,Brazil,Male,Metals & Mining,Inherited
+eli-broad,81,2,Married,United States,Male,Finance,Self-made
+robin-li,45,4,Married,China,Male,Technology,Self-made
+graeme-hart,59,2,Married,New Zealand,Male,,Self-made
+charlie-ergen,61,5,Married,United States,Male,Media,Self-made
+serge-dassault,89,4,Married,France,Male,Manufacturing,Inherited
+kumar-birla,47,3,Married,India,Male,Diversified,Inherited
+mikhail-fridman,50,2,Married,Russia,Male,Diversified,Self-made
+giorgio-armani,80,0,Single,Italy,Male,Retail,Self-made
+zong-qinghou,69,1,Married,China,Male,Food & Beverage,Self-made
+alexey-mordashov,49,6,Married,Russia,Male,Metals & Mining,Self-made
+alberto-bailleres,83,7,Married,Mexico,Male,Metals & Mining,Self-made
+mukesh-ambani,57,3,Married,India,Male,Energy,Inherited
+mohamed-al-jaber,55,3,Married,Saudi Arabia,Male,Service,Self-made
+ernesto-bertarelli,49,3,Married,Switzerland,Male,Diversified,Inherited
+carl-icahn,78,2,Married,United States,Male,Finance,Self-made
+rick-cohen,,2,Married,United States,Male,Diversified,Inherited
+richard-lefrak,69,2,Married,United States,Male,Real Estate,Inherited
+joao-moreira-salles,,0,,Brazil,Male,Finance,Inherited
+heinz-hermann-thiele,73,2,Married,Germany,Male,Manufacturing,Self-made
+rich-devos,88,4,Married,United States,Male,Retail,Self-made
+milane-duncan-frantz,,0,Married,United States,Female,Energy,Inherited
+joseph-lau,,0,Divorced,Hong Kong,Male,Real Estate,Self-made
+dannine-avara,,0,Married,United States,Female,Energy,Inherited
+liu-yonghao,,1,Married,China,Male,Manufacturing,Self-made
+walter-salles,58,0,,Brazil,Male,Finance,Inherited
+juan-roig,,4,Married,Spain,Unknown,Food & Beverage,Self-made
+rupert-johnson,74,0,,United States,Male,Finance,Self-made
+idan-ofer,59,5,Married,Israel,Male,Energy,Self-made
+pedro-moreira-salles,55,0,,Brazil,Male,Finance,Inherited
+ludwig-merckle,49,2,Married,Germany,Male,Manufacturing,Inherited
+denis-o-brien,56,4,Married,Ireland,Male,Telecommunications,Self-made
+charles-johnson,81,7,Married,United States,Male,Finance,Self-made
+eva-gonda,,4,Widowed,Mexico,Female,Food & Beverage,Inherited
+wei-jian-jun,,0,Married,China,Male,Manufacturing,Self-made
+horst-paulmann,,0,,,Male,,
+jeff-hildebrand,,3,Married,United States,Male,Energy,Self-made
+majid-al-futtaim,,0,Unknown,United Arab Emirates,Male,Real Estate,Self-made
+john-sall,66,4,Married,United States,Male,Technology,Self-made
+jim-pattison,86,3,Married,Canada,Male,Telecommunications,Self-made
+dave-duffield,74,0,,United States,Male,Technology,Self-made
+abdullah-al-ghurair,,0,Married,United Arab Emirates,Male,Diversified,Self-made
+liang-wengen,,0,,,Male,,
+phil-green,62,2,Married,United Kingdom,Male,Apparel,Self-made
+suleiman-kerimov,48,3,Married,Russia,Male,Diversified,Self-made
+margarita-louis-dreyfus,52,3,Widowed,Switzerland,Female,Metals & Mining,Inherited
+fernando-moreira-salles,68,0,,Brazil,Male,Finance,Inherited
+andrey-skoch,48,9,Married,Russia,Male,Diversified,Self-made
+randa-duncan-williams,,1,Married,United States,Female,Energy,Inherited
+david-tepper,57,3,Married,United States,Male,Finance,Self-made
+charles-gerald-john-cadogan,77,3,Married,United Kingdom,Male,Real Estate,Inherited
+hiroshi-mikitani,49,2,Married,Japan,Male,Technology,Self-made
+yang-huiyan,,0,Married,China,Female,Real Estate,Inherited
+stefano-pessina,73,2,Separated,Italy,Male,Medical,Self-made
+elon-r-musk,43,5,Married,United States,Male,Technology,Self-made
+john-malone,73,2,Married,United States,Male,Media,Self-made
+he-xiangjian,,3,Married,China,Male,Manufacturing,Self-made
+lorenzo-servitje,95,8,Unknown,Mexico,Male,Food & Beverage,Self-made
+heinz-horst-deichmann,88,4,Widowed,Germany,Male,Retail,Self-made
+scott-duncan,,0,Single,United States,Male,Energy,Inherited
+james-packer,47,3,Separated,Australia,Male,Service,Inherited
+gerard-wertheimer,62,2,Married,France,Male,Manufacturing,Inherited
+alain-wertheimer,66,3,Married,France,Male,Manufacturing,Inherited
+zhang-jindong,,0,Married,China,Male,Retail,Self-made
+dustin-moskovitz,30,0,Married,United States,Male,Technology,Self-made
+lucio-tan,80,7,Married,Philippines,Male,,Self-made
+jean-claude-decaux,77,3,Married,France,Male,Service,Self-made
+takemitsu-takizaki,69,1,Married,Japan,Male,Technology,Self-made
+sandra-ortega-mera,46,3,Married,Spain,Female,Retail,Inherited
+patrick-mcgovern,77,4,Married,United States,Male,Telecommunications,Self-made
+johann-graf,67,3,Divorced,Austria,Male,Service,Self-made
+andy-beal,61,4,Divorced,United States,Male,Finance,Self-made
+zhang-zhidong,,0,Married,China,Male,Technology,Self-made
+gianluigi-aponte,74,2,Married,Italy,Male,Service,Self-made
+sumner-redstone,91,2,Divorced,United States,Male,Media,Self-made
+jack-ma,50,1,Married,China,Male,Technology,Self-made
+patrick-drahi,51,4,Married,France,Male,Telecommunications,Self-made
+georg-schaeffler,50,4,Divorced,Germany,Male,Manufacturing,Inherited
+lee-shin-cheng,75,6,Married,Malaysia,Male,Diversified,Self-made
+jan-koum,,0,Married,United States,Male,Technology,Self-made
+mike-ashley,49,3,Divorced,United Kingdom,Male,Apparel,Self-made
+thomas-schmidheiny,68,4,Married,Switzerland,Male,Manufacturing,Inherited
+eyal-ofer,64,4,Married,Israel,Male,Diversified,Self-made
+natie-kirsh,82,3,Married,South Africa,Male,Food & Beverage,Self-made
+cesar-mata-pires,64,3,Married,Brazil,Male,Manufacturing,Self-made
+gautam-adani,52,2,Married,India,Male,Diversified,Self-made
+richard-liu,,0,Single,China,Male,Technology,Self-made
+terry-gou,64,4,Married,Taiwan,Male,Manufacturing,Self-made
+thomas-frist,76,0,Unknown,United States,Male,Medical,Self-made
+karl-albrecht-jr,,0,Unknown,Germany,Male,Retail,Inherited
+beate-heister,,6,Married,Germany,Female,Retail,Inherited
+tan-siok-tjien,,5,Widowed,Indonesia,Female,Manufacturing,Inherited
+les-wexner,77,4,Married,United States,Male,Retail,Self-made
+david-geffen,71,0,Single,United States,Male,Media,Self-made
+micky-jagtiani,,3,Married,India,Male,,Self-made
+suh-kyung-bae,51,2,Married,South Korea,Male,Manufacturing,Inherited
