@@ -248,8 +248,8 @@
           var label;
           curr_vals[i] = {
             split: s,
-            tarx: (_this.width * 0.05) + (0.5 + curr_col) * (width_2 / num_cols),
-            tary: (_this.height * 0.2) + (0.5 + curr_row) * (height_2 / num_rows)
+            tarx: (_this.width * 0.08) + (0.5 + curr_col) * (width_2 / num_cols),
+            tary: (_this.height * 0.15) + (0.5 + curr_row) * (height_2 / num_rows)
           };
           label = {
             val: s,

@@ -198,7 +198,7 @@ class BubbleChart
 
     # calculate positions for each filter group
     curr_vals.forEach (s, i) =>
-      curr_vals[i] = { split: s, tarx: (@width*0.05) + (0.5 + curr_col) * (width_2 / num_cols), tary: (@height*0.2) + (0.5 + curr_row) * (height_2 / num_rows)}
+      curr_vals[i] = { split: s, tarx: (@width*0.08) + (0.5 + curr_col) * (width_2 / num_cols), tary: (@height*0.15) + (0.5 + curr_row) * (height_2 / num_rows)}
 
       label = {
         val: s
