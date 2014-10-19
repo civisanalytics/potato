@@ -4,6 +4,10 @@ class BubbleChart
     @width = $(window).width()
     @height = $(window).height() - 105
 
+    # set node ids
+    $.each @data, (i, d) =>
+      d.node_id = i
+
     @tooltip = CustomTooltip("node_tooltip")
 
     @vis = d3.select("#vis").append("svg")
@@ -34,14 +38,14 @@ class BubbleChart
     $.each @data[0], (d) =>
       # columns named id or name are treated specially
       # TODO, this is for the nfl data set mostly and probably a bad idea?
-      if d != 'id' && d != 'name'
+      if d != 'node_id' && d != 'name'
         @filter_names.push {value: d}
         @filters[d] = []
 
     # populate the filters from the dataset
     @data.forEach (d) =>
       $.each d, (k, v) =>
-        if k != 'id' && k != 'name'
+        if k != 'node_id' && k != 'name'
           filter_exists = $.grep @filters[k], (e) =>
             return e.filter == k && e.value == v
           if filter_exists.length == 0
@@ -91,7 +95,7 @@ class BubbleChart
   add_nodes: (field, val) =>
     @data.forEach (d) =>
       if d[field] == val
-        if $.grep(@nodes, (e) => e.id == d.id).length == 0 # if it doesn't already exist in nodes
+        if $.grep(@nodes, (e) => e.node_id == d.node_id).length == 0 # if it doesn't already exist in nodes
 
           vals = {} # create a hash with the appropriate filters
           $.each @filter_names, (k, f) =>
@@ -106,7 +110,7 @@ class BubbleChart
             curr_r = 8
 
           node = {
-            id: d.id
+            id: d.node_id
             radius: curr_r
             name: d.name
             values: vals

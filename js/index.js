@@ -22,6 +22,11 @@
       this.data = data;
       this.width = $(window).width();
       this.height = $(window).height() - 105;
+      $.each(this.data, (function(_this) {
+        return function(i, d) {
+          return d.node_id = i;
+        };
+      })(this));
       this.tooltip = CustomTooltip("node_tooltip");
       this.vis = d3.select("#vis").append("svg").attr("viewBox", "0 0 " + this.width + " " + this.height);
       this.force = d3.layout.force().gravity(-0.01).charge(function(d) {
@@ -43,7 +48,7 @@
       this.filter_names = [];
       $.each(this.data[0], (function(_this) {
         return function(d) {
-          if (d !== 'id' && d !== 'name') {
+          if (d !== 'node_id' && d !== 'name') {
             _this.filter_names.push({
               value: d
             });
@@ -55,7 +60,7 @@
         return function(d) {
           return $.each(d, function(k, v) {
             var filter_exists;
-            if (k !== 'id' && k !== 'name') {
+            if (k !== 'node_id' && k !== 'name') {
               filter_exists = $.grep(_this.filters[k], function(e) {
                 return e.filter === k && e.value === v;
               });
@@ -125,7 +130,7 @@
           var curr_class, curr_r, node, vals;
           if (d[field] === val) {
             if ($.grep(_this.nodes, function(e) {
-              return e.id === d.id;
+              return e.node_id === d.node_id;
             }).length === 0) {
               vals = {};
               $.each(_this.filter_names, function(k, f) {
@@ -138,7 +143,7 @@
                 curr_r = 8;
               }
               node = {
-                id: d.id,
+                id: d.node_id,
                 radius: curr_r,
                 name: d.name,
                 values: vals,
