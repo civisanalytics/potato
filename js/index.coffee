@@ -36,8 +36,7 @@ class BubbleChart
     @filters = {}
     @filter_names = []
     $.each @data[0], (d) =>
-      # columns named id or name are treated specially
-      # TODO, this is for the nfl data set mostly and probably a bad idea?
+      # columns named node_id or name are treated specially
       if d != 'node_id' && d != 'name'
         @filter_names.push {value: d}
         @filters[d] = []
@@ -58,6 +57,7 @@ class BubbleChart
       b_group = new Bloodhound {
         datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value')
         queryTokenizer: Bloodhound.tokenizers.whitespace
+        limit: Infinity
         local: v
       }
 
@@ -67,7 +67,10 @@ class BubbleChart
       b_groups.push({
         name: k
         displayKey: 'value'
-        source: b_group.ttAdapter()
+        source: (query, cb) =>
+          b_group.get(query, (suggestions) =>
+            cb(this.s_filter(suggestions))
+          )
         templates: {
           header: '<h3 class="filter-header">'+k+'</h3>'
         }
@@ -80,6 +83,12 @@ class BubbleChart
     }, b_groups).on 'typeahead:selected typeahead:autocompleted', (e, d) =>
       this.add_filter(d['filter'], d['value'])
       $('.typeahead').typeahead('val', '')
+
+  s_filter: (suggestions) =>
+    return $.grep(suggestions, (s) =>
+      # if this suggestion is a curr_filter, return false
+      return $.grep(@curr_filters, (e) => e.value == s.value).length == 0
+    )
 
   add_filter: (field, val) =>
     @curr_filters.push({filter: field, value: val})
@@ -130,9 +139,12 @@ class BubbleChart
       this.split_by(split_id.split('-')[1])
 
   remove_nodes: (field, val) =>
+    console.log(@curr_filters)
     # remove this filter from the @curr_filters
     @curr_filters = $.grep @curr_filters, (e) =>
-      return e['filter'] != field && e['value'] != val
+      return e['filter'] != field || e['value'] != val
+
+    console.log(@curr_filters)
 
     # this was the only array iterator + removal I could get to work
     len = @nodes.length

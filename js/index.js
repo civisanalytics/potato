@@ -18,6 +18,7 @@
       this.remove_nodes = __bind(this.remove_nodes, this);
       this.add_nodes = __bind(this.add_nodes, this);
       this.add_filter = __bind(this.add_filter, this);
+      this.s_filter = __bind(this.s_filter, this);
       this.create_filters = __bind(this.create_filters, this);
       this.data = data;
       this.width = $(window).width();
@@ -81,13 +82,18 @@
           b_group = new Bloodhound({
             datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
             queryTokenizer: Bloodhound.tokenizers.whitespace,
+            limit: Infinity,
             local: v
           });
           b_group.initialize();
           return b_groups.push({
             name: k,
             displayKey: 'value',
-            source: b_group.ttAdapter(),
+            source: function(query, cb) {
+              return b_group.get(query, function(suggestions) {
+                return cb(_this.s_filter(suggestions));
+              });
+            },
             templates: {
               header: '<h3 class="filter-header">' + k + '</h3>'
             }
@@ -102,6 +108,16 @@
         return function(e, d) {
           _this.add_filter(d['filter'], d['value']);
           return $('.typeahead').typeahead('val', '');
+        };
+      })(this));
+    };
+
+    BubbleChart.prototype.s_filter = function(suggestions) {
+      return $.grep(suggestions, (function(_this) {
+        return function(s) {
+          return $.grep(_this.curr_filters, function(e) {
+            return e.value === s.value;
+          }).length === 0;
         };
       })(this));
     };
@@ -168,11 +184,13 @@
 
     BubbleChart.prototype.remove_nodes = function(field, val) {
       var len, should_remove;
+      console.log(this.curr_filters);
       this.curr_filters = $.grep(this.curr_filters, (function(_this) {
         return function(e) {
-          return e['filter'] !== field && e['value'] !== val;
+          return e['filter'] !== field || e['value'] !== val;
         };
       })(this));
+      console.log(this.curr_filters);
       len = this.nodes.length;
       while (len--) {
         if (this.nodes[len]['values'][field] === val) {
