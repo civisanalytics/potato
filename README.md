@@ -11,19 +11,18 @@ Heavily inspired by:
  - http://www.nytimes.com/interactive/2012/02/13/us/politics/2013-budget-proposal-graphic.html?_r=0
  - http://www.delimited.io/blog/2013/12/19/force-bubble-charts-in-d3
 
-Originally I built this to just handle the NFL dataset, and then decided
-to try and abstract the tool to work with any categorical dataset in csv
-form.
+Originally I built this just for the NFL dataset, and then decided
+to try and abstract the tool to work with any categorical dataset in csv form.
 
 The file uploader uses the HTML5 file API.  As a result, uploaded files
-are 'uploaded' to your browser and *not* to my website (aka never travel
-the tubes).
-So, short of someone stealing information from your browser, any
-uploaded data is relatively secure. 
+are 'uploaded' to your browser and **not** to my website (aka never travel the tubes).
+Moral of the story, any uploaded data is relatively secure, and I certainly won't see it
 
 All demo datasets are derived from publically available data.
-The football data is mostly pulled from ESPN.go.com, the billionaire database is a mixture of bloomberg's website and forbes.
-All of those names/rights to the data are owned by their respective owners.
+- Football: ESPN.go.com
+- Billionaire: bloomberg.com
+- Automobile: [UCI Machine Learning Repository](https://archive.ics.uci.edu/ml/datasets/Automobile)
+All datasets and the contents/names/rights are owned by their respective owners.
 
 Wishlist:
 - [ ] Data doesn't always fit on the screen well.

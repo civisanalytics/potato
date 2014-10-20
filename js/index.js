@@ -17,6 +17,7 @@
       this.split_buttons = __bind(this.split_buttons, this);
       this.remove_nodes = __bind(this.remove_nodes, this);
       this.add_nodes = __bind(this.add_nodes, this);
+      this.remove_filter = __bind(this.remove_filter, this);
       this.add_filter = __bind(this.add_filter, this);
       this.s_filter = __bind(this.s_filter, this);
       this.create_filters = __bind(this.create_filters, this);
@@ -124,6 +125,10 @@
 
     BubbleChart.prototype.add_filter = function(field, val) {
       var filter_button;
+      if (this.curr_filters.length === 0) {
+        $("#filter-select").find('input').attr("placeholder", "Add another subset");
+        $("#filter-select-buttons").text("Current subsets: ");
+      }
       this.curr_filters.push({
         filter: field,
         value: val
@@ -131,12 +136,20 @@
       filter_button = $("<button>" + val + "</button>");
       filter_button.on("click", (function(_this) {
         return function(e) {
-          _this.remove_nodes(field, val);
-          return filter_button.detach();
+          return _this.remove_filter(field, val, filter_button);
         };
       })(this));
       $("#filter-select-buttons").append(filter_button);
       return this.add_nodes(field, val);
+    };
+
+    BubbleChart.prototype.remove_filter = function(field, val, filter_button) {
+      this.remove_nodes(field, val);
+      filter_button.detach();
+      if (this.curr_filters.length === 0) {
+        $("#filter-select").find('input').attr("placeholder", "Choose a subset");
+        return $("#filter-select-buttons").text("");
+      }
     };
 
     BubbleChart.prototype.add_nodes = function(field, val) {
@@ -470,7 +483,7 @@
     var chart, render_vis;
     chart = null;
     render_vis = function(csv) {
-      $("#filter-select-wrapper").css("visibility", "visible");
+      $("#toolbar").css("visibility", "visible");
       $(".load-screen").hide();
       return chart = new BubbleChart(csv);
     };

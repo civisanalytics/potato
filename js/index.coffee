@@ -91,15 +91,27 @@ class BubbleChart
     )
 
   add_filter: (field, val) =>
+    # this is the first filter
+    if @curr_filters.length == 0
+      $("#filter-select").find('input').attr("placeholder", "Add another subset")
+      $("#filter-select-buttons").text("Current subsets: ")
+
     @curr_filters.push({filter: field, value: val})
 
     filter_button = $("<button>"+val+"</button>")
-    filter_button.on("click", (e) =>
-      this.remove_nodes(field, val)
-      filter_button.detach()
-    )
+    filter_button.on "click", (e) =>
+      this.remove_filter(field, val, filter_button)
     $("#filter-select-buttons").append(filter_button)
+
     this.add_nodes(field, val)
+
+  remove_filter: (field, val, filter_button) =>
+    this.remove_nodes(field, val)
+    filter_button.detach()
+    # that was the last filter
+    if @curr_filters.length == 0
+      $("#filter-select").find('input').attr("placeholder", "Choose a subset")
+      $("#filter-select-buttons").text("")
 
   add_nodes: (field, val) =>
     @data.forEach (d) =>
@@ -403,7 +415,7 @@ $ ->
   chart = null
 
   render_vis = (csv) ->
-    $("#filter-select-wrapper").css("visibility", "visible")
+    $("#toolbar").css("visibility", "visible")
     $(".load-screen").hide()
     chart = new BubbleChart csv
 

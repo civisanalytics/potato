@@ -25,6 +25,7 @@ a {
   width: 100%;
   top: 0;
   padding: 15px;
+  visibility: hidden;
 }
 
 .pull-left {
@@ -119,7 +120,6 @@ button.active {
   display: inline-block;
   margin: 0 15px 0 0;
   vertical-align: top;
-  visibility: hidden;
 }
 
 .tt-input,
@@ -171,8 +171,7 @@ button.active {
 */
 
 #filter-select-buttons {
-  display: inline-block;
-  vertical-align: top;
+  margin-top: 5px;
 }
 
 #modifier-buttons {
