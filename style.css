@@ -45,7 +45,6 @@ a {
 button {
   border: 1px solid #ccc;
   outline: none;
-  padding: 8px;
   border-radius: 5px;
   cursor: pointer;
   background-color: #FFF;
@@ -116,6 +115,10 @@ button.active {
   font-size: 0.7em;
 }
 
+.demo-button {
+  padding: 14px;
+}
+
 #filter-select-wrapper {
   display: inline-block;
   margin: 0 15px 0 0;
@@ -174,22 +177,34 @@ button.active {
   margin-top: 5px;
 }
 
-#modifier-buttons {
+#modifiers {
   display: inline-block;
   font-variant: small-caps;
+  vertical-align: top;
+}
+
+.button-arrow {
+  position: absolute;
+  right: 7px;
+  top: 12px;
 }
 
 .modifier-wrapper {
   display: inline-block;
+  vertical-align: top;
 }
 .modifier-button {
+  position: relative;
   height: 40px;
-  width: 120px;
+  width: 140px;
+}
+.modifier-hint {
+  font-variant: small-caps;
 }
 .modifier-menu {
   display:none;
   position:absolute;
-  width: 120px;
+  width: 140px;
   border-radius: 5px;
   border: 1px solid #ccc;
   z-index: 10;

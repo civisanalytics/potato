@@ -222,7 +222,7 @@
     };
 
     BubbleChart.prototype.split_buttons = function() {
-      $("#modifier-buttons").append("<div id='split-wrapper' class='modifier-wrapper'><button id='split-button' class='modifier-button'>Split By</button><div id='split-menu' class='modifier-menu'></div></div>");
+      $("#modifiers").append("<div id='split-wrapper' class='modifier-wrapper'><button id='split-button' class='modifier-button'>Split By<span class='button-arrow'>&#x25BC;</span><span id='split-hint' class='modifier-hint'></span></button><div id='split-menu' class='modifier-menu'></div></div>");
       $("#split-button").hover(function() {
         return $("#split-menu").slideDown(100);
       });
@@ -245,6 +245,7 @@
       if (this.circles === void 0 || this.circles.length === 0) {
         return;
       }
+      $("#split-hint").html("<br>" + split);
       $(".split-option").removeClass('active');
       $("#split-" + split).addClass('active');
       while (this.labels.length > 0) {
@@ -303,7 +304,7 @@
     };
 
     BubbleChart.prototype.color_buttons = function() {
-      $("#modifier-buttons").append("<div id='color-wrapper' class='modifier-wrapper'><button id='color-button' class='modifier-button'>Color By</button><div id='color-menu' class='modifier-menu'></div></div>");
+      $("#modifiers").append("<div id='color-wrapper' class='modifier-wrapper'><button id='color-button' class='modifier-button'>Color By<span class='button-arrow'>&#x25BC;</span><span id='color-hint' class='modifier-hint'></span></button><div id='color-menu' class='modifier-menu'></div></div>");
       $("#color-button").hover(function() {
         return $("#color-menu").slideDown(100);
       });
@@ -326,6 +327,7 @@
       if (this.circles === void 0 || this.circles.length === 0) {
         return;
       }
+      $("#color-hint").html("<br>" + split);
       $(".color-button").removeClass('active');
       $("#color-" + split).addClass('active');
       curr_vals = [];

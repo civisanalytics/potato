@@ -171,7 +171,7 @@ class BubbleChart
     this.update()
 
   split_buttons: () =>
-    $("#modifier-buttons").append("<div id='split-wrapper' class='modifier-wrapper'><button id='split-button' class='modifier-button'>Split By</button><div id='split-menu' class='modifier-menu'></div></div>")
+    $("#modifiers").append("<div id='split-wrapper' class='modifier-wrapper'><button id='split-button' class='modifier-button'>Split By<span class='button-arrow'>&#x25BC;</span><span id='split-hint' class='modifier-hint'></span></button><div id='split-menu' class='modifier-menu'></div></div>")
     $("#split-button").hover () ->
       $("#split-menu").slideDown(100)
 
@@ -190,6 +190,8 @@ class BubbleChart
   split_by: (split) =>
     if @circles == undefined || @circles.length == 0
       return
+
+    $("#split-hint").html("<br>"+split)
 
     $(".split-option").removeClass('active')
     $("#split-"+split).addClass('active')
@@ -249,7 +251,7 @@ class BubbleChart
     this.update()
 
   color_buttons: () =>
-    $("#modifier-buttons").append("<div id='color-wrapper' class='modifier-wrapper'><button id='color-button' class='modifier-button'>Color By</button><div id='color-menu' class='modifier-menu'></div></div>")
+    $("#modifiers").append("<div id='color-wrapper' class='modifier-wrapper'><button id='color-button' class='modifier-button'>Color By<span class='button-arrow'>&#x25BC;</span><span id='color-hint' class='modifier-hint'></span></button><div id='color-menu' class='modifier-menu'></div></div>")
     $("#color-button").hover () ->
       $("#color-menu").slideDown(100)
 
@@ -268,6 +270,8 @@ class BubbleChart
   color_by: (split) =>
     if @circles == undefined || @circles.length == 0
       return
+
+    $("#color-hint").html("<br>"+split)
 
     $(".color-button").removeClass('active')
     $("#color-"+split).addClass('active')
