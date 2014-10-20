@@ -492,9 +492,14 @@
         return d3.csv("data/football/players_2.csv", render_vis);
       };
     })(this));
-    return $("#billionaire-dataset").on('click', (function(_this) {
+    $("#billionaire-dataset").on('click', (function(_this) {
       return function(e) {
         return d3.csv("data/billion/billionaire.csv", render_vis);
+      };
+    })(this));
+    return $("#auto-dataset").on('click', (function(_this) {
+      return function(e) {
+        return d3.csv("data/auto/auto.csv", render_vis);
       };
     })(this));
   });
