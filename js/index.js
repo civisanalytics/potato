@@ -176,7 +176,7 @@
         };
       })(this));
       this.update();
-      split_id = $(".split-button.active").attr('id');
+      split_id = $(".split-option.active").attr('id');
       if (split_id !== void 0) {
         return this.split_by(split_id.split('-')[1]);
       }
@@ -209,15 +209,19 @@
     };
 
     BubbleChart.prototype.split_buttons = function() {
-      $("#modifier-buttons").append("<div id='split-buttons'>Split By: </div>");
-      return d3.select("#split-buttons").selectAll('button').data(this.filter_names).enter().append("button").text(function(d) {
+      $("#modifier-buttons").append("<div id='split-wrapper' class='modifier-wrapper'><button id='split-button' class='modifier-button'>Split By</button><div id='split-menu' class='modifier-menu'></div></div>");
+      $("#split-button").hover(function() {
+        return $("#split-menu").slideDown(100);
+      });
+      $("#split-wrapper").mouseleave(function() {
+        return $("#split-menu").slideUp(100);
+      });
+      return d3.select("#split-menu").selectAll('div').data(this.filter_names).enter().append("div").text(function(d) {
         return d.value;
-      }).attr("class", 'split-button').attr("id", function(d) {
+      }).attr("class", 'modifier-option split-option').attr("id", function(d) {
         return 'split-' + d.value;
       }).on("click", (function(_this) {
         return function(d) {
-          $(".split-button").removeClass('active');
-          $("#split-" + d.value).addClass('active');
           return _this.split_by(d.value);
         };
       })(this));
@@ -225,6 +229,11 @@
 
     BubbleChart.prototype.split_by = function(split) {
       var curr_col, curr_row, curr_vals, height_2, num_cols, num_rows, width_2;
+      if (this.circles === void 0 || this.circles.length === 0) {
+        return;
+      }
+      $(".split-option").removeClass('active');
+      $("#split-" + split).addClass('active');
       while (this.labels.length > 0) {
         this.labels.pop();
       }
@@ -281,15 +290,19 @@
     };
 
     BubbleChart.prototype.color_buttons = function() {
-      $("#modifier-buttons").append("<div id='color-buttons'>Color By: </div>");
-      return d3.select("#color-buttons").selectAll('button').data(this.filter_names).enter().append("button").text(function(d) {
+      $("#modifier-buttons").append("<div id='color-wrapper' class='modifier-wrapper'><button id='color-button' class='modifier-button'>Color By</button><div id='color-menu' class='modifier-menu'></div></div>");
+      $("#color-button").hover(function() {
+        return $("#color-menu").slideDown(100);
+      });
+      $("#color-wrapper").mouseleave(function() {
+        return $("#color-menu").slideUp(100);
+      });
+      return d3.select("#color-menu").selectAll('div').data(this.filter_names).enter().append("div").text(function(d) {
         return d.value;
-      }).attr("class", 'color-button').attr("id", function(d) {
+      }).attr("class", 'modifier-option color-option').attr("id", function(d) {
         return 'color-' + d.value;
       }).on("click", (function(_this) {
         return function(d) {
-          $(".color-button").removeClass('active');
-          $("#color-" + d.value).addClass('active');
           return _this.color_by(d.value);
         };
       })(this));
@@ -297,6 +310,11 @@
 
     BubbleChart.prototype.color_by = function(split) {
       var colors, curr_vals, g, l_size, legend, num_colors;
+      if (this.circles === void 0 || this.circles.length === 0) {
+        return;
+      }
+      $(".color-button").removeClass('active');
+      $("#color-" + split).addClass('active');
       curr_vals = [];
       this.circles.each((function(_this) {
         return function(c) {

@@ -134,7 +134,7 @@ class BubbleChart
     this.update()
 
     # apply any existing splits
-    split_id = $(".split-button.active").attr('id')
+    split_id = $(".split-option.active").attr('id')
     if split_id != undefined
       this.split_by(split_id.split('-')[1])
 
@@ -159,19 +159,29 @@ class BubbleChart
     this.update()
 
   split_buttons: () =>
-    $("#modifier-buttons").append("<div id='split-buttons'>Split By: </div>")
-    d3.select("#split-buttons").selectAll('button').data(@filter_names).enter()
-      .append("button")
+    $("#modifier-buttons").append("<div id='split-wrapper' class='modifier-wrapper'><button id='split-button' class='modifier-button'>Split By</button><div id='split-menu' class='modifier-menu'></div></div>")
+    $("#split-button").hover () ->
+      $("#split-menu").slideDown(100)
+
+    $("#split-wrapper").mouseleave () ->
+      $("#split-menu").slideUp(100)
+
+    d3.select("#split-menu").selectAll('div').data(@filter_names).enter()
+      .append("div")
       .text((d) -> d.value)
-      .attr("class", 'split-button')
+      .attr("class", 'modifier-option split-option')
       .attr("id", (d) -> 'split-' + d.value)
       .on("click", (d) =>
-        $(".split-button").removeClass('active')
-        $("#split-"+d.value).addClass('active')
         this.split_by(d.value)
       )
 
   split_by: (split) =>
+    if @circles == undefined || @circles.length == 0
+      return
+
+    $(".split-option").removeClass('active')
+    $("#split-"+split).addClass('active')
+
     # reset the @labels array
     while @labels.length > 0
       @labels.pop()
@@ -227,19 +237,28 @@ class BubbleChart
     this.update()
 
   color_buttons: () =>
-    $("#modifier-buttons").append("<div id='color-buttons'>Color By: </div>")
-    d3.select("#color-buttons").selectAll('button').data(@filter_names).enter()
-      .append("button")
+    $("#modifier-buttons").append("<div id='color-wrapper' class='modifier-wrapper'><button id='color-button' class='modifier-button'>Color By</button><div id='color-menu' class='modifier-menu'></div></div>")
+    $("#color-button").hover () ->
+      $("#color-menu").slideDown(100)
+
+    $("#color-wrapper").mouseleave () ->
+      $("#color-menu").slideUp(100)
+
+    d3.select("#color-menu").selectAll('div').data(@filter_names).enter()
+      .append("div")
       .text((d) -> d.value)
-      .attr("class", 'color-button')
+      .attr("class", 'modifier-option color-option')
       .attr("id", (d) -> 'color-' + d.value)
       .on("click", (d) =>
-        $(".color-button").removeClass('active')
-        $("#color-"+d.value).addClass('active')
         this.color_by(d.value)
       )
 
   color_by: (split) =>
+    if @circles == undefined || @circles.length == 0
+      return
+
+    $(".color-button").removeClass('active')
+    $("#color-"+split).addClass('active')
 
     curr_vals = []
 

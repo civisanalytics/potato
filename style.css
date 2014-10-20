@@ -52,7 +52,7 @@ button {
   -webkit-transition: background 0.2s ease-in-out;
   -moz-transition: background 0.2s ease-easein-out;
   -ms-transition: background 0.2s ease-in-out;
-  -o-transition: borderackground 0.2s ease-in-out;
+  -o-transition: background 0.2s ease-in-out;
   margin-right: 5px;
 }
 
@@ -64,10 +64,8 @@ button.active {
   background-color: #aaa;
 }
 
-.split-button {
-  margin-right: 5px;
-}
 .color-button {
+  font-variant: small-caps;
   margin-right: 5px;
 }
 
@@ -119,7 +117,7 @@ button.active {
 
 #filter-select-wrapper {
   display: inline-block;
-  margin: 5px 15px 0 0;
+  margin: 0 15px 0 0;
   vertical-align: top;
   visibility: hidden;
 }
@@ -179,10 +177,37 @@ button.active {
 
 #modifier-buttons {
   display: inline-block;
+  font-variant: small-caps;
 }
 
-#split-buttons {
-  margin: 5px 0 5px 7px;
+.modifier-wrapper {
+  display: inline-block;
+}
+.modifier-button {
+  height: 40px;
+  width: 120px;
+}
+.modifier-menu {
+  display:none;
+  position:absolute;
+  width: 120px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  z-index: 10;
+  background-color: rgba(255,255,255,0.9);
+}
+.modifier-option {
+  text-align: center;
+  height: 30px;
+  transition: background 0.2s ease-in-out;
+  -webkit-transition: background 0.2s ease-in-out;
+  -moz-transition: background 0.2s ease-easein-out;
+  -ms-transition: background 0.2s ease-in-out;
+  -o-transition: background 0.2s ease-in-out;
+}
+.modifier-option:hover {
+  background-color: #eee;
+  cursor: pointer;
 }
 
 .marker {
