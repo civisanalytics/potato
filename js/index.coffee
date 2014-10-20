@@ -72,7 +72,8 @@ class BubbleChart
             cb(this.s_filter(suggestions))
           )
         templates: {
-          header: '<h3 class="filter-header">'+k+'</h3>'
+          empty: ''
+          header: '<div class="filter-header">'+k+'</div>'
         }
       })
 

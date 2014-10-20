@@ -165,7 +165,7 @@ button.active {
   font-weight: normal;
   margin: 10px 0 0 0;
   padding: 0 5px 0 5px;
-
+  font-variant: small-caps;
 }
 /*
 .tt-suggestion-filter {
