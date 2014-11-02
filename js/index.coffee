@@ -34,22 +34,32 @@ class BubbleChart
     this.subset_selection()
 
   subset_selection: () =>
+    subset_select_button = $("<button id='subset-select-button'>Select Subset</button>")
+    subset_select_button.on "click", (e) =>
+      $("#subset-selection").toggle()
+    $("#modifiers").append(subset_select_button)
+
     $("#subset-selection").height(@height)
 
-    @new_filters = []
-
     $.each @filters, (k, v) =>
-
       filter_id = "filter" + k
-      filter_group = $("<div class='filter-group' id='"+filter_id+"'>"+k+"</div>")
+      filter_group = $("<div class='filter-group-wrapper'><div class='filter-group-header'>"+k+"</div><div class='filter-group' id='"+filter_id+"'></div></div>")
       $("#subset-selection").append(filter_group)
+
+      that = this
 
       d3.select("#"+filter_id).selectAll('div').data(v).enter()
         .append("div")
-        .text((d) ->
-          return d.value
+        .attr("class", "filter-value")
+        .text((d) -> return d.value)
+        .on("click", (d) ->
+          if $(this).hasClass("active")
+            that.remove_filter(d.filter, d.value)
+            $(this).removeClass("active")
+          else
+            that.add_filter(d.filter, d.value)
+            $(this).addClass("active")
         )
-
 
   # the logic behind taking the csv and determining what the categorical data is
   create_filters: () =>
@@ -70,51 +80,9 @@ class BubbleChart
           if filter_exists.length == 0
             @filters[k].push({filter: k, value: v})
 
-    b_groups = []
-
-    $.each @filters, (k, v) =>
-
-      b_group = new Bloodhound {
-        datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value')
-        queryTokenizer: Bloodhound.tokenizers.whitespace
-        limit: Infinity
-        local: v
-      }
-
-      # kicks off the loading/processing of `local` and `prefetch`
-      b_group.initialize();
-
-      b_groups.push({
-        name: k
-        displayKey: 'value'
-        source: (query, cb) =>
-          b_group.get(query, (suggestions) =>
-            cb(this.s_filter(suggestions))
-          )
-        templates: {
-          empty: ''
-          header: '<div class="filter-header">'+k+'</div>'
-        }
-      })
-
-    $('#filter-select .typeahead').typeahead({
-      hint: true
-      minLength: 1
-      autoselect: true
-    }, b_groups).on 'typeahead:selected typeahead:autocompleted', (e, d) =>
-      this.add_filter(d['filter'], d['value'])
-      $('.typeahead').typeahead('val', '')
-
-  s_filter: (suggestions) =>
-    return $.grep(suggestions, (s) =>
-      # if this suggestion is a curr_filter, return false
-      return $.grep(@curr_filters, (e) => e.value == s.value).length == 0
-    )
-
   add_filter: (field, val) =>
     # this is the first filter
     if @curr_filters.length == 0
-      $("#filter-select").find('input').attr("placeholder", "Add another subset")
       $("#filter-select-buttons").text("Current subsets: ")
 
     @curr_filters.push({filter: field, value: val})
@@ -131,7 +99,6 @@ class BubbleChart
     filter_button.detach()
     # that was the last filter
     if @curr_filters.length == 0
-      $("#filter-select").find('input').attr("placeholder", "Choose a subset")
       $("#filter-select-buttons").text("")
 
   add_nodes: (field, val) =>

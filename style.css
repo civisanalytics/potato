@@ -119,60 +119,6 @@ button.active {
   padding: 14px;
 }
 
-#filter-select-wrapper {
-  display: inline-block;
-  margin: 0 15px 0 0;
-  vertical-align: top;
-}
-
-.tt-input,
-.tt-hint {
-  width:300px;
-  height:40px;
-  font-size: 16px;
-  text-indent: 10px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-}
-
-.tt-dropdown-menu {
-  min-width:300px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  background-color: #FFF;
-  max-height: 50vh;
-  overflow-y: auto;
-}
-
-.tt-hint {
-  color: #ccc;
-}
-
-.tt-suggestion {
-  line-height: 3px;
-  padding: 1px 10px;
-}
-
-.tt-suggestion.tt-cursor {
-  cursor: pointer;
-  background-color: #eee;
-}
-
-.filter-header {
-  display:inline-block;
-  cursor: default;
-  color: #ccc;
-  font-weight: normal;
-  margin: 10px 0 0 0;
-  padding: 0 5px 0 5px;
-  font-variant: small-caps;
-}
-/*
-.tt-suggestion-filter {
-  color: #ccc;
-}
-*/
-
 #filter-select-buttons {
   margin-top: 5px;
 }
@@ -261,23 +207,47 @@ button.active {
   position:absolute;
 }
 
+#subset-select-button {
+  padding: 12px 25px 13px 25px;
+  display: inline-block;
+}
 #subset-selection {
   position: absolute;
-  background-color: #ac9a31;
-  opacity: .5;
+  background-color: #FFF;
+  opacity: .9;
   width: 100%;
   padding-left: 100px;
 }
-
-.filter-group {
+.filter-group-wrapper {
   display: inline-block;
   vertical-align: top;
-  height: 300px;
-  overflow: scroll;
   margin:30px 0 0 10px;
-  padding:0 20px 0 0;
 }
-
+.filter-group {
+  height: 300px;
+  padding:0 20px 0 0;
+  overflow: scroll;
+}
+.filter-group-header {
+  cursor: default;
+  font-weight: normal;
+  font-variant: small-caps;
+  border-bottom: 1px solid #ccc;
+  margin-bottom: 5px;
+}
+.filter-value {
+  padding: 2px 0;
+}
+.filter-value:hover {
+  background-color: #ccc;
+  cursor: pointer;
+}
+.filter-value.active{
+  background-color: #aaa;
+}
+.filter-value.active:hover{
+  background-color: #333;
+}
 
 
 .arizona_cardinals {
