@@ -33,6 +33,29 @@ class BubbleChart
 
     this.subset_selection()
 
+  # the logic behind taking the csv and determining what the categorical data is
+  create_filters: () =>
+
+    # get filter names from header row
+    @filter_names = []
+    $.each @data[0], (d) =>
+      # columns named node_id or name are treated specially
+      if d != 'node_id' && d != 'name'
+        @filter_names.push {value: d}
+
+    @filters = []
+    filter_counter = 1
+
+    # populate the filters from the dataset
+    @data.forEach (d) =>
+      $.each d, (k, v) =>
+        if k != 'node_id' && k != 'name' # ignore columns named node_id or name, TODO remove this?
+          filter_exists = $.grep @filters, (e) =>
+            return e.filter == k && e.value == v
+          if filter_exists.length == 0
+            @filters.push({id: filter_counter, filter: k, value: v})
+            filter_counter += 1
+
   subset_selection: () =>
     subset_select_button = $("<button id='subset-select-button'>Select Subset</button>")
     subset_select_button.on "click", (e) =>
@@ -42,90 +65,97 @@ class BubbleChart
     $("#subset-selection").height(@height)
 
     that = this
-
-    all_data = $("#all-data")
-    $("#all-data").on "click", (e) ->
+    $("#all-data").addClass("filter-0").on "click", (e) ->
       $(this).addClass("active")
       that.add_all()
       $("#subset-selection").hide()
 
+    # copy a modified version of @filters into subsets, where the filters are sorted by filter
+    subsets = {}
+    $.each @filter_names, (k, v) =>
+      subsets[v.value] = []
     $.each @filters, (k, v) =>
+      subsets[v.filter].push v
+
+    $.each subsets, (k, v) =>
       filter_id = "filter" + k
       filter_group = $("<div class='filter-group-wrapper'><div class='filter-group-header'>"+k+"</div><div class='filter-group' id='"+filter_id+"'></div></div>")
       $("#subset-groups").append(filter_group)
 
       that = this
-
       d3.select("#"+filter_id).selectAll('div').data(v).enter()
         .append("div")
-        .attr("class", "filter-value")
+        .attr("class", (d) -> return "filter-value filter-" + d.id)
         .text((d) -> return d.value)
         .on("click", (d) ->
           if $(this).hasClass("active")
-            that.remove_filter(d.filter, d.value)
-            $(this).removeClass("active")
+            that.remove_filter(d.id)
           else
-            that.add_filter(d.filter, d.value)
+            that.add_filter(d.id)
             $(this).addClass("active")
         )
 
     $("#subset-selection").show()
 
-  # the logic behind taking the csv and determining what the categorical data is
-  create_filters: () =>
-    @filters = {}
-    @filter_names = []
-    $.each @data[0], (d) =>
-      # columns named node_id or name are treated specially
-      if d != 'node_id' && d != 'name'
-        @filter_names.push {value: d}
-        @filters[d] = []
-
-    # populate the filters from the dataset
-    @data.forEach (d) =>
-      $.each d, (k, v) =>
-        if k != 'node_id' && k != 'name'
-          filter_exists = $.grep @filters[k], (e) =>
-            return e.filter == k && e.value == v
-          if filter_exists.length == 0
-            @filters[k].push({filter: k, value: v})
 
   # add all data nodes to screen
   add_all: () =>
     if @nodes.length != @data.length
-      filter_button = $("<button class='active'>All Data</button>")
+      filter_button = $("<button class='active filter-0'>All Data</button>")
       filter_button.on "click", (e) =>
         @nodes = []
-        this.remove_filter(null, null, filter_button)
+        this.remove_filter(null)
+        this.update()
       $("#filter-select-buttons").append(filter_button)
 
-      this.add_nodes(null, null)
+      this.add_nodes(null)
 
-  add_filter: (field, val) =>
+  add_filter: (id) =>
+    curr_filter = $.grep(@filters, (e) =>
+      return e.id == id
+    )[0]
+
     # this is the first filter
     if @curr_filters.length == 0
       $("#filter-select-buttons").text("Current subsets: ")
 
-    @curr_filters.push({filter: field, value: val})
+    @curr_filters.push(curr_filter)
 
-    filter_button = $("<button class='active'>"+val+"</button>")
+    filter_button = $("<button class='active filter-"+id+"'>"+curr_filter.value+"</button>")
     filter_button.on "click", (e) =>
-      this.remove_filter(field, val, filter_button)
+      this.remove_filter(id)
     $("#filter-select-buttons").append(filter_button)
 
-    this.add_nodes(field, val)
+    this.add_nodes(id)
 
-  remove_filter: (field, val, filter_button) =>
-    if field && val
-      this.remove_nodes(field, val)
-    filter_button.detach()
+  remove_filter: (id) =>
+    curr_filter = $.grep(@filters, (e) =>
+      return e.id == id
+    )[0]
+
+    if curr_filter # otherwise, we just removed all nodes so no need to call remove_nodes
+      this.remove_nodes(id)
+
+    # remove or turn off any necessary buttons / sub_selectors
+    $(".filter-"+id).each (k, v) ->
+      f_obj = $(v)
+      if f_obj.is('div')
+        f_obj.removeClass("active")
+      else if f_obj.is('button')
+        f_obj.detach()
+
     # that was the last filter
     if @curr_filters.length == 0
       $("#filter-select-buttons").text("")
 
-  add_nodes: (field, val) =>
+  add_nodes: (id) =>
+    if id
+      curr_filter = $.grep(@filters, (e) =>
+        return e.id == id
+      )[0]
+
     @data.forEach (d) =>
-      if d[field] == val || (field==null && val==null)
+      if id == null || d[curr_filter.filter] == curr_filter.value
         if $.grep(@nodes, (e) => e.id == d.node_id).length == 0 # if it doesn't already exist in nodes
 
           vals = {} # create a hash with the appropriate filters
@@ -160,15 +190,19 @@ class BubbleChart
     if split_id != undefined
       this.split_by(split_id.split('-')[1])
 
-  remove_nodes: (field, val) =>
+  remove_nodes: (id) =>
+    curr_filter = $.grep(@filters, (e) =>
+      return e.id == id
+    )[0]
+
     # remove this filter from the @curr_filters
     @curr_filters = $.grep @curr_filters, (e) =>
-      return e['filter'] != field || e['value'] != val
+      return e['filter'] != curr_filter.filter || e['value'] != curr_filter.value
 
     # this was the only array iterator + removal I could get to work
     len = @nodes.length
     while (len--)
-      if @nodes[len]['values'][field] == val # node with offending value found
+      if @nodes[len]['values'][curr_filter.filter] == curr_filter.value # node with offending value found
         # now check that it doesnt have other values that would allow it to stay
         should_remove = true
         @curr_filters.forEach (k) =>
