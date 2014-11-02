@@ -261,6 +261,23 @@ button.active {
   position:absolute;
 }
 
+#subset-selection {
+  position: absolute;
+  background-color: #ac9a31;
+  opacity: .5;
+  width: 100%;
+  padding-left: 100px;
+}
+
+.filter-group {
+  display: inline-block;
+  vertical-align: top;
+  height: 300px;
+  overflow: scroll;
+  margin:30px 0 0 10px;
+  padding:0 20px 0 0;
+}
+
 
 
 .arizona_cardinals {

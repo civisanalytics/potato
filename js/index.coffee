@@ -31,6 +31,26 @@ class BubbleChart
     if data.length != 1933
       this.color_buttons()
 
+    this.subset_selection()
+
+  subset_selection: () =>
+    $("#subset-selection").height(@height)
+
+    @new_filters = []
+
+    $.each @filters, (k, v) =>
+
+      filter_id = "filter" + k
+      filter_group = $("<div class='filter-group' id='"+filter_id+"'>"+k+"</div>")
+      $("#subset-selection").append(filter_group)
+
+      d3.select("#"+filter_id).selectAll('div').data(v).enter()
+        .append("div")
+        .text((d) ->
+          return d.value
+        )
+
+
   # the logic behind taking the csv and determining what the categorical data is
   create_filters: () =>
     @filters = {}

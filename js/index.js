@@ -21,6 +21,7 @@
       this.add_filter = __bind(this.add_filter, this);
       this.s_filter = __bind(this.s_filter, this);
       this.create_filters = __bind(this.create_filters, this);
+      this.subset_selection = __bind(this.subset_selection, this);
       this.data = data;
       this.width = $(window).width();
       this.height = $(window).height() - 105;
@@ -42,7 +43,24 @@
       if (data.length !== 1933) {
         this.color_buttons();
       }
+      this.subset_selection();
     }
+
+    BubbleChart.prototype.subset_selection = function() {
+      $("#subset-selection").height(this.height);
+      this.new_filters = [];
+      return $.each(this.filters, (function(_this) {
+        return function(k, v) {
+          var filter_group, filter_id;
+          filter_id = "filter" + k;
+          filter_group = $("<div class='filter-group' id='" + filter_id + "'>" + k + "</div>");
+          $("#subset-selection").append(filter_group);
+          return d3.select("#" + filter_id).selectAll('div').data(v).enter().append("div").text(function(d) {
+            return d.value;
+          });
+        };
+      })(this));
+    };
 
     BubbleChart.prototype.create_filters = function() {
       var b_groups;
