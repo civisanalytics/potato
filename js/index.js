@@ -58,22 +58,25 @@
           }
         };
       })(this));
-      this.filters = [];
+      this.filters = {};
       filter_counter = 1;
       return this.data.forEach((function(_this) {
         return function(d) {
           return $.each(d, function(k, v) {
             var filter_exists;
             if (k !== 'node_id' && k !== 'name') {
-              filter_exists = $.grep(_this.filters, function(e) {
-                return e.filter === k && e.value === v;
+              filter_exists = 0;
+              $.each(_this.filters, function(f, e) {
+                if (e.filter === k && e.value === v) {
+                  filter_exists = 1;
+                }
               });
-              if (filter_exists.length === 0) {
-                _this.filters.push({
+              if (filter_exists === 0) {
+                _this.filters[filter_counter] = {
                   id: filter_counter,
                   filter: k,
                   value: v
-                });
+                };
                 return filter_counter += 1;
               }
             }
@@ -140,10 +143,10 @@
         filter_button.on("click", (function(_this) {
           return function(e) {
             _this.nodes = [];
-            _this.remove_filter(null);
-            return _this.update();
+            return _this.remove_filter(null);
           };
         })(this));
+        this.update();
         $("#filter-select-buttons").append(filter_button);
         return this.add_nodes(null);
       }
@@ -151,11 +154,7 @@
 
     BubbleChart.prototype.add_filter = function(id) {
       var curr_filter, filter_button;
-      curr_filter = $.grep(this.filters, (function(_this) {
-        return function(e) {
-          return e.id === id;
-        };
-      })(this))[0];
+      curr_filter = this.filters[id];
       if (this.curr_filters.length === 0) {
         $("#filter-select-buttons").text("Current subsets: ");
       }
@@ -172,11 +171,7 @@
 
     BubbleChart.prototype.remove_filter = function(id) {
       var curr_filter;
-      curr_filter = $.grep(this.filters, (function(_this) {
-        return function(e) {
-          return e.id === id;
-        };
-      })(this))[0];
+      curr_filter = this.filters[id];
       if (curr_filter) {
         this.remove_nodes(id);
       }
@@ -197,11 +192,7 @@
     BubbleChart.prototype.add_nodes = function(id) {
       var curr_filter, split_id;
       if (id) {
-        curr_filter = $.grep(this.filters, (function(_this) {
-          return function(e) {
-            return e.id === id;
-          };
-        })(this))[0];
+        curr_filter = this.filters[id];
       }
       this.data.forEach((function(_this) {
         return function(d) {
@@ -246,11 +237,7 @@
 
     BubbleChart.prototype.remove_nodes = function(id) {
       var curr_filter, len, should_remove;
-      curr_filter = $.grep(this.filters, (function(_this) {
-        return function(e) {
-          return e.id === id;
-        };
-      })(this))[0];
+      curr_filter = this.filters[id];
       this.curr_filters = $.grep(this.curr_filters, (function(_this) {
         return function(e) {
           return e['filter'] !== curr_filter.filter || e['value'] !== curr_filter.value;

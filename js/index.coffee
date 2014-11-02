@@ -43,17 +43,20 @@ class BubbleChart
       if d != 'node_id' && d != 'name'
         @filter_names.push {value: d}
 
-    @filters = []
+    @filters = {}
     filter_counter = 1
 
     # populate the filters from the dataset
     @data.forEach (d) =>
       $.each d, (k, v) =>
         if k != 'node_id' && k != 'name' # ignore columns named node_id or name, TODO remove this?
-          filter_exists = $.grep @filters, (e) =>
-            return e.filter == k && e.value == v
-          if filter_exists.length == 0
-            @filters.push({id: filter_counter, filter: k, value: v})
+          filter_exists = 0
+          $.each @filters, (f, e) =>
+            if e.filter == k && e.value == v
+              filter_exists = 1
+              return
+          if filter_exists == 0
+            @filters[filter_counter] = {id: filter_counter, filter: k, value: v}
             filter_counter += 1
 
   subset_selection: () =>
@@ -105,15 +108,13 @@ class BubbleChart
       filter_button.on "click", (e) =>
         @nodes = []
         this.remove_filter(null)
-        this.update()
+      this.update()
       $("#filter-select-buttons").append(filter_button)
 
       this.add_nodes(null)
 
   add_filter: (id) =>
-    curr_filter = $.grep(@filters, (e) =>
-      return e.id == id
-    )[0]
+    curr_filter = @filters[id]
 
     # this is the first filter
     if @curr_filters.length == 0
@@ -129,9 +130,7 @@ class BubbleChart
     this.add_nodes(id)
 
   remove_filter: (id) =>
-    curr_filter = $.grep(@filters, (e) =>
-      return e.id == id
-    )[0]
+    curr_filter = @filters[id]
 
     if curr_filter # otherwise, we just removed all nodes so no need to call remove_nodes
       this.remove_nodes(id)
@@ -150,9 +149,7 @@ class BubbleChart
 
   add_nodes: (id) =>
     if id
-      curr_filter = $.grep(@filters, (e) =>
-        return e.id == id
-      )[0]
+      curr_filter = @filters[id]
 
     @data.forEach (d) =>
       if id == null || d[curr_filter.filter] == curr_filter.value
@@ -191,9 +188,7 @@ class BubbleChart
       this.split_by(split_id.split('-')[1])
 
   remove_nodes: (id) =>
-    curr_filter = $.grep(@filters, (e) =>
-      return e.id == id
-    )[0]
+    curr_filter = @filters[id]
 
     # remove this filter from the @curr_filters
     @curr_filters = $.grep @curr_filters, (e) =>
