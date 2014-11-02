@@ -98,9 +98,13 @@
       $("#subset-selection").height(this.height);
       that = this;
       $("#all-data").addClass("filter-0").on("click", function(e) {
-        $(this).addClass("active");
-        that.add_all();
-        return $("#subset-selection").hide();
+        if ($(this).hasClass("active")) {
+          return that.remove_all();
+        } else {
+          $(this).addClass("active");
+          that.add_all();
+          return $("#subset-selection").hide();
+        }
       });
       subsets = {};
       $.each(this.filter_names, (function(_this) {
@@ -140,7 +144,9 @@
     BubbleChart.prototype.add_all = function() {
       var filter_button;
       if (this.nodes.length !== this.data.length) {
-        this.remove_all();
+        if (this.curr_filters.length > 0) {
+          this.remove_all();
+        }
         this.curr_filters.push({
           id: 0
         });
@@ -252,6 +258,9 @@
       if (id === 0) {
         while (this.nodes.length > 0) {
           this.nodes.pop();
+        }
+        while (this.curr_filters.length > 0) {
+          this.curr_filters.pop();
         }
       } else {
         curr_filter = this.filters[id];

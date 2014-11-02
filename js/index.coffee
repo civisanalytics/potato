@@ -70,9 +70,12 @@ class BubbleChart
 
     that = this
     $("#all-data").addClass("filter-0").on "click", (e) ->
-      $(this).addClass("active")
-      that.add_all()
-      $("#subset-selection").hide()
+      if $(this).hasClass("active")
+        that.remove_all()
+      else
+        $(this).addClass("active")
+        that.add_all()
+        $("#subset-selection").hide()
 
     # copy a modified version of @filters into subsets, where the filters are sorted by filter
     subsets = {}
@@ -104,8 +107,10 @@ class BubbleChart
   # add all data nodes to screen
   add_all: () =>
     if @nodes.length != @data.length
-      # remove any currently selected filters
-      this.remove_all()
+
+      if @curr_filters.length > 0
+        # remove any currently selected filters
+        this.remove_all()
 
       @curr_filters.push({id: 0})
 
@@ -206,6 +211,9 @@ class BubbleChart
     if id == 0
       while @nodes.length > 0 # we can't just set @nodes = [] because that creates a new object
         @nodes.pop()
+
+      while @curr_filters.length > 0
+        @curr_filters.pop()
     else
       curr_filter = @filters[id]
 
