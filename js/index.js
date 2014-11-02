@@ -19,8 +19,8 @@
       this.add_nodes = __bind(this.add_nodes, this);
       this.remove_filter = __bind(this.remove_filter, this);
       this.add_filter = __bind(this.add_filter, this);
-      this.s_filter = __bind(this.s_filter, this);
       this.create_filters = __bind(this.create_filters, this);
+      this.subset_selection = __bind(this.subset_selection, this);
       this.data = data;
       this.width = $(window).width();
       this.height = $(window).height() - 105;
@@ -42,10 +42,42 @@
       if (data.length !== 1933) {
         this.color_buttons();
       }
+      this.subset_selection();
     }
 
+    BubbleChart.prototype.subset_selection = function() {
+      var subset_select_button;
+      subset_select_button = $("<button id='subset-select-button'>Select Subset</button>");
+      subset_select_button.on("click", (function(_this) {
+        return function(e) {
+          return $("#subset-selection").toggle();
+        };
+      })(this));
+      $("#modifiers").append(subset_select_button);
+      $("#subset-selection").height(this.height);
+      return $.each(this.filters, (function(_this) {
+        return function(k, v) {
+          var filter_group, filter_id, that;
+          filter_id = "filter" + k;
+          filter_group = $("<div class='filter-group-wrapper'><div class='filter-group-header'>" + k + "</div><div class='filter-group' id='" + filter_id + "'></div></div>");
+          $("#subset-selection").append(filter_group);
+          that = _this;
+          return d3.select("#" + filter_id).selectAll('div').data(v).enter().append("div").attr("class", "filter-value").text(function(d) {
+            return d.value;
+          }).on("click", function(d) {
+            if ($(this).hasClass("active")) {
+              that.remove_filter(d.filter, d.value);
+              return $(this).removeClass("active");
+            } else {
+              that.add_filter(d.filter, d.value);
+              return $(this).addClass("active");
+            }
+          });
+        };
+      })(this));
+    };
+
     BubbleChart.prototype.create_filters = function() {
-      var b_groups;
       this.filters = {};
       this.filter_names = [];
       $.each(this.data[0], (function(_this) {
@@ -58,7 +90,7 @@
           }
         };
       })(this));
-      this.data.forEach((function(_this) {
+      return this.data.forEach((function(_this) {
         return function(d) {
           return $.each(d, function(k, v) {
             var filter_exists;
@@ -76,58 +108,11 @@
           });
         };
       })(this));
-      b_groups = [];
-      $.each(this.filters, (function(_this) {
-        return function(k, v) {
-          var b_group;
-          b_group = new Bloodhound({
-            datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
-            queryTokenizer: Bloodhound.tokenizers.whitespace,
-            limit: Infinity,
-            local: v
-          });
-          b_group.initialize();
-          return b_groups.push({
-            name: k,
-            displayKey: 'value',
-            source: function(query, cb) {
-              return b_group.get(query, function(suggestions) {
-                return cb(_this.s_filter(suggestions));
-              });
-            },
-            templates: {
-              empty: '',
-              header: '<div class="filter-header">' + k + '</div>'
-            }
-          });
-        };
-      })(this));
-      return $('#filter-select .typeahead').typeahead({
-        hint: true,
-        minLength: 1,
-        autoselect: true
-      }, b_groups).on('typeahead:selected typeahead:autocompleted', (function(_this) {
-        return function(e, d) {
-          _this.add_filter(d['filter'], d['value']);
-          return $('.typeahead').typeahead('val', '');
-        };
-      })(this));
-    };
-
-    BubbleChart.prototype.s_filter = function(suggestions) {
-      return $.grep(suggestions, (function(_this) {
-        return function(s) {
-          return $.grep(_this.curr_filters, function(e) {
-            return e.value === s.value;
-          }).length === 0;
-        };
-      })(this));
     };
 
     BubbleChart.prototype.add_filter = function(field, val) {
       var filter_button;
       if (this.curr_filters.length === 0) {
-        $("#filter-select").find('input').attr("placeholder", "Add another subset");
         $("#filter-select-buttons").text("Current subsets: ");
       }
       this.curr_filters.push({
@@ -148,7 +133,6 @@
       this.remove_nodes(field, val);
       filter_button.detach();
       if (this.curr_filters.length === 0) {
-        $("#filter-select").find('input').attr("placeholder", "Choose a subset");
         return $("#filter-select-buttons").text("");
       }
     };
