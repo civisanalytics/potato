@@ -41,10 +41,18 @@ class BubbleChart
 
     $("#subset-selection").height(@height)
 
+    that = this
+
+    all_data = $("#all-data")
+    $("#all-data").on "click", (e) ->
+      $(this).addClass("active")
+      that.add_all()
+      $("#subset-selection").hide()
+
     $.each @filters, (k, v) =>
       filter_id = "filter" + k
       filter_group = $("<div class='filter-group-wrapper'><div class='filter-group-header'>"+k+"</div><div class='filter-group' id='"+filter_id+"'></div></div>")
-      $("#subset-selection").append(filter_group)
+      $("#subset-groups").append(filter_group)
 
       that = this
 
@@ -60,6 +68,8 @@ class BubbleChart
             that.add_filter(d.filter, d.value)
             $(this).addClass("active")
         )
+
+    $("#subset-selection").show()
 
   # the logic behind taking the csv and determining what the categorical data is
   create_filters: () =>
@@ -80,6 +90,17 @@ class BubbleChart
           if filter_exists.length == 0
             @filters[k].push({filter: k, value: v})
 
+  # add all data nodes to screen
+  add_all: () =>
+    if @nodes.length != @data.length
+      filter_button = $("<button class='active'>All Data</button>")
+      filter_button.on "click", (e) =>
+        @nodes = []
+        this.remove_filter(null, null, filter_button)
+      $("#filter-select-buttons").append(filter_button)
+
+      this.add_nodes(null, null)
+
   add_filter: (field, val) =>
     # this is the first filter
     if @curr_filters.length == 0
@@ -87,7 +108,7 @@ class BubbleChart
 
     @curr_filters.push({filter: field, value: val})
 
-    filter_button = $("<button>"+val+"</button>")
+    filter_button = $("<button class='active'>"+val+"</button>")
     filter_button.on "click", (e) =>
       this.remove_filter(field, val, filter_button)
     $("#filter-select-buttons").append(filter_button)
@@ -95,7 +116,8 @@ class BubbleChart
     this.add_nodes(field, val)
 
   remove_filter: (field, val, filter_button) =>
-    this.remove_nodes(field, val)
+    if field && val
+      this.remove_nodes(field, val)
     filter_button.detach()
     # that was the last filter
     if @curr_filters.length == 0
@@ -103,7 +125,7 @@ class BubbleChart
 
   add_nodes: (field, val) =>
     @data.forEach (d) =>
-      if d[field] == val
+      if d[field] == val || (field==null && val==null)
         if $.grep(@nodes, (e) => e.id == d.node_id).length == 0 # if it doesn't already exist in nodes
 
           vals = {} # create a hash with the appropriate filters
@@ -261,7 +283,7 @@ class BubbleChart
 
     $("#color-hint").html("<br>"+split)
 
-    $(".color-button").removeClass('active')
+    $(".color-option").removeClass('active')
     $("#color-"+split).addClass('active')
 
     curr_vals = []

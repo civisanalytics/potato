@@ -9,6 +9,8 @@ a {
   color: #000;
 }
 
+
+
 #git {
   position: absolute;
   bottom: 7px;
@@ -24,7 +26,7 @@ a {
 #toolbar {
   width: 100%;
   top: 0;
-  padding: 15px;
+  padding: 15px 0 0 20px;
   visibility: hidden;
 }
 
@@ -58,10 +60,6 @@ button {
 
 button:hover {
   background-color: #eee;
-}
-
-button.active {
-  background-color: #aaa;
 }
 
 .color-button {
@@ -120,7 +118,7 @@ button.active {
 }
 
 #filter-select-buttons {
-  margin-top: 5px;
+  display: inline-block;
 }
 
 #modifiers {
@@ -166,7 +164,7 @@ button.active {
   -o-transition: background 0.2s ease-in-out;
 }
 .modifier-option:hover {
-  background-color: #eee;
+  background-color: #ddd;
   cursor: pointer;
 }
 
@@ -208,16 +206,23 @@ button.active {
 }
 
 #subset-select-button {
+  margin-left: 20px;
   padding: 12px 25px 13px 25px;
   display: inline-block;
 }
 #subset-selection {
+  margin-top: 20px;
+  display: none;
   position: absolute;
   background-color: #FFF;
   opacity: .9;
   width: 100%;
   padding-left: 100px;
 }
+#subset-help-text {
+  width: 600px;
+}
+
 .filter-group-wrapper {
   display: inline-block;
   vertical-align: top;
@@ -225,7 +230,6 @@ button.active {
 }
 .filter-group {
   height: 300px;
-  padding:0 20px 0 0;
   overflow: scroll;
 }
 .filter-group-header {
@@ -236,17 +240,18 @@ button.active {
   margin-bottom: 5px;
 }
 .filter-value {
-  padding: 2px 0;
+  padding: 2px 20px 0 3px;
 }
 .filter-value:hover {
-  background-color: #ccc;
+  background-color: #ddd;
   cursor: pointer;
 }
-.filter-value.active{
-  background-color: #aaa;
+
+.active {
+  background-color: #86CFE8;
 }
-.filter-value.active:hover{
-  background-color: #333;
+.active:hover {
+  background-color: #0194D3;
 }
 
 

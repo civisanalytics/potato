@@ -19,6 +19,7 @@
       this.add_nodes = __bind(this.add_nodes, this);
       this.remove_filter = __bind(this.remove_filter, this);
       this.add_filter = __bind(this.add_filter, this);
+      this.add_all = __bind(this.add_all, this);
       this.create_filters = __bind(this.create_filters, this);
       this.subset_selection = __bind(this.subset_selection, this);
       this.data = data;
@@ -46,7 +47,7 @@
     }
 
     BubbleChart.prototype.subset_selection = function() {
-      var subset_select_button;
+      var all_data, subset_select_button, that;
       subset_select_button = $("<button id='subset-select-button'>Select Subset</button>");
       subset_select_button.on("click", (function(_this) {
         return function(e) {
@@ -55,12 +56,19 @@
       })(this));
       $("#modifiers").append(subset_select_button);
       $("#subset-selection").height(this.height);
-      return $.each(this.filters, (function(_this) {
+      that = this;
+      all_data = $("#all-data");
+      $("#all-data").on("click", function(e) {
+        $(this).addClass("active");
+        that.add_all();
+        return $("#subset-selection").hide();
+      });
+      $.each(this.filters, (function(_this) {
         return function(k, v) {
-          var filter_group, filter_id, that;
+          var filter_group, filter_id;
           filter_id = "filter" + k;
           filter_group = $("<div class='filter-group-wrapper'><div class='filter-group-header'>" + k + "</div><div class='filter-group' id='" + filter_id + "'></div></div>");
-          $("#subset-selection").append(filter_group);
+          $("#subset-groups").append(filter_group);
           that = _this;
           return d3.select("#" + filter_id).selectAll('div').data(v).enter().append("div").attr("class", "filter-value").text(function(d) {
             return d.value;
@@ -75,6 +83,7 @@
           });
         };
       })(this));
+      return $("#subset-selection").show();
     };
 
     BubbleChart.prototype.create_filters = function() {
@@ -110,6 +119,21 @@
       })(this));
     };
 
+    BubbleChart.prototype.add_all = function() {
+      var filter_button;
+      if (this.nodes.length !== this.data.length) {
+        filter_button = $("<button class='active'>All Data</button>");
+        filter_button.on("click", (function(_this) {
+          return function(e) {
+            _this.nodes = [];
+            return _this.remove_filter(null, null, filter_button);
+          };
+        })(this));
+        $("#filter-select-buttons").append(filter_button);
+        return this.add_nodes(null, null);
+      }
+    };
+
     BubbleChart.prototype.add_filter = function(field, val) {
       var filter_button;
       if (this.curr_filters.length === 0) {
@@ -119,7 +143,7 @@
         filter: field,
         value: val
       });
-      filter_button = $("<button>" + val + "</button>");
+      filter_button = $("<button class='active'>" + val + "</button>");
       filter_button.on("click", (function(_this) {
         return function(e) {
           return _this.remove_filter(field, val, filter_button);
@@ -130,7 +154,9 @@
     };
 
     BubbleChart.prototype.remove_filter = function(field, val, filter_button) {
-      this.remove_nodes(field, val);
+      if (field && val) {
+        this.remove_nodes(field, val);
+      }
       filter_button.detach();
       if (this.curr_filters.length === 0) {
         return $("#filter-select-buttons").text("");
@@ -142,7 +168,7 @@
       this.data.forEach((function(_this) {
         return function(d) {
           var curr_class, curr_r, node, vals;
-          if (d[field] === val) {
+          if (d[field] === val || (field === null && val === null)) {
             if ($.grep(_this.nodes, function(e) {
               return e.id === d.node_id;
             }).length === 0) {
@@ -313,7 +339,7 @@
         return;
       }
       $("#color-hint").html("<br>" + split);
-      $(".color-button").removeClass('active');
+      $(".color-option").removeClass('active');
       $("#color-" + split).addClass('active');
       curr_vals = [];
       this.circles.each((function(_this) {
