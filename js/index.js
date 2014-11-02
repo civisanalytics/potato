@@ -11,6 +11,8 @@
       this.move_towards_target = __bind(this.move_towards_target, this);
       this.adjust_label_pos = __bind(this.adjust_label_pos, this);
       this.update = __bind(this.update, this);
+      this.size_by = __bind(this.size_by, this);
+      this.size_buttons = __bind(this.size_buttons, this);
       this.color_by = __bind(this.color_by, this);
       this.color_buttons = __bind(this.color_buttons, this);
       this.split_by = __bind(this.split_by, this);
@@ -44,6 +46,7 @@
       if (data.length !== 1933) {
         this.color_buttons();
       }
+      this.size_buttons();
       this.subset_selection();
     }
 
@@ -436,6 +439,61 @@
       return this.circles.attr("fill", function(d) {
         return d.color;
       });
+    };
+
+    BubbleChart.prototype.size_buttons = function() {
+      $("#modifiers").append("<div id='size-wrapper' class='modifier-wrapper'><button id='size-button' class='modifier-button'>Size By<span class='button-arrow'>&#x25BC;</span><span id='size-hint' class='modifier-hint'></span></button><div id='size-menu' class='modifier-menu'></div></div>");
+      $("#size-button").hover(function() {
+        return $("#size-menu").slideDown(100);
+      });
+      $("#size-wrapper").mouseleave(function() {
+        return $("#size-menu").slideUp(100);
+      });
+      return d3.select("#size-menu").selectAll('div').data(this.filter_names).enter().append("div").text(function(d) {
+        return d.value;
+      }).attr("class", 'modifier-option size-option').attr("id", function(d) {
+        return 'size-' + d.value;
+      }).on("click", (function(_this) {
+        return function(d) {
+          return _this.size_by(d.value);
+        };
+      })(this));
+    };
+
+    BubbleChart.prototype.size_by = function(split) {
+      var curr_max, curr_vals, non_zero_min, sizes;
+      if (this.circles === void 0 || this.circles.length === 0) {
+        return;
+      }
+      $("#size-hint").html("<br>" + split);
+      $(".size-option").removeClass('active');
+      $("#size-" + split).addClass('active');
+      curr_vals = [];
+      this.circles.each((function(_this) {
+        return function(c) {
+          if (curr_vals.indexOf(c['values'][split]) < 0) {
+            return curr_vals.push(c['values'][split]);
+          }
+        };
+      })(this));
+      curr_max = d3.max(curr_vals, function(d) {
+        return d;
+      });
+      non_zero_min = curr_max;
+      $.each(curr_vals, (function(_this) {
+        return function(k, c) {
+          if (c > 0 && c < non_zero_min) {
+            return non_zero_min = c;
+          }
+        };
+      })(this));
+      sizes = d3.scale.linear().domain([Math.sqrt(non_zero_min), Math.sqrt(curr_max)]).range([3, 20]).clamp(true);
+      this.circles.each((function(_this) {
+        return function(c) {
+          return c.radius = sizes(Math.sqrt(c['values'][split]));
+        };
+      })(this));
+      return this.update();
     };
 
     BubbleChart.prototype.update = function() {

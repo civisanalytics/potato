@@ -30,6 +30,7 @@ class BubbleChart
     this.split_buttons()
     if data.length != 1933
       this.color_buttons()
+    this.size_buttons()
 
     this.subset_selection()
 
@@ -391,6 +392,57 @@ class BubbleChart
           c.color = String(colors(s))
 
     @circles.attr("fill", (d) -> d.color)
+
+  size_buttons: () =>
+    $("#modifiers").append("<div id='size-wrapper' class='modifier-wrapper'><button id='size-button' class='modifier-button'>Size By<span class='button-arrow'>&#x25BC;</span><span id='size-hint' class='modifier-hint'></span></button><div id='size-menu' class='modifier-menu'></div></div>")
+    $("#size-button").hover () ->
+      $("#size-menu").slideDown(100)
+
+    $("#size-wrapper").mouseleave () ->
+      $("#size-menu").slideUp(100)
+
+    d3.select("#size-menu").selectAll('div').data(@filter_names).enter()
+      .append("div")
+      .text((d) -> d.value)
+      .attr("class", 'modifier-option size-option')
+      .attr("id", (d) -> 'size-' + d.value)
+      .on("click", (d) =>
+        this.size_by(d.value)
+      )
+
+  size_by: (split) =>
+    if @circles == undefined || @circles.length == 0
+      return
+
+    $("#size-hint").html("<br>"+split)
+
+    $(".size-option").removeClass('active')
+    $("#size-"+split).addClass('active')
+
+    curr_vals = []
+
+    # first get number of unique values in the filter
+    @circles.each (c) =>
+      if curr_vals.indexOf(c['values'][split]) < 0
+        curr_vals.push c['values'][split]
+
+    curr_max = d3.max(curr_vals, (d) -> d)
+    non_zero_min = curr_max
+
+    $.each curr_vals, (k, c) =>
+      if c > 0 && c < non_zero_min
+        non_zero_min = c
+
+    sizes = d3.scale.linear()
+      .domain([Math.sqrt(non_zero_min), Math.sqrt(curr_max)])
+      .range([3,20])
+      .clamp(true) # allows us to handle null values
+
+    # then update all circle sizes appropriately
+    @circles.each (c) =>
+      c.radius = sizes(Math.sqrt(c['values'][split]))
+
+    this.update()
 
   update: () =>
     @circles = @vis.selectAll("circle")
