@@ -19,6 +19,7 @@
       this.add_nodes = __bind(this.add_nodes, this);
       this.remove_filter = __bind(this.remove_filter, this);
       this.add_filter = __bind(this.add_filter, this);
+      this.remove_all = __bind(this.remove_all, this);
       this.add_all = __bind(this.add_all, this);
       this.subset_selection = __bind(this.subset_selection, this);
       this.create_filters = __bind(this.create_filters, this);
@@ -139,27 +140,40 @@
     BubbleChart.prototype.add_all = function() {
       var filter_button;
       if (this.nodes.length !== this.data.length) {
-        filter_button = $("<button class='active filter-0'>All Data</button>");
+        this.remove_all();
+        this.curr_filters.push({
+          id: 0
+        });
+        filter_button = $("<button class='active filter-button filter-0'>All Data</button>");
         filter_button.on("click", (function(_this) {
           return function(e) {
-            _this.nodes = [];
-            return _this.remove_filter(null);
+            return _this.remove_all();
           };
         })(this));
-        this.update();
         $("#filter-select-buttons").append(filter_button);
         return this.add_nodes(null);
       }
     };
 
+    BubbleChart.prototype.remove_all = function() {
+      return $.each(this.curr_filters, (function(_this) {
+        return function(k, f) {
+          return _this.remove_filter(f.id);
+        };
+      })(this));
+    };
+
     BubbleChart.prototype.add_filter = function(id) {
       var curr_filter, filter_button;
       curr_filter = this.filters[id];
+      if (this.curr_filters.length === 1 && this.curr_filters[0].id === 0) {
+        this.remove_all();
+      }
       if (this.curr_filters.length === 0) {
         $("#filter-select-buttons").text("Current subsets: ");
       }
       this.curr_filters.push(curr_filter);
-      filter_button = $("<button class='active filter-" + id + "'>" + curr_filter.value + "</button>");
+      filter_button = $("<button class='active filter-button filter-" + id + "'>" + curr_filter.value + "</button>");
       filter_button.on("click", (function(_this) {
         return function(e) {
           return _this.remove_filter(id);
@@ -172,16 +186,14 @@
     BubbleChart.prototype.remove_filter = function(id) {
       var curr_filter;
       curr_filter = this.filters[id];
-      if (curr_filter) {
-        this.remove_nodes(id);
-      }
+      this.remove_nodes(id);
       $(".filter-" + id).each(function(k, v) {
         var f_obj;
         f_obj = $(v);
-        if (f_obj.is('div')) {
-          return f_obj.removeClass("active");
-        } else if (f_obj.is('button')) {
+        if (f_obj.hasClass('filter-button')) {
           return f_obj.detach();
+        } else {
+          return f_obj.removeClass("active");
         }
       });
       if (this.curr_filters.length === 0) {
@@ -237,25 +249,31 @@
 
     BubbleChart.prototype.remove_nodes = function(id) {
       var curr_filter, len, should_remove;
-      curr_filter = this.filters[id];
-      this.curr_filters = $.grep(this.curr_filters, (function(_this) {
-        return function(e) {
-          return e['filter'] !== curr_filter.filter || e['value'] !== curr_filter.value;
-        };
-      })(this));
-      len = this.nodes.length;
-      while (len--) {
-        if (this.nodes[len]['values'][curr_filter.filter] === curr_filter.value) {
-          should_remove = true;
-          this.curr_filters.forEach((function(_this) {
-            return function(k) {
-              if (_this.nodes[len]['values'][k['filter']] === k['value']) {
-                return should_remove = false;
-              }
-            };
-          })(this));
-          if (should_remove === true) {
-            this.nodes.splice(len, 1);
+      if (id === 0) {
+        while (this.nodes.length > 0) {
+          this.nodes.pop();
+        }
+      } else {
+        curr_filter = this.filters[id];
+        this.curr_filters = $.grep(this.curr_filters, (function(_this) {
+          return function(e) {
+            return e['filter'] !== curr_filter.filter || e['value'] !== curr_filter.value;
+          };
+        })(this));
+        len = this.nodes.length;
+        while (len--) {
+          if (this.nodes[len]['values'][curr_filter.filter] === curr_filter.value) {
+            should_remove = true;
+            this.curr_filters.forEach((function(_this) {
+              return function(k) {
+                if (_this.nodes[len]['values'][k['filter']] === k['value']) {
+                  return should_remove = false;
+                }
+              };
+            })(this));
+            if (should_remove === true) {
+              this.nodes.splice(len, 1);
+            }
           }
         }
       }

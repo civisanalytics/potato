@@ -59,6 +59,7 @@ class BubbleChart
             @filters[filter_counter] = {id: filter_counter, filter: k, value: v}
             filter_counter += 1
 
+  # given the filters, create the subset selection modal
   subset_selection: () =>
     subset_select_button = $("<button id='subset-select-button'>Select Subset</button>")
     subset_select_button.on "click", (e) =>
@@ -100,21 +101,33 @@ class BubbleChart
 
     $("#subset-selection").show()
 
-
   # add all data nodes to screen
   add_all: () =>
     if @nodes.length != @data.length
-      filter_button = $("<button class='active filter-0'>All Data</button>")
+      # remove any currently selected filters
+      this.remove_all()
+
+      @curr_filters.push({id: 0})
+
+      filter_button = $("<button class='active filter-button filter-0'>All Data</button>")
       filter_button.on "click", (e) =>
-        @nodes = []
-        this.remove_filter(null)
-      this.update()
+        this.remove_all()
       $("#filter-select-buttons").append(filter_button)
 
       this.add_nodes(null)
 
+  remove_all: () =>
+    $.each @curr_filters, (k, f) =>
+      this.remove_filter(f.id)
+
+  # add a filter by id
+  # this entails both adding the actual nodes as well as the subset button
   add_filter: (id) =>
     curr_filter = @filters[id]
+
+    # if the only filter is the all filter, remove the all filter
+    if @curr_filters.length == 1 && @curr_filters[0].id == 0
+      this.remove_all()
 
     # this is the first filter
     if @curr_filters.length == 0
@@ -122,26 +135,28 @@ class BubbleChart
 
     @curr_filters.push(curr_filter)
 
-    filter_button = $("<button class='active filter-"+id+"'>"+curr_filter.value+"</button>")
+    filter_button = $("<button class='active filter-button filter-"+id+"'>"+curr_filter.value+"</button>")
     filter_button.on "click", (e) =>
       this.remove_filter(id)
     $("#filter-select-buttons").append(filter_button)
 
     this.add_nodes(id)
 
+  # remove a filter by id
+  # this entails both removing the actual nodes as well as removing the subset button
+  # and changing the active state in the subset_select modal
   remove_filter: (id) =>
     curr_filter = @filters[id]
 
-    if curr_filter # otherwise, we just removed all nodes so no need to call remove_nodes
-      this.remove_nodes(id)
+    this.remove_nodes(id)
 
     # remove or turn off any necessary buttons / sub_selectors
     $(".filter-"+id).each (k, v) ->
       f_obj = $(v)
-      if f_obj.is('div')
-        f_obj.removeClass("active")
-      else if f_obj.is('button')
+      if f_obj.hasClass('filter-button')
         f_obj.detach()
+      else
+        f_obj.removeClass("active")
 
     # that was the last filter
     if @curr_filters.length == 0
@@ -188,24 +203,28 @@ class BubbleChart
       this.split_by(split_id.split('-')[1])
 
   remove_nodes: (id) =>
-    curr_filter = @filters[id]
+    if id == 0
+      while @nodes.length > 0 # we can't just set @nodes = [] because that creates a new object
+        @nodes.pop()
+    else
+      curr_filter = @filters[id]
 
-    # remove this filter from the @curr_filters
-    @curr_filters = $.grep @curr_filters, (e) =>
-      return e['filter'] != curr_filter.filter || e['value'] != curr_filter.value
+      # remove this filter from the @curr_filters
+      @curr_filters = $.grep @curr_filters, (e) =>
+        return e['filter'] != curr_filter.filter || e['value'] != curr_filter.value
 
-    # this was the only array iterator + removal I could get to work
-    len = @nodes.length
-    while (len--)
-      if @nodes[len]['values'][curr_filter.filter] == curr_filter.value # node with offending value found
-        # now check that it doesnt have other values that would allow it to stay
-        should_remove = true
-        @curr_filters.forEach (k) =>
-          if @nodes[len]['values'][k['filter']] == k['value']
-            should_remove = false
-        # we can now remove it
-        if should_remove == true
-          @nodes.splice(len, 1)
+      # this was the only array iterator + removal I could get to work
+      len = @nodes.length
+      while (len--)
+        if @nodes[len]['values'][curr_filter.filter] == curr_filter.value # node with offending value found
+          # now check that it doesnt have other values that would allow it to stay
+          should_remove = true
+          @curr_filters.forEach (k) =>
+            if @nodes[len]['values'][k['filter']] == k['value']
+              should_remove = false
+          # we can now remove it
+          if should_remove == true
+            @nodes.splice(len, 1)
 
     this.update()
 

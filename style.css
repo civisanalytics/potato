@@ -240,7 +240,12 @@ button:hover {
   margin-bottom: 5px;
 }
 .filter-value {
-  padding: 2px 20px 0 3px;
+  padding: 5px 20px 0 5px;
+  transition: background 0.2s ease-in-out;
+  -webkit-transition: background 0.2s ease-in-out;
+  -moz-transition: background 0.2s ease-easein-out;
+  -ms-transition: background 0.2s ease-in-out;
+  -o-transition: background 0.2s ease-in-out;
 }
 .filter-value:hover {
   background-color: #ddd;
