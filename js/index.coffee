@@ -8,8 +8,9 @@ class BubbleChart
     $.each @data, (i, d) =>
       d.node_id = i
 
-    @tooltip = CustomTooltip("node_tooltip")
+    $("body").append("<div class='tooltip' id='node-tooltip'></div>");
 
+    # scale vis size to fit browser window
     @vis = d3.select("#vis").append("svg")
        .attr("viewBox", "0 0 #{@width} #{@height}")
 
@@ -523,10 +524,22 @@ class BubbleChart
     content = "<div class='tooltip-name'>#{data.name}</div>"
     $.each data.values, (k, v) ->
       content +="#{v}<br/>"
-    @tooltip.showTooltip(content,d3.event)
+    $("#node-tooltip").html(content)
+    this.update_details(d3.event)
 
   hide_details: (data, i, element) =>
-    @tooltip.hideTooltip()
+    $("#node-tooltip").hide()
+
+  update_position: (e) =>
+    xOffset = 20
+    yOffset = 10
+
+    # move tooltip to fit on screen as needed
+    ttw = $("#node-tooltip").width()
+    tth = $("#node-tooltip").height()
+    ttleft = ((e.pageX + xOffset*2 + ttw) > $(window).width()) ? e.pageX - ttw - xOffset*2 : e.pageX + xOffset
+    tttop = ((e.pageY + yOffset*2 + tth) > $(window).height()) ? e.pageY - tth - yOffset*2 : e.pageY + yOffset
+    $("#node-tooltip").css('top', tttop + 'px').css('left', ttleft + 'px')
 
   safe_string: (input) =>
     input.toLowerCase().replace(/\s/g, '_').replace('.','')

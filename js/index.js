@@ -6,6 +6,7 @@
   BubbleChart = (function() {
     function BubbleChart(data) {
       this.safe_string = __bind(this.safe_string, this);
+      this.update_position = __bind(this.update_position, this);
       this.hide_details = __bind(this.hide_details, this);
       this.show_details = __bind(this.show_details, this);
       this.move_towards_target = __bind(this.move_towards_target, this);
@@ -33,7 +34,7 @@
           return d.node_id = i;
         };
       })(this));
-      this.tooltip = CustomTooltip("node_tooltip");
+      $("body").append("<div class='tooltip' id='node-tooltip'></div>");
       this.vis = d3.select("#vis").append("svg").attr("viewBox", "0 0 " + this.width + " " + this.height);
       this.force = d3.layout.force().gravity(-0.01).charge(function(d) {
         return -Math.pow(d.radius, 2.0) * 1.5;
@@ -590,11 +591,27 @@
       $.each(data.values, function(k, v) {
         return content += "" + v + "<br/>";
       });
-      return this.tooltip.showTooltip(content, d3.event);
+      $("#node-tooltip").html(content);
+      return this.update_details(d3.event);
     };
 
     BubbleChart.prototype.hide_details = function(data, i, element) {
-      return this.tooltip.hideTooltip();
+      return $("#node-tooltip").hide();
+    };
+
+    BubbleChart.prototype.update_position = function(e) {
+      var tth, ttleft, tttop, ttw, xOffset, yOffset, _ref, _ref1;
+      xOffset = 20;
+      yOffset = 10;
+      ttw = $("#node-tooltip").width();
+      tth = $("#node-tooltip").height();
+      ttleft = (_ref = (e.pageX + xOffset * 2 + ttw) > $(window).width()) != null ? _ref : e.pageX - ttw - xOffset * {
+        2: e.pageX + xOffset
+      };
+      tttop = (_ref1 = (e.pageY + yOffset * 2 + tth) > $(window).height()) != null ? _ref1 : e.pageY - tth - yOffset * {
+        2: e.pageY + yOffset
+      };
+      return $("#node-tooltip").css('top', tttop + 'px').css('left', ttleft + 'px');
     };
 
     BubbleChart.prototype.safe_string = function(input) {
