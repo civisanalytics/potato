@@ -87,7 +87,8 @@ class window.Potato
           <p>OR</p>
           Display data matching any of the selected values:
         </div>
-        <div id='subset-groups'></div>
+        <div id='categorical-filters'></div>
+        <div id='numeric-filters'></div>
       </div></div>")
 
     subset_select_button = $("<button id='subset-select-button'>Data Selection</button>")
@@ -117,27 +118,55 @@ class window.Potato
         $("#subset-wrapper").hide()
 
     $.each @categorical_filters, (k, v) =>
-      this.add_subset_category(v.value, @sorted_filters[v.value])
+      this.add_categorical_filter(v.value, @sorted_filters[v.value])
 
-  add_subset_category: (k, v) =>
-      filter_id = "filter" + k
-      filter_group = $("<div class='filter-group-wrapper'><div class='filter-group-header'>"+k+"</div><div class='filter-group' id='"+filter_id+"'></div></div>")
-      $("#subset-groups").append(filter_group)
-
-      that = this
-      d3.select("#"+filter_id).selectAll('div').data(v).enter()
-        .append("div")
-        .attr("class", (d) -> return "filter-value filter-" + d.id)
-        .text((d) -> return d.value)
-        .on("click", (d) ->
-          if $(this).hasClass("active")
-            that.remove_filter(d.id)
-          else
-            that.add_filter(d.id)
-            $(this).addClass("active")
-        )
+    $.each @numeric_filters, (k, v) =>
+      this.add_numeric_filter(v.value, @sorted_filters[v.value])
 
     $("#subset-wrapper").show()
+
+  add_numeric_filter: (k, v) =>
+    filter_id = "filter" + k
+    filter_group = $("<div class='filter-group-wrapper'><div class='filter-group-header'>"+k+"</div><form class='filter-group' id='"+filter_id+"'></form></div>")
+    $("#numeric-filters").append(filter_group)
+
+    filter_min = d3.min(v, (d) -> parseFloat(d.value))
+    filter_max = d3.max(v, (d) -> parseFloat(d.value))
+
+    input_min = $("<input type='number' name='"+k+"' value="+filter_min+" min="+filter_min+" max="+filter_max+">")
+    input_max = $("<input type='number' name='"+k+"' value="+filter_max+" min="+filter_min+" max="+filter_max+">")
+    $("#"+filter_id).append(input_min)
+      .append(input_max)
+      .append($("<input type='submit'>"))
+      .submit((e) =>
+        e.preventDefault()
+        this.test_numeric(e)
+      )
+
+
+  test_numeric: (e) =>
+    console.log(e.target[0].name)
+    console.log(e.target[0].value)
+    console.log(e.target[1].value)
+    this.add_nodes_by_filter_range(e.target[0].name, e.target[0].value, e.target[1].value)
+
+  add_categorical_filter: (k, v) =>
+    filter_id = "filter" + k
+    filter_group = $("<div class='filter-group-wrapper'><div class='filter-group-header'>"+k+"</div><div class='filter-group' id='"+filter_id+"'></div></div>")
+    $("#categorical-filters").append(filter_group)
+
+    that = this
+    d3.select("#"+filter_id).selectAll('div').data(v).enter()
+      .append("div")
+      .attr("class", (d) -> return "filter-value filter-" + d.id)
+      .text((d) -> return d.value)
+      .on("click", (d) ->
+        if $(this).hasClass("active")
+          that.remove_filter(d.id)
+        else
+          that.add_filter(d.id)
+          $(this).addClass("active")
+      )
 
   # add all data nodes to screen
   add_all: () =>
@@ -154,7 +183,7 @@ class window.Potato
         this.remove_all()
       $("#filter-select-buttons").append(filter_button)
 
-      this.add_nodes(null)
+      this.add_nodes_by_filter(null)
 
   remove_all: () =>
     $.each @curr_filters, (k, f) =>
@@ -180,7 +209,7 @@ class window.Potato
       this.remove_filter(id)
     $("#filter-select-buttons").append(filter_button)
 
-    this.add_nodes(id)
+    this.add_nodes_by_filter(id)
 
   # remove a filter by id
   # this entails both removing the actual nodes as well as removing the subset button
@@ -202,44 +231,57 @@ class window.Potato
     if @curr_filters.length == 0
       $("#filter-select-buttons").text("")
 
-  add_nodes: (id) =>
+  add_nodes_by_filter: (id) =>
     if id
       curr_filter = @filters[id]
 
     @data.forEach (d) =>
       if id == null || d[curr_filter.filter] == curr_filter.value
         if $.grep(@nodes, (e) => e.id == d.node_id).length == 0 # if it doesn't already exist in nodes
+          this.add_node(d)
 
-          vals = {} # create a hash with the appropriate filters
-          $.each @filter_names, (k, f) =>
-            vals[f.value] = d[f.value]
-
-          curr_class = ''
-          curr_r = 5
-
-          # TODO temp hack for NFL dataset
-          if d['team']
-            curr_class = d.team
-            curr_r = 8
-
-          node = {
-            id: d.node_id
-            radius: curr_r
-            values: vals
-            color: "#777"
-            class: curr_class
-            x: Math.random() * 900
-            y: Math.random() * 800
-            tarx: @width/2.0
-            tary: @height/2.0
-          }
-          @nodes.push node
     this.update()
 
     # apply any existing splits
     split_id = $(".split-option.active").attr('id')
     if split_id != undefined
       this.split_by(split_id.split('-')[1])
+
+
+  add_nodes_by_filter_range: (id, min, max) =>
+
+    @data.forEach (d) =>
+      if parseFloat(d[id]) >= min and parseFloat(d[id]) <= max
+        if $.grep(@nodes, (e) => e.id == d.node_id).length == 0 # if it doesn't already exist in nodes
+          this.add_node(d)
+
+    this.update()
+
+  add_node: (d) =>
+    vals = {} # create a hash with the appropriate filters
+    $.each @filter_names, (k, f) =>
+      vals[f.value] = d[f.value]
+
+    curr_class = ''
+    curr_r = 5
+
+    # TODO temp hack for NFL dataset
+    if d['team']
+      curr_class = d.team
+      curr_r = 8
+
+    node = {
+      id: d.node_id
+      radius: curr_r
+      values: vals
+      color: "#777"
+      class: curr_class
+      x: Math.random() * 900
+      y: Math.random() * 800
+      tarx: @width/2.0
+      tary: @height/2.0
+    }
+    @nodes.push node
 
   remove_nodes: (id) =>
     if id == 0

@@ -258,7 +258,7 @@ button:hover {
   cursor: default;
   font-weight: normal;
   font-variant: small-caps;
-  border-bottom: 1px solid #ccc;
+  border-bottom: 1px solid #bbb;
   margin-bottom: 5px;
 }
 .filter-value {

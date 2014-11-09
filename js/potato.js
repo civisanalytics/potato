@@ -26,12 +26,16 @@
       this.split_by = __bind(this.split_by, this);
       this.split_buttons = __bind(this.split_buttons, this);
       this.remove_nodes = __bind(this.remove_nodes, this);
-      this.add_nodes = __bind(this.add_nodes, this);
+      this.add_node = __bind(this.add_node, this);
+      this.add_nodes_by_filter_range = __bind(this.add_nodes_by_filter_range, this);
+      this.add_nodes_by_filter = __bind(this.add_nodes_by_filter, this);
       this.remove_filter = __bind(this.remove_filter, this);
       this.add_filter = __bind(this.add_filter, this);
       this.remove_all = __bind(this.remove_all, this);
       this.add_all = __bind(this.add_all, this);
-      this.add_subset_category = __bind(this.add_subset_category, this);
+      this.add_categorical_filter = __bind(this.add_categorical_filter, this);
+      this.test_numeric = __bind(this.test_numeric, this);
+      this.add_numeric_filter = __bind(this.add_numeric_filter, this);
       this.subset_selection = __bind(this.subset_selection, this);
       this.create_filters = __bind(this.create_filters, this);
       this.data = data;
@@ -123,7 +127,7 @@
 
     Potato.prototype.subset_selection = function() {
       var subset_select_button, that;
-      $("#vis").append("<div id='subset-wrapper'><div id='subset-selection'> <div id='subset-help-text'> <button id='all-data'>Display All Data</button> <p>OR</p> Display data matching any of the selected values: </div> <div id='subset-groups'></div> </div></div>");
+      $("#vis").append("<div id='subset-wrapper'><div id='subset-selection'> <div id='subset-help-text'> <button id='all-data'>Display All Data</button> <p>OR</p> Display data matching any of the selected values: </div> <div id='categorical-filters'></div> <div id='numeric-filters'></div> </div></div>");
       subset_select_button = $("<button id='subset-select-button'>Data Selection</button>");
       subset_select_button.click(function() {
         return $("#subset-wrapper").toggle();
@@ -146,18 +150,52 @@
           return $("#subset-wrapper").hide();
         }
       });
-      return $.each(this.categorical_filters, (function(_this) {
+      $.each(this.categorical_filters, (function(_this) {
         return function(k, v) {
-          return _this.add_subset_category(v.value, _this.sorted_filters[v.value]);
+          return _this.add_categorical_filter(v.value, _this.sorted_filters[v.value]);
+        };
+      })(this));
+      $.each(this.numeric_filters, (function(_this) {
+        return function(k, v) {
+          return _this.add_numeric_filter(v.value, _this.sorted_filters[v.value]);
+        };
+      })(this));
+      return $("#subset-wrapper").show();
+    };
+
+    Potato.prototype.add_numeric_filter = function(k, v) {
+      var filter_group, filter_id, filter_max, filter_min, input_max, input_min;
+      filter_id = "filter" + k;
+      filter_group = $("<div class='filter-group-wrapper'><div class='filter-group-header'>" + k + "</div><form class='filter-group' id='" + filter_id + "'></form></div>");
+      $("#numeric-filters").append(filter_group);
+      filter_min = d3.min(v, function(d) {
+        return parseFloat(d.value);
+      });
+      filter_max = d3.max(v, function(d) {
+        return parseFloat(d.value);
+      });
+      input_min = $("<input type='number' name='" + k + "' value=" + filter_min + " min=" + filter_min + " max=" + filter_max + ">");
+      input_max = $("<input type='number' name='" + k + "' value=" + filter_max + " min=" + filter_min + " max=" + filter_max + ">");
+      return $("#" + filter_id).append(input_min).append(input_max).append($("<input type='submit'>")).submit((function(_this) {
+        return function(e) {
+          e.preventDefault();
+          return _this.test_numeric(e);
         };
       })(this));
     };
 
-    Potato.prototype.add_subset_category = function(k, v) {
+    Potato.prototype.test_numeric = function(e) {
+      console.log(e.target[0].name);
+      console.log(e.target[0].value);
+      console.log(e.target[1].value);
+      return this.add_nodes_by_filter_range(e.target[0].name, e.target[0].value, e.target[1].value);
+    };
+
+    Potato.prototype.add_categorical_filter = function(k, v) {
       var filter_group, filter_id, that;
       filter_id = "filter" + k;
       filter_group = $("<div class='filter-group-wrapper'><div class='filter-group-header'>" + k + "</div><div class='filter-group' id='" + filter_id + "'></div></div>");
-      $("#subset-groups").append(filter_group);
+      $("#categorical-filters").append(filter_group);
       that = this;
       return d3.select("#" + filter_id).selectAll('div').data(v).enter().append("div").attr("class", function(d) {
         return "filter-value filter-" + d.id;
@@ -172,8 +210,6 @@
         }
       });
     };
-
-    $("#subset-wrapper").show();
 
     Potato.prototype.add_all = function() {
       var filter_button;
@@ -191,7 +227,7 @@
           };
         })(this));
         $("#filter-select-buttons").append(filter_button);
-        return this.add_nodes(null);
+        return this.add_nodes_by_filter(null);
       }
     };
 
@@ -220,7 +256,7 @@
         };
       })(this));
       $("#filter-select-buttons").append(filter_button);
-      return this.add_nodes(id);
+      return this.add_nodes_by_filter(id);
     };
 
     Potato.prototype.remove_filter = function(id) {
@@ -241,40 +277,18 @@
       }
     };
 
-    Potato.prototype.add_nodes = function(id) {
+    Potato.prototype.add_nodes_by_filter = function(id) {
       var curr_filter, split_id;
       if (id) {
         curr_filter = this.filters[id];
       }
       this.data.forEach((function(_this) {
         return function(d) {
-          var curr_class, curr_r, node, vals;
           if (id === null || d[curr_filter.filter] === curr_filter.value) {
             if ($.grep(_this.nodes, function(e) {
               return e.id === d.node_id;
             }).length === 0) {
-              vals = {};
-              $.each(_this.filter_names, function(k, f) {
-                return vals[f.value] = d[f.value];
-              });
-              curr_class = '';
-              curr_r = 5;
-              if (d['team']) {
-                curr_class = d.team;
-                curr_r = 8;
-              }
-              node = {
-                id: d.node_id,
-                radius: curr_r,
-                values: vals,
-                color: "#777",
-                "class": curr_class,
-                x: Math.random() * 900,
-                y: Math.random() * 800,
-                tarx: _this.width / 2.0,
-                tary: _this.height / 2.0
-              };
-              return _this.nodes.push(node);
+              return _this.add_node(d);
             }
           }
         };
@@ -284,6 +298,49 @@
       if (split_id !== void 0) {
         return this.split_by(split_id.split('-')[1]);
       }
+    };
+
+    Potato.prototype.add_nodes_by_filter_range = function(id, min, max) {
+      this.data.forEach((function(_this) {
+        return function(d) {
+          if (parseFloat(d[id]) >= min && parseFloat(d[id]) <= max) {
+            if ($.grep(_this.nodes, function(e) {
+              return e.id === d.node_id;
+            }).length === 0) {
+              return _this.add_node(d);
+            }
+          }
+        };
+      })(this));
+      return this.update();
+    };
+
+    Potato.prototype.add_node = function(d) {
+      var curr_class, curr_r, node, vals;
+      vals = {};
+      $.each(this.filter_names, (function(_this) {
+        return function(k, f) {
+          return vals[f.value] = d[f.value];
+        };
+      })(this));
+      curr_class = '';
+      curr_r = 5;
+      if (d['team']) {
+        curr_class = d.team;
+        curr_r = 8;
+      }
+      node = {
+        id: d.node_id,
+        radius: curr_r,
+        values: vals,
+        color: "#777",
+        "class": curr_class,
+        x: Math.random() * 900,
+        y: Math.random() * 800,
+        tarx: this.width / 2.0,
+        tary: this.height / 2.0
+      };
+      return this.nodes.push(node);
     };
 
     Potato.prototype.remove_nodes = function(id) {
