@@ -31,9 +31,9 @@ class window.Potato
     @curr_filters = []
     this.create_filters()
 
-    this.split_buttons() if params.split?
-    this.color_buttons() if params.color?
-    this.size_buttons() if params.size?
+    this.split_buttons() if params.split
+    this.color_buttons() if params.color
+    this.size_buttons() if params.size
 
     this.subset_selection()
 
@@ -43,8 +43,7 @@ class window.Potato
     # get filter names from header row
     @filter_names = []
     $.each @data[0], (d) =>
-      # columns named node_id or name are treated specially
-      if d != 'node_id' && d != 'name'
+      if d != 'node_id'
         @filter_names.push {value: d}
 
     @filters = {}
@@ -53,7 +52,7 @@ class window.Potato
     # populate the filters from the dataset
     @data.forEach (d) =>
       $.each d, (k, v) =>
-        if k != 'node_id' && k != 'name' # ignore columns named node_id or name, TODO remove this?
+        if k != 'node_id'
           filter_exists = 0
           $.each @filters, (f, e) =>
             if e.filter == k && e.value == v
@@ -67,15 +66,11 @@ class window.Potato
   subset_selection: () =>
     $("#vis").append("<div id='subset-selection'>
         <div id='subset-help-text'>
-          Hi!<br><br>
-          You can either view
-          <button id='all-data'>All Data</button>
+          You can either view <button id='all-data'>All Data</button>
           or view a subset by selecting values below.
         </div>
         <div id='subset-groups'></div>
       </div>")
-
-
 
     subset_select_button = $("<button id='subset-select-button'>Select Subset</button>")
     subset_select_button.on "click", (e) =>
@@ -206,7 +201,6 @@ class window.Potato
           node = {
             id: d.node_id
             radius: curr_r
-            name: d.name
             values: vals
             color: "#777"
             class: curr_class
@@ -536,7 +530,7 @@ class window.Potato
       d.y = d.y + (d.tary - d.y) * (0.7) * alpha
 
   show_details: (data, i, element) =>
-    content = "<div class='tooltip-name'>#{data.name}</div>"
+    content = ""
     $.each data.values, (k, v) ->
       content +="#{v}<br/>"
     $("#node-tooltip").html(content)

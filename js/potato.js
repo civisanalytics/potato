@@ -51,13 +51,13 @@
       this.labels = [];
       this.curr_filters = [];
       this.create_filters();
-      if (params.split != null) {
+      if (params.split) {
         this.split_buttons();
       }
-      if (params.color != null) {
+      if (params.color) {
         this.color_buttons();
       }
-      if (params.size != null) {
+      if (params.size) {
         this.size_buttons();
       }
       this.subset_selection();
@@ -68,7 +68,7 @@
       this.filter_names = [];
       $.each(this.data[0], (function(_this) {
         return function(d) {
-          if (d !== 'node_id' && d !== 'name') {
+          if (d !== 'node_id') {
             return _this.filter_names.push({
               value: d
             });
@@ -81,7 +81,7 @@
         return function(d) {
           return $.each(d, function(k, v) {
             var filter_exists;
-            if (k !== 'node_id' && k !== 'name') {
+            if (k !== 'node_id') {
               filter_exists = 0;
               $.each(_this.filters, function(f, e) {
                 if (e.filter === k && e.value === v) {
@@ -104,7 +104,7 @@
 
     Potato.prototype.subset_selection = function() {
       var subset_select_button, subsets, that;
-      $("#vis").append("<div id='subset-selection'> <div id='subset-help-text'> Hi!<br><br> You can either view <button id='all-data'>All Data</button> or view a subset by selecting values below. </div> <div id='subset-groups'></div> </div>");
+      $("#vis").append("<div id='subset-selection'> <div id='subset-help-text'> You can either view <button id='all-data'>All Data</button> or view a subset by selecting values below. </div> <div id='subset-groups'></div> </div>");
       subset_select_button = $("<button id='subset-select-button'>Select Subset</button>");
       subset_select_button.on("click", (function(_this) {
         return function(e) {
@@ -249,7 +249,6 @@
               node = {
                 id: d.node_id,
                 radius: curr_r,
-                name: d.name,
                 values: vals,
                 color: "#777",
                 "class": curr_class,
@@ -601,7 +600,7 @@
 
     Potato.prototype.show_details = function(data, i, element) {
       var content;
-      content = "<div class='tooltip-name'>" + data.name + "</div>";
+      content = "";
       $.each(data.values, function(k, v) {
         return content += "" + v + "<br/>";
       });
