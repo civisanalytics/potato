@@ -3,10 +3,13 @@
   $(function() {
     var chart, render_vis;
     chart = null;
-    render_vis = function(csv) {
+    render_vis = function(csv, params) {
+      if (params == null) {
+        params = null;
+      }
       $("#toolbar").css("visibility", "visible");
       $(".load-screen").hide();
-      return chart = new BubbleChart(csv);
+      return chart = new BubbleChart(csv, params);
     };
     $("#file-uploader").on('change', (function(_this) {
       return function(e) {
@@ -23,17 +26,27 @@
     })(this));
     $("#nfl-dataset").on('click', (function(_this) {
       return function(e) {
-        return d3.csv("data/football/players_2.csv", render_vis);
+        return d3.csv("data/football/players_2.csv", function(csv) {
+          return render_vis(csv, {
+            split: true,
+            color: false,
+            size: false
+          });
+        });
       };
     })(this));
     $("#billionaire-dataset").on('click', (function(_this) {
       return function(e) {
-        return d3.csv("data/billion/billionaire.csv", render_vis);
+        return d3.csv("data/billion/billionaire.csv", function(csv) {
+          return render_vis(csv);
+        });
       };
     })(this));
     return $("#auto-dataset").on('click', (function(_this) {
       return function(e) {
-        return d3.csv("data/auto/auto.csv", render_vis);
+        return d3.csv("data/auto/auto.csv", function(csv) {
+          return render_vis(csv);
+        });
       };
     })(this));
   });

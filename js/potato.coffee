@@ -1,5 +1,5 @@
 class window.BubbleChart
-  constructor: (data) ->
+  constructor: (data, params = {split: true, color: true, size: true}) ->
     @data = data
     @width = $(window).width()
     @height = $(window).height() - 105
@@ -29,10 +29,9 @@ class window.BubbleChart
     @curr_filters = []
     this.create_filters()
 
-    this.split_buttons()
-    if data.length != 1933
-      this.color_buttons()
-    this.size_buttons()
+    this.split_buttons() if params.split?
+    this.color_buttons() if params.color?
+    this.size_buttons() if params.size?
 
     this.subset_selection()
 

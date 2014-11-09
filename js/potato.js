@@ -4,7 +4,14 @@
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
   window.BubbleChart = (function() {
-    function BubbleChart(data) {
+    function BubbleChart(data, params) {
+      if (params == null) {
+        params = {
+          split: true,
+          color: true,
+          size: true
+        };
+      }
       this.safe_string = __bind(this.safe_string, this);
       this.update_position = __bind(this.update_position, this);
       this.hide_details = __bind(this.hide_details, this);
@@ -44,11 +51,15 @@
       this.labels = [];
       this.curr_filters = [];
       this.create_filters();
-      this.split_buttons();
-      if (data.length !== 1933) {
+      if (params.split != null) {
+        this.split_buttons();
+      }
+      if (params.color != null) {
         this.color_buttons();
       }
-      this.size_buttons();
+      if (params.size != null) {
+        this.size_buttons();
+      }
       this.subset_selection();
     }
 
