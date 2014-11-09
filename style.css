@@ -187,7 +187,7 @@ button:hover {
   margin: 20px 0 20px 0;
 }
 
-#node_tooltip {
+#node-tooltip {
   border-radius: 10px;
   padding: 10px;
   position: absolute;
