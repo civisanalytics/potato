@@ -7,7 +7,6 @@
       if (params == null) {
         params = null;
       }
-      $("#toolbar").css("visibility", "visible");
       $(".load-screen").hide();
       return chart = new BubbleChart(csv, params);
     };

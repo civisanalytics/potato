@@ -2,7 +2,6 @@ $ ->
   chart = null
 
   render_vis = (csv, params = null) ->
-    $("#toolbar").css("visibility", "visible")
     $(".load-screen").hide()
     chart = new BubbleChart csv, params
 

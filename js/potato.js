@@ -41,7 +41,7 @@
           return d.node_id = i;
         };
       })(this));
-      $("body").append("<div class='tooltip' id='node-tooltip'></div>");
+      $("#vis").append("<div class='tooltip' id='node-tooltip'></div>").append("<div id='toolbar'><div id='modifiers'></div><div id='filter-select-buttons'></div></div>");
       $("#node-tooltip").hide();
       this.vis = d3.select("#vis").append("svg").attr("viewBox", "0 0 " + this.width + " " + this.height);
       this.force = d3.layout.force().gravity(-0.01).charge(function(d) {
@@ -388,6 +388,7 @@
     };
 
     BubbleChart.prototype.color_buttons = function() {
+      $("#vis").append("<div id='color-legend'></div>");
       $("#modifiers").append("<div id='color-wrapper' class='modifier-wrapper'><button id='color-button' class='modifier-button'>Color By<span class='button-arrow'>&#x25BC;</span><span id='color-hint' class='modifier-hint'></span></button><div id='color-menu' class='modifier-menu'></div></div>");
       $("#color-button").hover(function() {
         return $("#color-menu").slideDown(100);

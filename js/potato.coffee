@@ -8,7 +8,8 @@ class window.BubbleChart
     $.each @data, (i, d) =>
       d.node_id = i
 
-    $("body").append("<div class='tooltip' id='node-tooltip'></div>");
+    $("#vis").append("<div class='tooltip' id='node-tooltip'></div>")
+      .append("<div id='toolbar'><div id='modifiers'></div><div id='filter-select-buttons'></div></div>")
     $("#node-tooltip").hide()
 
     # scale vis size to fit browser window
@@ -319,6 +320,7 @@ class window.BubbleChart
     this.update()
 
   color_buttons: () =>
+    $("#vis").append("<div id='color-legend'></div>")
     $("#modifiers").append("<div id='color-wrapper' class='modifier-wrapper'><button id='color-button' class='modifier-button'>Color By<span class='button-arrow'>&#x25BC;</span><span id='color-hint' class='modifier-hint'></span></button><div id='color-menu' class='modifier-menu'></div></div>")
     $("#color-button").hover () ->
       $("#color-menu").slideDown(100)
