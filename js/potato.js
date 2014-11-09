@@ -31,6 +31,7 @@
       this.add_filter = __bind(this.add_filter, this);
       this.remove_all = __bind(this.remove_all, this);
       this.add_all = __bind(this.add_all, this);
+      this.add_subset_category = __bind(this.add_subset_category, this);
       this.subset_selection = __bind(this.subset_selection, this);
       this.create_filters = __bind(this.create_filters, this);
       this.data = data;
@@ -141,29 +142,34 @@
           return $("#subset-selection").hide();
         }
       });
-      $.each(this.sorted_filters, (function(_this) {
+      return $.each(this.categorical_filters, (function(_this) {
         return function(k, v) {
-          var filter_group, filter_id;
-          filter_id = "filter" + k;
-          filter_group = $("<div class='filter-group-wrapper'><div class='filter-group-header'>" + k + "</div><div class='filter-group' id='" + filter_id + "'></div></div>");
-          $("#subset-groups").append(filter_group);
-          that = _this;
-          return d3.select("#" + filter_id).selectAll('div').data(v).enter().append("div").attr("class", function(d) {
-            return "filter-value filter-" + d.id;
-          }).text(function(d) {
-            return d.value;
-          }).on("click", function(d) {
-            if ($(this).hasClass("active")) {
-              return that.remove_filter(d.id);
-            } else {
-              that.add_filter(d.id);
-              return $(this).addClass("active");
-            }
-          });
+          return _this.add_subset_category(v.value, _this.sorted_filters[v.value]);
         };
       })(this));
-      return $("#subset-selection").show();
     };
+
+    Potato.prototype.add_subset_category = function(k, v) {
+      var filter_group, filter_id, that;
+      filter_id = "filter" + k;
+      filter_group = $("<div class='filter-group-wrapper'><div class='filter-group-header'>" + k + "</div><div class='filter-group' id='" + filter_id + "'></div></div>");
+      $("#subset-groups").append(filter_group);
+      that = this;
+      return d3.select("#" + filter_id).selectAll('div').data(v).enter().append("div").attr("class", function(d) {
+        return "filter-value filter-" + d.id;
+      }).text(function(d) {
+        return d.value;
+      }).on("click", function(d) {
+        if ($(this).hasClass("active")) {
+          return that.remove_filter(d.id);
+        } else {
+          that.add_filter(d.id);
+          return $(this).addClass("active");
+        }
+      });
+    };
+
+    $("#subset-selection").show();
 
     Potato.prototype.add_all = function() {
       var filter_button;

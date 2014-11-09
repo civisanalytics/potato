@@ -105,7 +105,10 @@ class window.Potato
         that.add_all()
         $("#subset-selection").hide()
 
-    $.each @sorted_filters, (k, v) =>
+    $.each @categorical_filters, (k, v) =>
+      this.add_subset_category(v.value, @sorted_filters[v.value])
+
+  add_subset_category: (k, v) =>
       filter_id = "filter" + k
       filter_group = $("<div class='filter-group-wrapper'><div class='filter-group-header'>"+k+"</div><div class='filter-group' id='"+filter_id+"'></div></div>")
       $("#subset-groups").append(filter_group)
