@@ -123,15 +123,16 @@
 
     Potato.prototype.subset_selection = function() {
       var subset_select_button, that;
-      $("#vis").append("<div id='subset-selection'> <div id='subset-help-text'> You can either view <button id='all-data'>All Data</button> or view a subset by selecting values below. </div> <div id='subset-groups'></div> </div>");
-      subset_select_button = $("<button id='subset-select-button'>Select Subset</button>");
-      subset_select_button.on("click", (function(_this) {
-        return function(e) {
-          return $("#subset-selection").toggle();
-        };
-      })(this));
+      $("#vis").append("<div id='subset-wrapper'><div id='subset-selection'> <div id='subset-help-text'> <button id='all-data'>Display All Data</button> <p>OR</p> Display data matching any of the selected values: </div> <div id='subset-groups'></div> </div></div>");
+      subset_select_button = $("<button id='subset-select-button'>Data Selection</button>");
+      subset_select_button.click(function() {
+        return $("#subset-wrapper").toggle();
+      });
       $("#modifiers").append(subset_select_button);
-      $("#subset-selection").height(this.height);
+      $("#subset-selection").height($(window).height() - 200).width($(window).width() - 300).css("margin-left", 100).css("margin-top", $("#toolbar").outerHeight() + 25);
+      $("#subset-wrapper").click(function() {
+        return $("#subset-wrapper").hide();
+      });
       that = this;
       $("#all-data").addClass("filter-0").on("click", function(e) {
         if ($(this).hasClass("active")) {
@@ -139,7 +140,7 @@
         } else {
           $(this).addClass("active");
           that.add_all();
-          return $("#subset-selection").hide();
+          return $("#subset-wrapper").hide();
         }
       });
       return $.each(this.categorical_filters, (function(_this) {
@@ -169,7 +170,7 @@
       });
     };
 
-    $("#subset-selection").show();
+    $("#subset-wrapper").show();
 
     Potato.prototype.add_all = function() {
       var filter_button;

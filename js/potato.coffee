@@ -81,20 +81,28 @@ class window.Potato
 
   # given the filters, create the subset selection modal
   subset_selection: () =>
-    $("#vis").append("<div id='subset-selection'>
+    $("#vis").append("<div id='subset-wrapper'><div id='subset-selection'>
         <div id='subset-help-text'>
-          You can either view <button id='all-data'>All Data</button>
-          or view a subset by selecting values below.
+          <button id='all-data'>Display All Data</button>
+          <p>OR</p>
+          Display data matching any of the selected values:
         </div>
         <div id='subset-groups'></div>
-      </div>")
+      </div></div>")
 
-    subset_select_button = $("<button id='subset-select-button'>Select Subset</button>")
-    subset_select_button.on "click", (e) =>
-      $("#subset-selection").toggle()
+    subset_select_button = $("<button id='subset-select-button'>Data Selection</button>")
+    subset_select_button.click () ->
+      $("#subset-wrapper").toggle()
     $("#modifiers").append(subset_select_button)
 
-    $("#subset-selection").height(@height)
+    # move the subset selection under the toolbar
+    $("#subset-selection").height($(window).height() - 200)
+      .width($(window).width() - 300)
+      .css("margin-left", 100)
+      .css("margin-top", $("#toolbar").outerHeight() + 25)
+
+    $("#subset-wrapper").click () ->
+      $("#subset-wrapper").hide()
 
     that = this
     $("#all-data").addClass("filter-0").on "click", (e) ->
@@ -103,7 +111,7 @@ class window.Potato
       else
         $(this).addClass("active")
         that.add_all()
-        $("#subset-selection").hide()
+        $("#subset-wrapper").hide()
 
     $.each @categorical_filters, (k, v) =>
       this.add_subset_category(v.value, @sorted_filters[v.value])
@@ -126,7 +134,7 @@ class window.Potato
             $(this).addClass("active")
         )
 
-    $("#subset-selection").show()
+    $("#subset-wrapper").show()
 
   # add all data nodes to screen
   add_all: () =>
