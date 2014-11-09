@@ -79,7 +79,7 @@
         };
       })(this));
       filter_counter = 1;
-      return this.data.forEach((function(_this) {
+      this.data.forEach((function(_this) {
         return function(d) {
           return $.each(d, function(k, v) {
             var curr_filter, filter_exists;
@@ -99,6 +99,23 @@
               }
             }
           });
+        };
+      })(this));
+      this.categorical_filters = [];
+      this.numeric_filters = [];
+      return $.each(this.sorted_filters, (function(_this) {
+        return function(f, v) {
+          if (v.length !== _this.data.length) {
+            if (isNaN(v[0].value)) {
+              return _this.categorical_filters.push({
+                value: f
+              });
+            } else {
+              return _this.numeric_filters.push({
+                value: f
+              });
+            }
+          }
         };
       })(this));
     };
@@ -303,7 +320,7 @@
       $("#split-wrapper").mouseleave(function() {
         return $("#split-menu").slideUp(100);
       });
-      return d3.select("#split-menu").selectAll('div').data(this.filter_names).enter().append("div").text(function(d) {
+      return d3.select("#split-menu").selectAll('div').data(this.categorical_filters).enter().append("div").text(function(d) {
         return d.value;
       }).attr("class", 'modifier-option split-option').attr("id", function(d) {
         return 'split-' + d.value;
@@ -386,7 +403,7 @@
       $("#color-wrapper").mouseleave(function() {
         return $("#color-menu").slideUp(100);
       });
-      return d3.select("#color-menu").selectAll('div').data(this.filter_names).enter().append("div").text(function(d) {
+      return d3.select("#color-menu").selectAll('div').data(this.categorical_filters).enter().append("div").text(function(d) {
         return d.value;
       }).attr("class", 'modifier-option color-option').attr("id", function(d) {
         return 'color-' + d.value;
@@ -453,7 +470,7 @@
       $("#size-wrapper").mouseleave(function() {
         return $("#size-menu").slideUp(100);
       });
-      return d3.select("#size-menu").selectAll('div').data(this.filter_names).enter().append("div").text(function(d) {
+      return d3.select("#size-menu").selectAll('div').data(this.numeric_filters).enter().append("div").text(function(d) {
         return d.value;
       }).attr("class", 'modifier-option size-option').attr("id", function(d) {
         return 'size-' + d.value;

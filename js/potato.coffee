@@ -41,7 +41,7 @@ class window.Potato
   create_filters: () =>
 
     # a hash where the key is the filter type and the value is an array of filters
-    # used only in construction to determin filter attributes and allow for faster filter creation
+    # used only in construction to determine filter attributes and allow for faster filter creation
     @sorted_filters = {}
 
     # a hash where the key is the filter id and the value is the filter
@@ -68,6 +68,16 @@ class window.Potato
             @sorted_filters[k].push(curr_filter)
             @filters[filter_counter] = curr_filter
             filter_counter += 1
+
+    @categorical_filters = []
+    @numeric_filters = []
+
+    $.each @sorted_filters, (f, v) =>
+      if v.length != @data.length # every filter value is not unique
+        if isNaN(v[0].value)
+          @categorical_filters.push({value: f})
+        else
+          @numeric_filters.push({value: f})
 
   # given the filters, create the subset selection modal
   subset_selection: () =>
@@ -254,7 +264,7 @@ class window.Potato
     $("#split-wrapper").mouseleave () ->
       $("#split-menu").slideUp(100)
 
-    d3.select("#split-menu").selectAll('div').data(@filter_names).enter()
+    d3.select("#split-menu").selectAll('div').data(@categorical_filters).enter()
       .append("div")
       .text((d) -> d.value)
       .attr("class", 'modifier-option split-option')
@@ -335,7 +345,7 @@ class window.Potato
     $("#color-wrapper").mouseleave () ->
       $("#color-menu").slideUp(100)
 
-    d3.select("#color-menu").selectAll('div').data(@filter_names).enter()
+    d3.select("#color-menu").selectAll('div').data(@categorical_filters).enter()
       .append("div")
       .text((d) -> d.value)
       .attr("class", 'modifier-option color-option')
@@ -411,7 +421,7 @@ class window.Potato
     $("#size-wrapper").mouseleave () ->
       $("#size-menu").slideUp(100)
 
-    d3.select("#size-menu").selectAll('div').data(@filter_names).enter()
+    d3.select("#size-menu").selectAll('div').data(@numeric_filters).enter()
       .append("div")
       .text((d) -> d.value)
       .attr("class", 'modifier-option size-option')
