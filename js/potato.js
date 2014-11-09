@@ -106,16 +106,16 @@
       this.numeric_filters = [];
       return $.each(this.sorted_filters, (function(_this) {
         return function(f, v) {
-          if (v.length !== _this.data.length) {
-            if (isNaN(v[0].value)) {
+          if (isNaN(v[0].value)) {
+            if (v.length !== _this.data.length) {
               return _this.categorical_filters.push({
                 value: f
               });
-            } else {
-              return _this.numeric_filters.push({
-                value: f
-              });
             }
+          } else {
+            return _this.numeric_filters.push({
+              value: f
+            });
           }
         };
       })(this));
@@ -498,9 +498,7 @@
       curr_vals = [];
       this.circles.each((function(_this) {
         return function(c) {
-          if (curr_vals.indexOf(c['values'][split]) < 0) {
-            return curr_vals.push(c['values'][split]);
-          }
+          return curr_vals.push(parseFloat(c['values'][split]));
         };
       })(this));
       curr_max = d3.max(curr_vals, function(d) {
@@ -514,10 +512,16 @@
           }
         };
       })(this));
-      sizes = d3.scale.linear().domain([Math.sqrt(non_zero_min), Math.sqrt(curr_max)]).range([3, 20]).clamp(true);
+      sizes = d3.scale.sqrt().domain([non_zero_min, curr_max]).range([2, 20]).clamp(true);
       this.circles.each((function(_this) {
         return function(c) {
-          return c.radius = sizes(Math.sqrt(c['values'][split]));
+          var s_val;
+          s_val = c['values'][split];
+          if (!isNaN(s_val) && s_val !== "") {
+            return c.radius = sizes(parseFloat(s_val));
+          } else {
+            return c.radius = 0;
+          }
         };
       })(this));
       return this.update();

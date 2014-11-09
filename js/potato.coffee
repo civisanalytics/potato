@@ -73,11 +73,11 @@ class window.Potato
     @numeric_filters = []
 
     $.each @sorted_filters, (f, v) =>
-      if v.length != @data.length # every filter value is not unique
-        if isNaN(v[0].value)
+      if isNaN(v[0].value)
+        if v.length != @data.length # every filter value is not unique
           @categorical_filters.push({value: f})
-        else
-          @numeric_filters.push({value: f})
+      else
+        @numeric_filters.push({value: f})
 
   # given the filters, create the subset selection modal
   subset_selection: () =>
@@ -444,10 +444,9 @@ class window.Potato
 
     curr_vals = []
 
-    # first get number of unique values in the filter
+    # first get all the values for this filter
     @circles.each (c) =>
-      if curr_vals.indexOf(c['values'][split]) < 0
-        curr_vals.push c['values'][split]
+      curr_vals.push parseFloat(c['values'][split])
 
     curr_max = d3.max(curr_vals, (d) -> d)
     non_zero_min = curr_max
@@ -456,14 +455,18 @@ class window.Potato
       if c > 0 && c < non_zero_min
         non_zero_min = c
 
-    sizes = d3.scale.linear()
-      .domain([Math.sqrt(non_zero_min), Math.sqrt(curr_max)])
-      .range([3,20])
+    sizes = d3.scale.sqrt()
+      .domain([non_zero_min, curr_max])
+      .range([2,20])
       .clamp(true) # allows us to handle null values
 
     # then update all circle sizes appropriately
     @circles.each (c) =>
-      c.radius = sizes(Math.sqrt(c['values'][split]))
+      s_val = c['values'][split]
+      if !isNaN(s_val) and s_val != ""
+        c.radius = sizes(parseFloat(s_val))
+      else
+        c.radius = 0
 
     this.update()
 
