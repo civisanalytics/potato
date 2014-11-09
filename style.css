@@ -28,6 +28,10 @@ a {
   top: 0;
   padding: 15px 0 0 20px;
 }
+#vis-svg {
+  position: absolute;
+
+}
 
 .pull-left {
   float: left;
@@ -210,13 +214,11 @@ button:hover {
   display: inline-block;
 }
 #subset-selection {
-  margin-top: 20px;
-  display: none;
+  padding: 20px 0 0 100px;
   position: absolute;
   background-color: #FFF;
   opacity: .9;
   width: 100%;
-  padding-left: 100px;
 }
 #subset-help-text {
   width: 600px;

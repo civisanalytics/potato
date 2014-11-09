@@ -43,7 +43,7 @@
       })(this));
       $("#vis").append("<div class='tooltip' id='node-tooltip'></div>").append("<div id='toolbar'><div id='modifiers'></div><div id='filter-select-buttons'></div></div>");
       $("#node-tooltip").hide();
-      this.vis = d3.select("#vis").append("svg").attr("viewBox", "0 0 " + this.width + " " + this.height);
+      this.vis = d3.select("#vis").append("svg").attr("viewBox", "0 0 " + this.width + " " + this.height).attr("id", "vis-svg");
       this.force = d3.layout.force().gravity(-0.01).charge(function(d) {
         return -Math.pow(d.radius, 2.0) * 1.5;
       }).size([this.width, this.height]);
@@ -104,6 +104,7 @@
 
     BubbleChart.prototype.subset_selection = function() {
       var subset_select_button, subsets, that;
+      $("#vis").append("<div id='subset-selection'> <div id='subset-help-text'> Hi!<br><br> You can either view <button id='all-data'>All Data</button> or view a subset by selecting values below. </div> <div id='subset-groups'></div> </div>");
       subset_select_button = $("<button id='subset-select-button'>Select Subset</button>");
       subset_select_button.on("click", (function(_this) {
         return function(e) {

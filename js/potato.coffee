@@ -15,6 +15,7 @@ class window.BubbleChart
     # scale vis size to fit browser window
     @vis = d3.select("#vis").append("svg")
        .attr("viewBox", "0 0 #{@width} #{@height}")
+       .attr("id", "vis-svg")
 
     @force = d3.layout.force()
       .gravity(-0.01)
@@ -64,6 +65,18 @@ class window.BubbleChart
 
   # given the filters, create the subset selection modal
   subset_selection: () =>
+    $("#vis").append("<div id='subset-selection'>
+        <div id='subset-help-text'>
+          Hi!<br><br>
+          You can either view
+          <button id='all-data'>All Data</button>
+          or view a subset by selecting values below.
+        </div>
+        <div id='subset-groups'></div>
+      </div>")
+
+
+
     subset_select_button = $("<button id='subset-select-button'>Select Subset</button>")
     subset_select_button.on "click", (e) =>
       $("#subset-selection").toggle()
