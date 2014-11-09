@@ -65,35 +65,36 @@
 
     Potato.prototype.create_filters = function() {
       var filter_counter;
+      this.sorted_filters = {};
+      this.filters = {};
       this.filter_names = [];
       $.each(this.data[0], (function(_this) {
         return function(d) {
           if (d !== 'node_id') {
-            return _this.filter_names.push({
+            _this.filter_names.push({
               value: d
             });
+            return _this.sorted_filters[d] = [];
           }
         };
       })(this));
-      this.filters = {};
       filter_counter = 1;
       return this.data.forEach((function(_this) {
         return function(d) {
           return $.each(d, function(k, v) {
-            var filter_exists;
+            var curr_filter, filter_exists;
             if (k !== 'node_id') {
-              filter_exists = 0;
-              $.each(_this.filters, function(f, e) {
-                if (e.filter === k && e.value === v) {
-                  filter_exists = 1;
-                }
+              filter_exists = $.grep(_this.sorted_filters[k], function(e) {
+                return e.filter === k && e.value === v;
               });
-              if (filter_exists === 0) {
-                _this.filters[filter_counter] = {
+              if (filter_exists.length === 0) {
+                curr_filter = {
                   id: filter_counter,
                   filter: k,
                   value: v
                 };
+                _this.sorted_filters[k].push(curr_filter);
+                _this.filters[filter_counter] = curr_filter;
                 return filter_counter += 1;
               }
             }
@@ -103,7 +104,7 @@
     };
 
     Potato.prototype.subset_selection = function() {
-      var subset_select_button, subsets, that;
+      var subset_select_button, that;
       $("#vis").append("<div id='subset-selection'> <div id='subset-help-text'> You can either view <button id='all-data'>All Data</button> or view a subset by selecting values below. </div> <div id='subset-groups'></div> </div>");
       subset_select_button = $("<button id='subset-select-button'>Select Subset</button>");
       subset_select_button.on("click", (function(_this) {
@@ -123,18 +124,7 @@
           return $("#subset-selection").hide();
         }
       });
-      subsets = {};
-      $.each(this.filter_names, (function(_this) {
-        return function(k, v) {
-          return subsets[v.value] = [];
-        };
-      })(this));
-      $.each(this.filters, (function(_this) {
-        return function(k, v) {
-          return subsets[v.filter].push(v);
-        };
-      })(this));
-      $.each(subsets, (function(_this) {
+      $.each(this.sorted_filters, (function(_this) {
         return function(k, v) {
           var filter_group, filter_id;
           filter_id = "filter" + k;

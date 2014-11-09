@@ -40,26 +40,33 @@ class window.Potato
   # the logic behind taking the csv and determining what the categorical data is
   create_filters: () =>
 
+    # a hash where the key is the filter type and the value is an array of filters
+    # used only in construction to determin filter attributes and allow for faster filter creation
+    @sorted_filters = {}
+
+    # a hash where the key is the filter id and the value is the filter
+    # used post construction for all add/remove interactions, as its a faster lookup
+    @filters = {}
+
     # get filter names from header row
     @filter_names = []
     $.each @data[0], (d) =>
       if d != 'node_id'
         @filter_names.push {value: d}
+        @sorted_filters[d] = []
 
-    @filters = {}
     filter_counter = 1
 
     # populate the filters from the dataset
     @data.forEach (d) =>
       $.each d, (k, v) =>
         if k != 'node_id'
-          filter_exists = 0
-          $.each @filters, (f, e) =>
-            if e.filter == k && e.value == v
-              filter_exists = 1
-              return
-          if filter_exists == 0
-            @filters[filter_counter] = {id: filter_counter, filter: k, value: v}
+          filter_exists = $.grep @sorted_filters[k], (e) =>
+            return e.filter == k && e.value == v
+          if filter_exists.length == 0
+            curr_filter = {id: filter_counter, filter: k, value: v}
+            @sorted_filters[k].push(curr_filter)
+            @filters[filter_counter] = curr_filter
             filter_counter += 1
 
   # given the filters, create the subset selection modal
@@ -88,14 +95,7 @@ class window.Potato
         that.add_all()
         $("#subset-selection").hide()
 
-    # copy a modified version of @filters into subsets, where the filters are sorted by filter
-    subsets = {}
-    $.each @filter_names, (k, v) =>
-      subsets[v.value] = []
-    $.each @filters, (k, v) =>
-      subsets[v.filter].push v
-
-    $.each subsets, (k, v) =>
+    $.each @sorted_filters, (k, v) =>
       filter_id = "filter" + k
       filter_group = $("<div class='filter-group-wrapper'><div class='filter-group-header'>"+k+"</div><div class='filter-group' id='"+filter_id+"'></div></div>")
       $("#subset-groups").append(filter_group)
