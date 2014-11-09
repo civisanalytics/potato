@@ -101,6 +101,9 @@ class window.Potato
       .css("margin-left", 100)
       .css("margin-top", $("#toolbar").outerHeight() + 25)
 
+    # close modal if clicked on wrapper, but not inner
+    $("#subset-selection").click (e) ->
+      e.stopPropagation()
     $("#subset-wrapper").click () ->
       $("#subset-wrapper").hide()
 

@@ -130,6 +130,9 @@
       });
       $("#modifiers").append(subset_select_button);
       $("#subset-selection").height($(window).height() - 200).width($(window).width() - 300).css("margin-left", 100).css("margin-top", $("#toolbar").outerHeight() + 25);
+      $("#subset-selection").click(function(e) {
+        return e.stopPropagation();
+      });
       $("#subset-wrapper").click(function() {
         return $("#subset-wrapper").hide();
       });
