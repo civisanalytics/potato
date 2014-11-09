@@ -3,7 +3,7 @@ $ ->
 
   render_vis = (csv, params = null) ->
     $(".load-screen").hide()
-    chart = new BubbleChart csv, params
+    chart = new Potato csv, params
 
   $("#file-uploader").on 'change', (e) =>
     file = e.target.files[0]

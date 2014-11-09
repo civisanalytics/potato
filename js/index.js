@@ -8,7 +8,7 @@
         params = null;
       }
       $(".load-screen").hide();
-      return chart = new BubbleChart(csv, params);
+      return chart = new Potato(csv, params);
     };
     $("#file-uploader").on('change', (function(_this) {
       return function(e) {

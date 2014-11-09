@@ -197,6 +197,7 @@ button:hover {
   color: #FFF;
   background-color: #222;
   opacity: .9;
+  z-index: 1;
 }
 
 .tooltip-name {

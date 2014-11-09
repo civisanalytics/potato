@@ -3,8 +3,8 @@
   var root,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
-  window.BubbleChart = (function() {
-    function BubbleChart(data, params) {
+  window.Potato = (function() {
+    function Potato(data, params) {
       if (params == null) {
         params = {
           split: true,
@@ -63,7 +63,7 @@
       this.subset_selection();
     }
 
-    BubbleChart.prototype.create_filters = function() {
+    Potato.prototype.create_filters = function() {
       var filter_counter;
       this.filter_names = [];
       $.each(this.data[0], (function(_this) {
@@ -102,7 +102,7 @@
       })(this));
     };
 
-    BubbleChart.prototype.subset_selection = function() {
+    Potato.prototype.subset_selection = function() {
       var subset_select_button, subsets, that;
       $("#vis").append("<div id='subset-selection'> <div id='subset-help-text'> Hi!<br><br> You can either view <button id='all-data'>All Data</button> or view a subset by selecting values below. </div> <div id='subset-groups'></div> </div>");
       subset_select_button = $("<button id='subset-select-button'>Select Subset</button>");
@@ -158,7 +158,7 @@
       return $("#subset-selection").show();
     };
 
-    BubbleChart.prototype.add_all = function() {
+    Potato.prototype.add_all = function() {
       var filter_button;
       if (this.nodes.length !== this.data.length) {
         if (this.curr_filters.length > 0) {
@@ -178,7 +178,7 @@
       }
     };
 
-    BubbleChart.prototype.remove_all = function() {
+    Potato.prototype.remove_all = function() {
       return $.each(this.curr_filters, (function(_this) {
         return function(k, f) {
           return _this.remove_filter(f.id);
@@ -186,7 +186,7 @@
       })(this));
     };
 
-    BubbleChart.prototype.add_filter = function(id) {
+    Potato.prototype.add_filter = function(id) {
       var curr_filter, filter_button;
       curr_filter = this.filters[id];
       if (this.curr_filters.length === 1 && this.curr_filters[0].id === 0) {
@@ -206,7 +206,7 @@
       return this.add_nodes(id);
     };
 
-    BubbleChart.prototype.remove_filter = function(id) {
+    Potato.prototype.remove_filter = function(id) {
       var curr_filter;
       curr_filter = this.filters[id];
       this.remove_nodes(id);
@@ -224,7 +224,7 @@
       }
     };
 
-    BubbleChart.prototype.add_nodes = function(id) {
+    Potato.prototype.add_nodes = function(id) {
       var curr_filter, split_id;
       if (id) {
         curr_filter = this.filters[id];
@@ -270,7 +270,7 @@
       }
     };
 
-    BubbleChart.prototype.remove_nodes = function(id) {
+    Potato.prototype.remove_nodes = function(id) {
       var curr_filter, len, should_remove;
       if (id === 0) {
         while (this.nodes.length > 0) {
@@ -306,7 +306,7 @@
       return this.update();
     };
 
-    BubbleChart.prototype.split_buttons = function() {
+    Potato.prototype.split_buttons = function() {
       $("#modifiers").append("<div id='split-wrapper' class='modifier-wrapper'><button id='split-button' class='modifier-button'>Split By<span class='button-arrow'>&#x25BC;</span><span id='split-hint' class='modifier-hint'></span></button><div id='split-menu' class='modifier-menu'></div></div>");
       $("#split-button").hover(function() {
         return $("#split-menu").slideDown(100);
@@ -325,7 +325,7 @@
       })(this));
     };
 
-    BubbleChart.prototype.split_by = function(split) {
+    Potato.prototype.split_by = function(split) {
       var curr_col, curr_row, curr_vals, height_2, num_cols, num_rows, width_2;
       if (this.circles === void 0 || this.circles.length === 0) {
         return;
@@ -388,7 +388,7 @@
       return this.update();
     };
 
-    BubbleChart.prototype.color_buttons = function() {
+    Potato.prototype.color_buttons = function() {
       $("#vis").append("<div id='color-legend'></div>");
       $("#modifiers").append("<div id='color-wrapper' class='modifier-wrapper'><button id='color-button' class='modifier-button'>Color By<span class='button-arrow'>&#x25BC;</span><span id='color-hint' class='modifier-hint'></span></button><div id='color-menu' class='modifier-menu'></div></div>");
       $("#color-button").hover(function() {
@@ -408,7 +408,7 @@
       })(this));
     };
 
-    BubbleChart.prototype.color_by = function(split) {
+    Potato.prototype.color_by = function(split) {
       var colors, curr_vals, g, l_size, legend, num_colors;
       if (this.circles === void 0 || this.circles.length === 0) {
         return;
@@ -456,7 +456,7 @@
       });
     };
 
-    BubbleChart.prototype.size_buttons = function() {
+    Potato.prototype.size_buttons = function() {
       $("#modifiers").append("<div id='size-wrapper' class='modifier-wrapper'><button id='size-button' class='modifier-button'>Size By<span class='button-arrow'>&#x25BC;</span><span id='size-hint' class='modifier-hint'></span></button><div id='size-menu' class='modifier-menu'></div></div>");
       $("#size-button").hover(function() {
         return $("#size-menu").slideDown(100);
@@ -475,7 +475,7 @@
       })(this));
     };
 
-    BubbleChart.prototype.size_by = function(split) {
+    Potato.prototype.size_by = function(split) {
       var curr_max, curr_vals, non_zero_min, sizes;
       if (this.circles === void 0 || this.circles.length === 0) {
         return;
@@ -511,7 +511,7 @@
       return this.update();
     };
 
-    BubbleChart.prototype.update = function() {
+    Potato.prototype.update = function() {
       var that;
       this.circles = this.vis.selectAll("circle").data(this.nodes, function(d) {
         return d.id;
@@ -564,7 +564,7 @@
       return this.force.start();
     };
 
-    BubbleChart.prototype.adjust_label_pos = function() {
+    Potato.prototype.adjust_label_pos = function() {
       return (function(_this) {
         return function(d) {
           var max_x, min_x, min_y;
@@ -590,7 +590,7 @@
       })(this);
     };
 
-    BubbleChart.prototype.move_towards_target = function(alpha) {
+    Potato.prototype.move_towards_target = function(alpha) {
       return (function(_this) {
         return function(d) {
           d.x = d.x + (d.tarx - d.x) * 0.7 * alpha;
@@ -599,41 +599,37 @@
       })(this);
     };
 
-    BubbleChart.prototype.show_details = function(data, i, element) {
+    Potato.prototype.show_details = function(data, i, element) {
       var content;
       content = "<div class='tooltip-name'>" + data.name + "</div>";
       $.each(data.values, function(k, v) {
         return content += "" + v + "<br/>";
       });
       $("#node-tooltip").html(content);
-      this.update_details(d3.event);
+      this.update_position(d3.event);
       return $("#node-tooltip").show();
     };
 
-    BubbleChart.prototype.hide_details = function(data, i, element) {
+    Potato.prototype.hide_details = function(data, i, element) {
       return $("#node-tooltip").hide();
     };
 
-    BubbleChart.prototype.update_position = function(e) {
-      var tth, ttleft, tttop, ttw, xOffset, yOffset, _ref, _ref1;
+    Potato.prototype.update_position = function(e) {
+      var tth, ttleft, tttop, ttw, xOffset, yOffset;
       xOffset = 20;
       yOffset = 10;
       ttw = $("#node-tooltip").width();
       tth = $("#node-tooltip").height();
-      ttleft = (_ref = (e.pageX + xOffset * 2 + ttw) > $(window).width()) != null ? _ref : e.pageX - ttw - xOffset * {
-        2: e.pageX + xOffset
-      };
-      tttop = (_ref1 = (e.pageY + yOffset * 2 + tth) > $(window).height()) != null ? _ref1 : e.pageY - tth - yOffset * {
-        2: e.pageY + yOffset
-      };
+      ttleft = (e.pageX + xOffset * 2 + ttw) > $(window).width() ? e.pageX - ttw - xOffset * 2 : e.pageX + xOffset;
+      tttop = (e.pageY + yOffset * 2 + tth) > $(window).height() ? e.pageY - tth - yOffset * 2 : e.pageY + yOffset;
       return $("#node-tooltip").css('top', tttop + 'px').css('left', ttleft + 'px');
     };
 
-    BubbleChart.prototype.safe_string = function(input) {
+    Potato.prototype.safe_string = function(input) {
       return input.toLowerCase().replace(/\s/g, '_').replace('.', '');
     };
 
-    return BubbleChart;
+    return Potato;
 
   })();
 

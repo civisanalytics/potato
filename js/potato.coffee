@@ -1,4 +1,4 @@
-class window.BubbleChart
+class window.Potato
   constructor: (data, params = {split: true, color: true, size: true}) ->
     @data = data
     @width = $(window).width()
@@ -540,7 +540,7 @@ class window.BubbleChart
     $.each data.values, (k, v) ->
       content +="#{v}<br/>"
     $("#node-tooltip").html(content)
-    this.update_details(d3.event)
+    this.update_position(d3.event)
     $("#node-tooltip").show()
 
   hide_details: (data, i, element) =>
@@ -549,12 +549,11 @@ class window.BubbleChart
   update_position: (e) =>
     xOffset = 20
     yOffset = 10
-
     # move tooltip to fit on screen as needed
     ttw = $("#node-tooltip").width()
     tth = $("#node-tooltip").height()
-    ttleft = ((e.pageX + xOffset*2 + ttw) > $(window).width()) ? e.pageX - ttw - xOffset*2 : e.pageX + xOffset
-    tttop = ((e.pageY + yOffset*2 + tth) > $(window).height()) ? e.pageY - tth - yOffset*2 : e.pageY + yOffset
+    ttleft = if ((e.pageX + xOffset*2 + ttw) > $(window).width()) then e.pageX - ttw - xOffset*2 else e.pageX + xOffset
+    tttop = if ((e.pageY + yOffset*2 + tth) > $(window).height()) then e.pageY - tth - yOffset*2 else e.pageY + yOffset
     $("#node-tooltip").css('top', tttop + 'px').css('left', ttleft + 'px')
 
   safe_string: (input) =>
