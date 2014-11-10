@@ -74,10 +74,15 @@ class window.Potato
 
     $.each @sorted_filters, (f, v) =>
       if isNaN(v[0].value)
-        if v.length != @data.length # every filter value is not unique
+        if v.length != @data.length  && v.length < 500 # every filter value is not unique
           @categorical_filters.push({value: f})
       else
         @numeric_filters.push({value: f})
+
+    # for the categoricals, put them in sorted alpha order
+    $.each @categorical_filters, (k, v) =>
+      @sorted_filters[v.value].sort (a, b) ->
+        return if a.value == b.value then 0 else (a.value > b.value) || -1
 
   # given the filters, create the subset selection modal
   subset_selection: () =>

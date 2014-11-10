@@ -108,10 +108,10 @@
       })(this));
       this.categorical_filters = [];
       this.numeric_filters = [];
-      return $.each(this.sorted_filters, (function(_this) {
+      $.each(this.sorted_filters, (function(_this) {
         return function(f, v) {
           if (isNaN(v[0].value)) {
-            if (v.length !== _this.data.length) {
+            if (v.length !== _this.data.length && v.length < 500) {
               return _this.categorical_filters.push({
                 value: f
               });
@@ -121,6 +121,17 @@
               value: f
             });
           }
+        };
+      })(this));
+      return $.each(this.categorical_filters, (function(_this) {
+        return function(k, v) {
+          return _this.sorted_filters[v.value].sort(function(a, b) {
+            if (a.value === b.value) {
+              return 0;
+            } else {
+              return (a.value > b.value) || -1;
+            }
+          });
         };
       })(this));
     };
