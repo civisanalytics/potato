@@ -87,8 +87,8 @@ class window.Potato
           <p>OR</p>
           Display data matching any of the selected values:
         </div>
-        <div id='categorical-filters'></div>
         <div id='numeric-filters'></div>
+        <div id='categorical-filters'></div>
       </div></div>")
 
     subset_select_button = $("<button id='subset-select-button'>Data Selection</button>")
@@ -117,27 +117,29 @@ class window.Potato
         that.add_all()
         $("#subset-wrapper").hide()
 
-    $.each @categorical_filters, (k, v) =>
-      this.add_categorical_filter(v.value, @sorted_filters[v.value])
-
     $.each @numeric_filters, (k, v) =>
       this.add_numeric_filter(v.value, @sorted_filters[v.value])
+
+    $.each @categorical_filters, (k, v) =>
+      this.add_categorical_filter(v.value, @sorted_filters[v.value])
 
     $("#subset-wrapper").show()
 
   add_numeric_filter: (k, v) =>
     filter_id = "filter" + k
-    filter_group = $("<div class='filter-group-wrapper'><div class='filter-group-header'>"+k+"</div><form class='filter-group' id='"+filter_id+"'></form></div>")
+    filter_group = $("<div class='filter-group-wrapper'><div class='filter-group-header'>"+k+"</div><form class='filter-numeric' id='"+filter_id+"'></form></div>")
     $("#numeric-filters").append(filter_group)
 
-    filter_min = d3.min(v, (d) -> parseFloat(d.value))
-    filter_max = d3.max(v, (d) -> parseFloat(d.value))
+    filter_min = Math.floor(d3.min(v, (d) -> parseFloat(d.value)))
+    filter_max = Math.ceil(d3.max(v, (d) -> parseFloat(d.value)))
 
     input_min = $("<input type='number' name='"+k+"' value="+filter_min+" min="+filter_min+" max="+filter_max+">")
+    dash = $("<span>-</span>")
     input_max = $("<input type='number' name='"+k+"' value="+filter_max+" min="+filter_min+" max="+filter_max+">")
     $("#"+filter_id).append(input_min)
+      .append(dash)
       .append(input_max)
-      .append($("<input type='submit'>"))
+      .append($("<input type='submit' value='apply'>"))
       .submit((e) =>
         e.preventDefault()
         this.test_numeric(e)

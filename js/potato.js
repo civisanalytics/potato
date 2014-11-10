@@ -127,7 +127,7 @@
 
     Potato.prototype.subset_selection = function() {
       var subset_select_button, that;
-      $("#vis").append("<div id='subset-wrapper'><div id='subset-selection'> <div id='subset-help-text'> <button id='all-data'>Display All Data</button> <p>OR</p> Display data matching any of the selected values: </div> <div id='categorical-filters'></div> <div id='numeric-filters'></div> </div></div>");
+      $("#vis").append("<div id='subset-wrapper'><div id='subset-selection'> <div id='subset-help-text'> <button id='all-data'>Display All Data</button> <p>OR</p> Display data matching any of the selected values: </div> <div id='numeric-filters'></div> <div id='categorical-filters'></div> </div></div>");
       subset_select_button = $("<button id='subset-select-button'>Data Selection</button>");
       subset_select_button.click(function() {
         return $("#subset-wrapper").toggle();
@@ -150,33 +150,34 @@
           return $("#subset-wrapper").hide();
         }
       });
-      $.each(this.categorical_filters, (function(_this) {
-        return function(k, v) {
-          return _this.add_categorical_filter(v.value, _this.sorted_filters[v.value]);
-        };
-      })(this));
       $.each(this.numeric_filters, (function(_this) {
         return function(k, v) {
           return _this.add_numeric_filter(v.value, _this.sorted_filters[v.value]);
+        };
+      })(this));
+      $.each(this.categorical_filters, (function(_this) {
+        return function(k, v) {
+          return _this.add_categorical_filter(v.value, _this.sorted_filters[v.value]);
         };
       })(this));
       return $("#subset-wrapper").show();
     };
 
     Potato.prototype.add_numeric_filter = function(k, v) {
-      var filter_group, filter_id, filter_max, filter_min, input_max, input_min;
+      var dash, filter_group, filter_id, filter_max, filter_min, input_max, input_min;
       filter_id = "filter" + k;
-      filter_group = $("<div class='filter-group-wrapper'><div class='filter-group-header'>" + k + "</div><form class='filter-group' id='" + filter_id + "'></form></div>");
+      filter_group = $("<div class='filter-group-wrapper'><div class='filter-group-header'>" + k + "</div><form class='filter-numeric' id='" + filter_id + "'></form></div>");
       $("#numeric-filters").append(filter_group);
-      filter_min = d3.min(v, function(d) {
+      filter_min = Math.floor(d3.min(v, function(d) {
         return parseFloat(d.value);
-      });
-      filter_max = d3.max(v, function(d) {
+      }));
+      filter_max = Math.ceil(d3.max(v, function(d) {
         return parseFloat(d.value);
-      });
+      }));
       input_min = $("<input type='number' name='" + k + "' value=" + filter_min + " min=" + filter_min + " max=" + filter_max + ">");
+      dash = $("<span>-</span>");
       input_max = $("<input type='number' name='" + k + "' value=" + filter_max + " min=" + filter_min + " max=" + filter_max + ">");
-      return $("#" + filter_id).append(input_min).append(input_max).append($("<input type='submit'>")).submit((function(_this) {
+      return $("#" + filter_id).append(input_min).append(dash).append(input_max).append($("<input type='submit' value='apply'>")).submit((function(_this) {
         return function(e) {
           e.preventDefault();
           return _this.test_numeric(e);

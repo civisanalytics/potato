@@ -26,11 +26,10 @@ a {
 #toolbar {
   width: 100%;
   top: 0;
-  padding: 15px 0 0 20px;
+  padding: 15px 0 0 0;
 }
 #vis-svg {
   position: absolute;
-
 }
 
 .pull-left {
@@ -128,6 +127,7 @@ button:hover {
   display: inline-block;
   font-variant: small-caps;
   vertical-align: top;
+  margin-left: 20px;
 }
 
 .button-arrow {
@@ -180,7 +180,7 @@ button:hover {
 
 .split-labels {
   fill: #999;
-  font-size: 1.8em;
+  font-size: 1.5em;
   z-index: -1;
   text-anchor: middle;
 }
