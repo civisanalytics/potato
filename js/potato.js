@@ -76,18 +76,17 @@
       this.data.forEach((function(_this) {
         return function(d) {
           return $.each(d, function(k, v) {
-            var curr_filter, filter_exists;
+            var filter_exists;
             if (k !== 'node_id') {
               filter_exists = $.grep(sorted_filters[k], function(e) {
                 return e.filter === k && e.value === v;
               });
               if (filter_exists.length === 0) {
-                curr_filter = {
+                sorted_filters[k].push({
                   id: filter_counter,
                   filter: k,
                   value: v
-                };
-                sorted_filters[k].push(curr_filter);
+                });
                 return filter_counter += 1;
               }
             }
@@ -132,6 +131,7 @@
     };
 
     Potato.prototype.add_all = function() {
+      var color_id, size_id, split_id;
       if (this.nodes.length !== this.data.length) {
         this.data.forEach((function(_this) {
           return function(d) {
@@ -143,7 +143,19 @@
           };
         })(this));
       }
-      return this.update();
+      this.update();
+      split_id = $(".split-option.active").attr('id');
+      if (split_id !== void 0) {
+        this.split_by(split_id.substr(split_id.indexOf("-") + 1));
+      }
+      color_id = $(".color-option.active").attr('id');
+      if (color_id !== void 0) {
+        this.color_by(color_id.substr(color_id.indexOf("-") + 1));
+      }
+      size_id = $(".size-option.active").attr('id');
+      if (size_id !== void 0) {
+        return this.size_by(size_id.substr(size_id.indexOf("-") + 1));
+      }
     };
 
     Potato.prototype.add_node = function(d) {

@@ -38,7 +38,6 @@ class window.Potato
 
   # the logic behind taking the csv and determining what the categorical data is
   create_filters: () =>
-
     # a hash where the key is the filter type and the value is an array of filters
     # used only in construction to determine filter attributes and allow for faster filter creation
     sorted_filters = {}
@@ -59,8 +58,7 @@ class window.Potato
           filter_exists = $.grep sorted_filters[k], (e) =>
             return e.filter == k && e.value == v
           if filter_exists.length == 0
-            curr_filter = {id: filter_counter, filter: k, value: v}
-            sorted_filters[k].push(curr_filter)
+            sorted_filters[k].push({id: filter_counter, filter: k, value: v})
             filter_counter += 1
 
     @categorical_filters = []
@@ -68,7 +66,7 @@ class window.Potato
 
     $.each sorted_filters, (f, v) =>
       if isNaN(v[0].value)
-        if v.length != @data.length  && v.length < 500 # every filter value is not unique
+        if v.length != @data.length && v.length < 500 # every filter value is not unique
           @categorical_filters.push({value: f})
       else
         @numeric_filters.push({value: f})
@@ -83,7 +81,6 @@ class window.Potato
       this.add_all()
     $("#filter-select-buttons").append(filter_button)
 
-
   # add all data nodes to screen
   add_all: () =>
     if @nodes.length != @data.length
@@ -92,10 +89,13 @@ class window.Potato
           this.add_node(d)
     this.update()
 
-    # apply any existing splits
-    #split_id = $(".split-option.active").attr('id')
-    #if split_id != undefined
-    #  this.split_by(split_id.split('-')[1])
+    # apply any existing splits/colors/sizes
+    split_id = $(".split-option.active").attr('id')
+    this.split_by(split_id.substr(split_id.indexOf("-") + 1)) if split_id != undefined
+    color_id = $(".color-option.active").attr('id')
+    this.color_by(color_id.substr(color_id.indexOf("-") + 1)) if color_id != undefined
+    size_id = $(".size-option.active").attr('id')
+    this.size_by(size_id.substr(size_id.indexOf("-") + 1)) if size_id != undefined
 
   add_node: (d) =>
     vals = {} # create a hash with the appropriate filters
