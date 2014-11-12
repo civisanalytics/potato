@@ -59,7 +59,7 @@
     }
 
     Potato.prototype.create_filters = function() {
-      var filter_button, filter_counter, sorted_filters;
+      var filter_button, sorted_filters;
       sorted_filters = {};
       this.filter_names = [];
       $.each(this.data[0], (function(_this) {
@@ -72,7 +72,6 @@
           }
         };
       })(this));
-      filter_counter = 1;
       this.data.forEach((function(_this) {
         return function(d) {
           return $.each(d, function(k, v) {
@@ -82,12 +81,10 @@
                 return e.filter === k && e.value === v;
               });
               if (filter_exists.length === 0) {
-                sorted_filters[k].push({
-                  id: filter_counter,
+                return sorted_filters[k].push({
                   filter: k,
                   value: v
                 });
-                return filter_counter += 1;
               }
             }
           });
@@ -170,7 +167,6 @@
       curr_r = 5;
       if (d['team']) {
         curr_class = d.team;
-        curr_r = 8;
       }
       node = {
         id: d.node_id,

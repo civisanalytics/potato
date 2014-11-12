@@ -49,8 +49,6 @@ class window.Potato
         @filter_names.push {value: d}
         sorted_filters[d] = []
 
-    filter_counter = 1
-
     # populate the filters from the dataset
     @data.forEach (d) =>
       $.each d, (k, v) =>
@@ -58,8 +56,7 @@ class window.Potato
           filter_exists = $.grep sorted_filters[k], (e) =>
             return e.filter == k && e.value == v
           if filter_exists.length == 0
-            sorted_filters[k].push({id: filter_counter, filter: k, value: v})
-            filter_counter += 1
+            sorted_filters[k].push({filter: k, value: v})
 
     @categorical_filters = []
     @numeric_filters = []
@@ -108,7 +105,6 @@ class window.Potato
     # TODO temp hack for NFL dataset
     if d['team']
       curr_class = d.team
-      curr_r = 8
 
     node = {
       id: d.node_id
@@ -227,9 +223,7 @@ class window.Potato
       .text((d) -> d.value)
       .attr("class", 'modifier-option color-option')
       .attr("id", (d) -> 'color-' + d.value)
-      .on("click", (d) =>
-        this.color_by(d.value)
-      )
+      .on("click", (d) => this.color_by(d.value) )
 
   color_by: (split) =>
     if @circles == undefined || @circles.length == 0
@@ -303,9 +297,7 @@ class window.Potato
       .text((d) -> d.value)
       .attr("class", 'modifier-option size-option')
       .attr("id", (d) -> 'size-' + d.value)
-      .on("click", (d) =>
-        this.size_by(d.value)
-      )
+      .on("click", (d) => this.size_by(d.value))
 
   size_by: (split) =>
     if @circles == undefined || @circles.length == 0
