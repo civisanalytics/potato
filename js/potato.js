@@ -25,18 +25,9 @@
       this.color_buttons = __bind(this.color_buttons, this);
       this.split_by = __bind(this.split_by, this);
       this.split_buttons = __bind(this.split_buttons, this);
-      this.remove_nodes = __bind(this.remove_nodes, this);
+      this.remove_node = __bind(this.remove_node, this);
       this.add_node = __bind(this.add_node, this);
-      this.add_nodes_by_filter_range = __bind(this.add_nodes_by_filter_range, this);
-      this.add_nodes_by_filter = __bind(this.add_nodes_by_filter, this);
-      this.remove_filter = __bind(this.remove_filter, this);
-      this.add_filter = __bind(this.add_filter, this);
-      this.remove_all = __bind(this.remove_all, this);
       this.add_all = __bind(this.add_all, this);
-      this.add_categorical_filter = __bind(this.add_categorical_filter, this);
-      this.test_numeric = __bind(this.test_numeric, this);
-      this.add_numeric_filter = __bind(this.add_numeric_filter, this);
-      this.subset_selection = __bind(this.subset_selection, this);
       this.create_filters = __bind(this.create_filters, this);
       this.data = data;
       this.width = $(window).width();
@@ -54,7 +45,6 @@
       }).size([this.width, this.height]);
       this.nodes = this.force.nodes();
       this.labels = [];
-      this.curr_filters = [];
       this.create_filters();
       if (params.split) {
         this.split_buttons();
@@ -65,13 +55,12 @@
       if (params.size) {
         this.size_buttons();
       }
-      this.subset_selection();
+      this.add_all();
     }
 
     Potato.prototype.create_filters = function() {
-      var filter_counter;
-      this.sorted_filters = {};
-      this.filters = {};
+      var filter_button, filter_counter, sorted_filters;
+      sorted_filters = {};
       this.filter_names = [];
       $.each(this.data[0], (function(_this) {
         return function(d) {
@@ -79,7 +68,7 @@
             _this.filter_names.push({
               value: d
             });
-            return _this.sorted_filters[d] = [];
+            return sorted_filters[d] = [];
           }
         };
       })(this));
@@ -89,7 +78,7 @@
           return $.each(d, function(k, v) {
             var curr_filter, filter_exists;
             if (k !== 'node_id') {
-              filter_exists = $.grep(_this.sorted_filters[k], function(e) {
+              filter_exists = $.grep(sorted_filters[k], function(e) {
                 return e.filter === k && e.value === v;
               });
               if (filter_exists.length === 0) {
@@ -98,8 +87,7 @@
                   filter: k,
                   value: v
                 };
-                _this.sorted_filters[k].push(curr_filter);
-                _this.filters[filter_counter] = curr_filter;
+                sorted_filters[k].push(curr_filter);
                 return filter_counter += 1;
               }
             }
@@ -108,7 +96,7 @@
       })(this));
       this.categorical_filters = [];
       this.numeric_filters = [];
-      $.each(this.sorted_filters, (function(_this) {
+      $.each(sorted_filters, (function(_this) {
         return function(f, v) {
           if (isNaN(v[0].value)) {
             if (v.length !== _this.data.length && v.length < 500) {
@@ -123,9 +111,9 @@
           }
         };
       })(this));
-      return $.each(this.categorical_filters, (function(_this) {
+      $.each(this.categorical_filters, (function(_this) {
         return function(k, v) {
-          return _this.sorted_filters[v.value].sort(function(a, b) {
+          return sorted_filters[v.value].sort(function(a, b) {
             if (a.value === b.value) {
               return 0;
             } else {
@@ -134,196 +122,27 @@
           });
         };
       })(this));
-    };
-
-    Potato.prototype.subset_selection = function() {
-      var subset_select_button, that;
-      $("#vis").append("<div id='subset-wrapper'><div id='subset-selection'> <div id='subset-help-text'> <button id='all-data'>Display All Data</button> <p>OR</p> Display data matching any of the selected values: </div> <div id='numeric-filters'></div> <div id='categorical-filters'></div> </div></div>");
-      subset_select_button = $("<button id='subset-select-button'>Data Selection</button>");
-      subset_select_button.click(function() {
-        return $("#subset-wrapper").toggle();
-      });
-      $("#modifiers").append(subset_select_button);
-      $("#subset-selection").height($(window).height() - 200).width($(window).width() - 300).css("margin-left", 100).css("margin-top", $("#toolbar").outerHeight() + 25);
-      $("#subset-selection").click(function(e) {
-        return e.stopPropagation();
-      });
-      $("#subset-wrapper").click(function() {
-        return $("#subset-wrapper").hide();
-      });
-      that = this;
-      $("#all-data").addClass("filter-0").on("click", function(e) {
-        if ($(this).hasClass("active")) {
-          return that.remove_all();
-        } else {
-          $(this).addClass("active");
-          that.add_all();
-          return $("#subset-wrapper").hide();
-        }
-      });
-      $.each(this.numeric_filters, (function(_this) {
-        return function(k, v) {
-          return _this.add_numeric_filter(v.value, _this.sorted_filters[v.value]);
-        };
-      })(this));
-      $.each(this.categorical_filters, (function(_this) {
-        return function(k, v) {
-          return _this.add_categorical_filter(v.value, _this.sorted_filters[v.value]);
-        };
-      })(this));
-      return $("#subset-wrapper").show();
-    };
-
-    Potato.prototype.add_numeric_filter = function(k, v) {
-      var dash, filter_group, filter_id, filter_max, filter_min, input_max, input_min;
-      filter_id = "filter" + k;
-      filter_group = $("<div class='filter-group-wrapper'><div class='filter-group-header'>" + k + "</div><form class='filter-numeric' id='" + filter_id + "'></form></div>");
-      $("#numeric-filters").append(filter_group);
-      filter_min = Math.floor(d3.min(v, function(d) {
-        return parseFloat(d.value);
-      }));
-      filter_max = Math.ceil(d3.max(v, function(d) {
-        return parseFloat(d.value);
-      }));
-      input_min = $("<input type='number' name='" + k + "' value=" + filter_min + " min=" + filter_min + " max=" + filter_max + ">");
-      dash = $("<span>-</span>");
-      input_max = $("<input type='number' name='" + k + "' value=" + filter_max + " min=" + filter_min + " max=" + filter_max + ">");
-      return $("#" + filter_id).append(input_min).append(dash).append(input_max).append($("<input type='submit' value='apply'>")).submit((function(_this) {
+      filter_button = $("<button class='active filter-button filter-0'>Reset Nodes</button>");
+      filter_button.on("click", (function(_this) {
         return function(e) {
-          e.preventDefault();
-          return _this.test_numeric(e);
+          return _this.add_all();
         };
       })(this));
-    };
-
-    Potato.prototype.test_numeric = function(e) {
-      console.log(e.target[0].name);
-      console.log(e.target[0].value);
-      console.log(e.target[1].value);
-      return this.add_nodes_by_filter_range(e.target[0].name, e.target[0].value, e.target[1].value);
-    };
-
-    Potato.prototype.add_categorical_filter = function(k, v) {
-      var filter_group, filter_id, that;
-      filter_id = "filter" + k;
-      filter_group = $("<div class='filter-group-wrapper'><div class='filter-group-header'>" + k + "</div><div class='filter-group' id='" + filter_id + "'></div></div>");
-      $("#categorical-filters").append(filter_group);
-      that = this;
-      return d3.select("#" + filter_id).selectAll('div').data(v).enter().append("div").attr("class", function(d) {
-        return "filter-value filter-" + d.id;
-      }).text(function(d) {
-        return d.value;
-      }).on("click", function(d) {
-        if ($(this).hasClass("active")) {
-          return that.remove_filter(d.id);
-        } else {
-          that.add_filter(d.id);
-          return $(this).addClass("active");
-        }
-      });
+      return $("#filter-select-buttons").append(filter_button);
     };
 
     Potato.prototype.add_all = function() {
-      var filter_button;
       if (this.nodes.length !== this.data.length) {
-        if (this.curr_filters.length > 0) {
-          this.remove_all();
-        }
-        this.curr_filters.push({
-          id: 0
-        });
-        filter_button = $("<button class='active filter-button filter-0'>All Data</button>");
-        filter_button.on("click", (function(_this) {
-          return function(e) {
-            return _this.remove_all();
+        this.data.forEach((function(_this) {
+          return function(d) {
+            if ($.grep(_this.nodes, function(e) {
+              return e.id === d.node_id;
+            }).length === 0) {
+              return _this.add_node(d);
+            }
           };
         })(this));
-        $("#filter-select-buttons").append(filter_button);
-        return this.add_nodes_by_filter(null);
       }
-    };
-
-    Potato.prototype.remove_all = function() {
-      return $.each(this.curr_filters, (function(_this) {
-        return function(k, f) {
-          return _this.remove_filter(f.id);
-        };
-      })(this));
-    };
-
-    Potato.prototype.add_filter = function(id) {
-      var curr_filter, filter_button;
-      curr_filter = this.filters[id];
-      if (this.curr_filters.length === 1 && this.curr_filters[0].id === 0) {
-        this.remove_all();
-      }
-      if (this.curr_filters.length === 0) {
-        $("#filter-select-buttons").text("Current subsets: ");
-      }
-      this.curr_filters.push(curr_filter);
-      filter_button = $("<button class='active filter-button filter-" + id + "'>" + curr_filter.value + "</button>");
-      filter_button.on("click", (function(_this) {
-        return function(e) {
-          return _this.remove_filter(id);
-        };
-      })(this));
-      $("#filter-select-buttons").append(filter_button);
-      return this.add_nodes_by_filter(id);
-    };
-
-    Potato.prototype.remove_filter = function(id) {
-      var curr_filter;
-      curr_filter = this.filters[id];
-      this.remove_nodes(id);
-      $(".filter-" + id).each(function(k, v) {
-        var f_obj;
-        f_obj = $(v);
-        if (f_obj.hasClass('filter-button')) {
-          return f_obj.detach();
-        } else {
-          return f_obj.removeClass("active");
-        }
-      });
-      if (this.curr_filters.length === 0) {
-        return $("#filter-select-buttons").text("");
-      }
-    };
-
-    Potato.prototype.add_nodes_by_filter = function(id) {
-      var curr_filter, split_id;
-      if (id) {
-        curr_filter = this.filters[id];
-      }
-      this.data.forEach((function(_this) {
-        return function(d) {
-          if (id === null || d[curr_filter.filter] === curr_filter.value) {
-            if ($.grep(_this.nodes, function(e) {
-              return e.id === d.node_id;
-            }).length === 0) {
-              return _this.add_node(d);
-            }
-          }
-        };
-      })(this));
-      this.update();
-      split_id = $(".split-option.active").attr('id');
-      if (split_id !== void 0) {
-        return this.split_by(split_id.split('-')[1]);
-      }
-    };
-
-    Potato.prototype.add_nodes_by_filter_range = function(id, min, max) {
-      this.data.forEach((function(_this) {
-        return function(d) {
-          if (parseFloat(d[id]) >= min && parseFloat(d[id]) <= max) {
-            if ($.grep(_this.nodes, function(e) {
-              return e.id === d.node_id;
-            }).length === 0) {
-              return _this.add_node(d);
-            }
-          }
-        };
-      })(this));
       return this.update();
     };
 
@@ -355,37 +174,13 @@
       return this.nodes.push(node);
     };
 
-    Potato.prototype.remove_nodes = function(id) {
-      var curr_filter, len, should_remove;
-      if (id === 0) {
-        while (this.nodes.length > 0) {
-          this.nodes.pop();
-        }
-        while (this.curr_filters.length > 0) {
-          this.curr_filters.pop();
-        }
-      } else {
-        curr_filter = this.filters[id];
-        this.curr_filters = $.grep(this.curr_filters, (function(_this) {
-          return function(e) {
-            return e['filter'] !== curr_filter.filter || e['value'] !== curr_filter.value;
-          };
-        })(this));
-        len = this.nodes.length;
-        while (len--) {
-          if (this.nodes[len]['values'][curr_filter.filter] === curr_filter.value) {
-            should_remove = true;
-            this.curr_filters.forEach((function(_this) {
-              return function(k) {
-                if (_this.nodes[len]['values'][k['filter']] === k['value']) {
-                  return should_remove = false;
-                }
-              };
-            })(this));
-            if (should_remove === true) {
-              this.nodes.splice(len, 1);
-            }
-          }
+    Potato.prototype.remove_node = function(id) {
+      var len;
+      len = this.nodes.length;
+      while (len--) {
+        if (this.nodes[len]['id'] === id) {
+          this.nodes.splice(len, 1);
+          break;
         }
       }
       return this.update();

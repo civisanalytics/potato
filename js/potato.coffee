@@ -28,32 +28,27 @@ class window.Potato
 
     @labels = []
 
-    @curr_filters = []
     this.create_filters()
 
     this.split_buttons() if params.split
     this.color_buttons() if params.color
     this.size_buttons() if params.size
 
-    this.subset_selection()
+    this.add_all()
 
   # the logic behind taking the csv and determining what the categorical data is
   create_filters: () =>
 
     # a hash where the key is the filter type and the value is an array of filters
     # used only in construction to determine filter attributes and allow for faster filter creation
-    @sorted_filters = {}
-
-    # a hash where the key is the filter id and the value is the filter
-    # used post construction for all add/remove interactions, as its a faster lookup
-    @filters = {}
+    sorted_filters = {}
 
     # get filter names from header row
     @filter_names = []
     $.each @data[0], (d) =>
       if d != 'node_id'
         @filter_names.push {value: d}
-        @sorted_filters[d] = []
+        sorted_filters[d] = []
 
     filter_counter = 1
 
@@ -61,18 +56,17 @@ class window.Potato
     @data.forEach (d) =>
       $.each d, (k, v) =>
         if k != 'node_id'
-          filter_exists = $.grep @sorted_filters[k], (e) =>
+          filter_exists = $.grep sorted_filters[k], (e) =>
             return e.filter == k && e.value == v
           if filter_exists.length == 0
             curr_filter = {id: filter_counter, filter: k, value: v}
-            @sorted_filters[k].push(curr_filter)
-            @filters[filter_counter] = curr_filter
+            sorted_filters[k].push(curr_filter)
             filter_counter += 1
 
     @categorical_filters = []
     @numeric_filters = []
 
-    $.each @sorted_filters, (f, v) =>
+    $.each sorted_filters, (f, v) =>
       if isNaN(v[0].value)
         if v.length != @data.length  && v.length < 500 # every filter value is not unique
           @categorical_filters.push({value: f})
@@ -81,188 +75,27 @@ class window.Potato
 
     # for the categoricals, put them in sorted alpha order
     $.each @categorical_filters, (k, v) =>
-      @sorted_filters[v.value].sort (a, b) ->
+      sorted_filters[v.value].sort (a, b) ->
         return if a.value == b.value then 0 else (a.value > b.value) || -1
 
-  # given the filters, create the subset selection modal
-  subset_selection: () =>
-    $("#vis").append("<div id='subset-wrapper'><div id='subset-selection'>
-        <div id='subset-help-text'>
-          <button id='all-data'>Display All Data</button>
-          <p>OR</p>
-          Display data matching any of the selected values:
-        </div>
-        <div id='numeric-filters'></div>
-        <div id='categorical-filters'></div>
-      </div></div>")
+    filter_button = $("<button class='active filter-button filter-0'>Reset Nodes</button>")
+    filter_button.on "click", (e) =>
+      this.add_all()
+    $("#filter-select-buttons").append(filter_button)
 
-    subset_select_button = $("<button id='subset-select-button'>Data Selection</button>")
-    subset_select_button.click () ->
-      $("#subset-wrapper").toggle()
-    $("#modifiers").append(subset_select_button)
-
-    # move the subset selection under the toolbar
-    $("#subset-selection").height($(window).height() - 200)
-      .width($(window).width() - 300)
-      .css("margin-left", 100)
-      .css("margin-top", $("#toolbar").outerHeight() + 25)
-
-    # close modal if clicked on wrapper, but not inner
-    $("#subset-selection").click (e) ->
-      e.stopPropagation()
-    $("#subset-wrapper").click () ->
-      $("#subset-wrapper").hide()
-
-    that = this
-    $("#all-data").addClass("filter-0").on "click", (e) ->
-      if $(this).hasClass("active")
-        that.remove_all()
-      else
-        $(this).addClass("active")
-        that.add_all()
-        $("#subset-wrapper").hide()
-
-    $.each @numeric_filters, (k, v) =>
-      this.add_numeric_filter(v.value, @sorted_filters[v.value])
-
-    $.each @categorical_filters, (k, v) =>
-      this.add_categorical_filter(v.value, @sorted_filters[v.value])
-
-    $("#subset-wrapper").show()
-
-  add_numeric_filter: (k, v) =>
-    filter_id = "filter" + k
-    filter_group = $("<div class='filter-group-wrapper'><div class='filter-group-header'>"+k+"</div><form class='filter-numeric' id='"+filter_id+"'></form></div>")
-    $("#numeric-filters").append(filter_group)
-
-    filter_min = Math.floor(d3.min(v, (d) -> parseFloat(d.value)))
-    filter_max = Math.ceil(d3.max(v, (d) -> parseFloat(d.value)))
-
-    input_min = $("<input type='number' name='"+k+"' value="+filter_min+" min="+filter_min+" max="+filter_max+">")
-    dash = $("<span>-</span>")
-    input_max = $("<input type='number' name='"+k+"' value="+filter_max+" min="+filter_min+" max="+filter_max+">")
-    $("#"+filter_id).append(input_min)
-      .append(dash)
-      .append(input_max)
-      .append($("<input type='submit' value='apply'>"))
-      .submit((e) =>
-        e.preventDefault()
-        this.test_numeric(e)
-      )
-
-
-  test_numeric: (e) =>
-    console.log(e.target[0].name)
-    console.log(e.target[0].value)
-    console.log(e.target[1].value)
-    this.add_nodes_by_filter_range(e.target[0].name, e.target[0].value, e.target[1].value)
-
-  add_categorical_filter: (k, v) =>
-    filter_id = "filter" + k
-    filter_group = $("<div class='filter-group-wrapper'><div class='filter-group-header'>"+k+"</div><div class='filter-group' id='"+filter_id+"'></div></div>")
-    $("#categorical-filters").append(filter_group)
-
-    that = this
-    d3.select("#"+filter_id).selectAll('div').data(v).enter()
-      .append("div")
-      .attr("class", (d) -> return "filter-value filter-" + d.id)
-      .text((d) -> return d.value)
-      .on("click", (d) ->
-        if $(this).hasClass("active")
-          that.remove_filter(d.id)
-        else
-          that.add_filter(d.id)
-          $(this).addClass("active")
-      )
 
   # add all data nodes to screen
   add_all: () =>
     if @nodes.length != @data.length
-
-      if @curr_filters.length > 0
-        # remove any currently selected filters
-        this.remove_all()
-
-      @curr_filters.push({id: 0})
-
-      filter_button = $("<button class='active filter-button filter-0'>All Data</button>")
-      filter_button.on "click", (e) =>
-        this.remove_all()
-      $("#filter-select-buttons").append(filter_button)
-
-      this.add_nodes_by_filter(null)
-
-  remove_all: () =>
-    $.each @curr_filters, (k, f) =>
-      this.remove_filter(f.id)
-
-  # add a filter by id
-  # this entails both adding the actual nodes as well as the subset button
-  add_filter: (id) =>
-    curr_filter = @filters[id]
-
-    # if the only filter is the all filter, remove the all filter
-    if @curr_filters.length == 1 && @curr_filters[0].id == 0
-      this.remove_all()
-
-    # this is the first filter
-    if @curr_filters.length == 0
-      $("#filter-select-buttons").text("Current subsets: ")
-
-    @curr_filters.push(curr_filter)
-
-    filter_button = $("<button class='active filter-button filter-"+id+"'>"+curr_filter.value+"</button>")
-    filter_button.on "click", (e) =>
-      this.remove_filter(id)
-    $("#filter-select-buttons").append(filter_button)
-
-    this.add_nodes_by_filter(id)
-
-  # remove a filter by id
-  # this entails both removing the actual nodes as well as removing the subset button
-  # and changing the active state in the subset_select modal
-  remove_filter: (id) =>
-    curr_filter = @filters[id]
-
-    this.remove_nodes(id)
-
-    # remove or turn off any necessary buttons / sub_selectors
-    $(".filter-"+id).each (k, v) ->
-      f_obj = $(v)
-      if f_obj.hasClass('filter-button')
-        f_obj.detach()
-      else
-        f_obj.removeClass("active")
-
-    # that was the last filter
-    if @curr_filters.length == 0
-      $("#filter-select-buttons").text("")
-
-  add_nodes_by_filter: (id) =>
-    if id
-      curr_filter = @filters[id]
-
-    @data.forEach (d) =>
-      if id == null || d[curr_filter.filter] == curr_filter.value
+      @data.forEach (d) =>
         if $.grep(@nodes, (e) => e.id == d.node_id).length == 0 # if it doesn't already exist in nodes
           this.add_node(d)
-
     this.update()
 
     # apply any existing splits
-    split_id = $(".split-option.active").attr('id')
-    if split_id != undefined
-      this.split_by(split_id.split('-')[1])
-
-
-  add_nodes_by_filter_range: (id, min, max) =>
-
-    @data.forEach (d) =>
-      if parseFloat(d[id]) >= min and parseFloat(d[id]) <= max
-        if $.grep(@nodes, (e) => e.id == d.node_id).length == 0 # if it doesn't already exist in nodes
-          this.add_node(d)
-
-    this.update()
+    #split_id = $(".split-option.active").attr('id')
+    #if split_id != undefined
+    #  this.split_by(split_id.split('-')[1])
 
   add_node: (d) =>
     vals = {} # create a hash with the appropriate filters
@@ -290,32 +123,13 @@ class window.Potato
     }
     @nodes.push node
 
-  remove_nodes: (id) =>
-    if id == 0
-      while @nodes.length > 0 # we can't just set @nodes = [] because that creates a new object
-        @nodes.pop()
-
-      while @curr_filters.length > 0
-        @curr_filters.pop()
-    else
-      curr_filter = @filters[id]
-
-      # remove this filter from the @curr_filters
-      @curr_filters = $.grep @curr_filters, (e) =>
-        return e['filter'] != curr_filter.filter || e['value'] != curr_filter.value
-
-      # this was the only array iterator + removal I could get to work
-      len = @nodes.length
-      while (len--)
-        if @nodes[len]['values'][curr_filter.filter] == curr_filter.value # node with offending value found
-          # now check that it doesnt have other values that would allow it to stay
-          should_remove = true
-          @curr_filters.forEach (k) =>
-            if @nodes[len]['values'][k['filter']] == k['value']
-              should_remove = false
-          # we can now remove it
-          if should_remove == true
-            @nodes.splice(len, 1)
+  remove_node: (id) =>
+    # this was the only array iterator + removal I could get to work
+    len = @nodes.length
+    while (len--)
+      if @nodes[len]['id'] == id # node with offending value found
+        @nodes.splice(len, 1)
+        break
 
     this.update()
 
