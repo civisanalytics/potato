@@ -409,7 +409,11 @@
         return that.show_details(d, i, this);
       }).on("mouseout", function(d, i) {
         return that.hide_details(d, i, this);
-      }).attr("class", function(d) {
+      }).on("click", (function(_this) {
+        return function(d) {
+          return _this.remove_node(d.id);
+        };
+      })(this)).attr("class", function(d) {
         if (d["class"].length > 0) {
           return d["class"].toLowerCase().replace(/\s/g, '_').replace('.', '');
         } else {

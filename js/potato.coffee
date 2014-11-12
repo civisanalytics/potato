@@ -357,6 +357,7 @@ class window.Potato
       .attr("fill", (d) -> d.color)
       .on("mouseover", (d,i) -> that.show_details(d,i,this))
       .on("mouseout", (d,i) -> that.hide_details(d,i,this))
+      .on("click", (d) => this.remove_node(d.id))
       .attr("class", (d) ->
         if d.class.length > 0
           d.class.toLowerCase().replace(/\s/g, '_').replace('.','')
