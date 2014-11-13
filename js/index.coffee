@@ -17,6 +17,9 @@ $ ->
   $("#nfl-dataset").on 'click', (e) =>
     d3.csv "data/football/players_2.csv", (csv) ->
       render_vis(csv, {split: true, color: false, size: false})
+  $("#nba-dataset").on 'click', (e) =>
+    d3.csv "data/basketball/basketball.csv", (csv) ->
+      render_vis(csv)
   $("#billionaire-dataset").on 'click', (e) =>
     d3.csv "data/billion/billionaire.csv", (csv) ->
       render_vis(csv)

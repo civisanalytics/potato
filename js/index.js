@@ -34,6 +34,13 @@
         });
       };
     })(this));
+    $("#nba-dataset").on('click', (function(_this) {
+      return function(e) {
+        return d3.csv("data/basketball/basketball.csv", function(csv) {
+          return render_vis(csv);
+        });
+      };
+    })(this));
     $("#billionaire-dataset").on('click', (function(_this) {
       return function(e) {
         return d3.csv("data/billion/billionaire.csv", function(csv) {
