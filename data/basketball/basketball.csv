@@ -1,0 +1,448 @@
+position,number,name,height-in,weight-lb,dob,from,team
+Forward,30, Brandon Bass,80,250,1985?04?30,LSU,Boston Celtics
+Guard,0, Avery Bradley,74,180,1990?11?26,Texas,Boston Celtics
+Forward-center,38, V?tor Faverani,83,260,1988?05?05,Brazil,Boston Celtics
+Forward,8, Jeff Green,81,235,1986?08?28,Georgetown,Boston Celtics
+Forward-center,41, Kelly Olynyk,84,238,1991?04?19,Gonzaga,Boston Celtics
+Forward,12, Dwight Powell,83,240,1991?07?20,Stanford,Boston Celtics
+Guard,26, Phil Pressey,71,175,1991?02?17,Missouri,Boston Celtics
+Guard,9, Rajon Rondo,73,186,1986?02?22,Kentucky,Boston Celtics
+Guard,36, Marcus Smart,75,227,1994?03?06,Oklahoma State,Boston Celtics
+Forward,7, Jared Sullinger,81,260,1992?03?04,Ohio State,Boston Celtics
+Guard,4, Marcus Thornton,76,205,1987?06?05,LSU,Boston Celtics
+Swingman,11, Evan Turner,79,220,1988?10?27,Ohio State,Boston Celtics
+Forward,45, Gerald Wallace,79,220,1982?07?23,Alabama,Boston Celtics
+Swingman,13, James Young,78,215,1995?08?16,Kentucky,Boston Celtics
+Forward-center,44, Tyler Zeller,84,253,1990?01?17,North Carolina,Boston Celtics
+Swingman,6, Alan Anderson,78,220,1982?10?16,Michigan State,Brooklyn Nets
+Swingman,44, Bojan Bogdanovi?,80,216,1989?04?18,Croatia,Brooklyn Nets
+Guard,22, Markel Brown,76,185,1992?01?27,Oklahoma State,Brooklyn Nets
+Forward-center,2, Kevin Garnett,83,253,1976?05?19,Farragut HS (IL),Brooklyn Nets
+Guard,13, Jorge Guti?rrez,75,195,1988?12?27,California,Brooklyn Nets
+Guard,0, Jarrett Jack,75,200,1983?10?28,Georgia Tech,Brooklyn Nets
+Forward,21, Cory Jefferson,81,220,1990?12?26,Baylor,Brooklyn Nets
+Swingman,7, Joe Johnson,79,240,1981?06?29,Arkansas,Brooklyn Nets
+Center,9, Jerome Jordan,84,253,1986?09?29,Tulsa,Brooklyn Nets
+Swingman,10, Sergey Karasev,79,196,1993?10?26,Russia,Brooklyn Nets
+Forward,47, Andrei Kirilenko,81,235,1981?02?18,Russia,Brooklyn Nets
+Center,11, Brook Lopez,84,275,1988?04?01,Stanford,Brooklyn Nets
+Forward-center,1, Mason Plumlee,83,235,1990?03?05,Duke,Brooklyn Nets
+Forward,33, Mirza Teletovi?,81,255,1985?09?17,Bosnia and Herzegovina,Brooklyn Nets
+Guard,8, Deron Williams,75,209,1984?06?26,Illinois,Brooklyn Nets
+Forward,4, Quincy Acy,79,225,1990?10?06,Baylor,New York Knicks
+Center,45, Cole Aldrich,83,245,1988?10?31,Kansas,New York Knicks
+Forward,7, Carmelo Anthony,80,235,1984?05?29,Syracuse,New York Knicks
+Forward-center,77, Andrea Bargnani,84,250,1985?08?26,Italy,New York Knicks
+Guard,3, Jos? Calder?n,75,211,1981?09?28,Spain,New York Knicks
+Center,11, Samuel Dalembert,83,250,1981?06?10,Seton Hall,New York Knicks
+Forward,17, Cleanthony Early,80,219,1991?04?17,Wichita State,New York Knicks
+Guard,5, Tim Hardaway,78,205,1992?03?16,Michigan,New York Knicks
+Guard,0, Shane Larkin,71,176,1992?10?02,Miami (FL),New York Knicks
+Guard,9, Pablo Prigioni,75,185,1977?05?17,Argentina,New York Knicks
+Swingman,21, Iman Shumpert,77,220,1990?06?26,Georgia Tech,New York Knicks
+Swingman,8, J. R. Smith,78,220,1985?09?09,St. Benedict's Prep (NJ),New York Knicks
+Forward-center,14, Jason Smith,84,240,1986?03?02,Colorado State,New York Knicks
+Forward-center,1, Amar'e Stoudemire,83,245,1982?11?16,Cypress Creek HS (FL),New York Knicks
+Forward,6, Travis Wear,82,230,1990?09?21,UCLA,New York Knicks
+Guard,1, Michael Carter-Williams,78,185,1991?10?12,Syracuse,Philadelphia 76ers
+Forward,0, Brandon Davies,82,240,1991?07?25,Brigham Young,Philadelphia 76ers
+Center,21, Joel Embiid,84,250,1994?03?16,Kansas,Philadelphia 76ers
+Forward,30, Drew Gordon,81,245,1990?07?12,New Mexico,Philadelphia 76ers
+Forward,39, Jerami Grant,80,210,1994?03?12,Syracuse,Philadelphia 76ers
+Swingman,16, Chris Johnson,78,201,1990?04?29,Dayton,Philadelphia 76ers
+Forward,12, Luc Mbah a Moute,80,230,1986?09?09,UCLA,Philadelphia 76ers
+Forward,14, K. J. McDaniels,78,200,1993?02?09,Clemson,Philadelphia 76ers
+Forward-center,4, Nerlens Noel,83,228,1994?04?10,Kentucky,Philadelphia 76ers
+Swingman,23, Jason Richardson,78,225,1981?01?20,Michigan State,Philadelphia 76ers
+Forward,9, JaKarr Sampson,81,214,1993?03?20,St. John's,Philadelphia 76ers
+Guard,88, Alexey Shved,78,187,1988?12?16,Russia,Philadelphia 76ers
+Forward-center,35, Henry Sims,82,248,1990?03?27,Georgetown,Philadelphia 76ers
+Swingman,31, Hollis Thompson,80,206,1991?04?03,Georgetown,Philadelphia 76ers
+Guard,8, Tony Wroten,78,205,1993?04?13,Washington,Philadelphia 76ers
+Forward,5, Bruno Caboclo,81,200,1995?09?21,Brazil,Toronto Raptors
+Swingman,10, DeMar DeRozan,79,216,1989?08?07,Southern California,Toronto Raptors
+Swingman,2, Landry Fields,79,215,1988?06?27,Stanford,Toronto Raptors
+Forward-center,50, Tyler Hansbrough,81,250,1985?11?03,North Carolina,Toronto Raptors
+Center,44, Chuck Hayes,78,250,1983?06?11,Kentucky,Toronto Raptors
+Forward-center,15, Amir Johnson,81,210,1987?05?01,Westchester HS (CA),Toronto Raptors
+Forward,3, James Johnson,81,248,1987?02?20,Wake Forest,Toronto Raptors
+Guard,7, Kyle Lowry,72,205,1986?03?25,Villanova,Toronto Raptors
+Center,92, Lucas Nogueira,84,220,1992?07?26,Brazil,Toronto Raptors
+Forward-center,54, Patrick Patterson,81,235,1989?03?14,Kentucky,Toronto Raptors
+Swingman,31, Terrence Ross,78,195,1991?02?05,Washington,Toronto Raptors
+Center,34, Greg Stiemsma,83,260,1985?09?26,Wisconsin,Toronto Raptors
+Center,17, Jonas Valan?i?nas,84,255,1992?05?06,Lithuania,Toronto Raptors
+Guard,21, Greivis V?squez,78,211,1987?01?16,Maryland,Toronto Raptors
+Guard,23, Louis Williams,74,175,1986?10?27,South Gwinnett HS (GA),Toronto Raptors
+Forward-center,41, Cameron Bairstow,82,250,1990?12?07,New Mexico,Chicago Bulls
+Guard,0, Aaron Brooks,72,161,1985?01?14,Oregon,Chicago Bulls
+Swingman,21, Jimmy Butler,79,220,1989?09?14,Marquette,Chicago Bulls
+Swingman,34, Mike Dunleavy,81,230,1980?09?15,Duke,Chicago Bulls
+Forward-center,16, Pau Gasol,84,250,1980?07?06,Spain,Chicago Bulls
+Forward,22, Taj Gibson,81,225,1985?06?24,Southern California,Chicago Bulls
+Guard,12, Kirk Hinrich,76,190,1981?01?02,Kansas,Chicago Bulls
+Forward,3, Doug McDermott,80,225,1992?01?03,Creighton,Chicago Bulls
+Forward,44, Nikola Miroti?,82,236,1991?02?11,Spain,Chicago Bulls
+Center,48, Nazr Mohammed,82,250,1977?09?05,Kentucky,Chicago Bulls
+Guard,55, E'Twaun Moore,76,191,1989?02?25,Purdue,Chicago Bulls
+Center,13, Joakim Noah,83,232,1985?02?25,Florida,Chicago Bulls
+Guard,1, Derrick Rose,75,190,1988?10?04,Memphis,Chicago Bulls
+Swingman,20, Tony Snell,79,215,1991?11?10,New Mexico,Chicago Bulls
+Forward,89, Lou Amundson,81,225,1982?12?07,UNLV,Cleveland Cavaliers
+Guard,5, Will Cherry,73,176,1991?02?08,Montana,Cleveland Cavaliers
+Guard,8, Matthew Dellavedova,76,200,1990?09?08,St. Mary's (CA),Cleveland Cavaliers
+Guard,12, Joe Harris,78,215,1991?09?07,Virginia,Cleveland Cavaliers
+Center,33, Brendan Haywood,84,263,1979?11?27,North Carolina,Cleveland Cavaliers
+Guard,2, Kyrie Irving,75,193,1992?03?23,Duke,Cleveland Cavaliers
+Forward,23, LeBron James,80,250,1984?12?30,St. Vincent?St. Mary HS (OH),Cleveland Cavaliers
+Swingman,1, James Jones,80,215,1980?10?04,Miami (FL),Cleveland Cavaliers
+Center,53, Alex Kirk,84,245,1991?11?14,New Mexico,Cleveland Cavaliers
+Forward-center,0, Kevin Love,82,243,1988?09?07,UCLA,Cleveland Cavaliers
+Swingman,31, Shawn Marion,79,228,1978?05?07,UNLV,Cleveland Cavaliers
+Swingman,18, Mike Miller,80,218,1980?02?19,Florida,Cleveland Cavaliers
+Forward-center,13, Tristan Thompson,82,238,1991?03?13,Texas,Cleveland Cavaliers
+Forward-center,17, Anderson Varej?o,83,267,1982?09?28,Brazil,Cleveland Cavaliers
+Guard,3, Dion Waiters,75,225,1991?12?01,Syracuse,Cleveland Cavaliers
+Center,50, Joel Anthony,81,245,1982?08?09,UNLV,Detroit Pistons
+Guard,14, D. J. Augustin,72,183,1987?11?10,Texas,Detroit Pistons
+Forward,31, Caron Butler,79,221,1980?03?13,Connecticut,Detroit Pistons
+Guard,5, Kentavious Caldwell-Pope,77,205,1993?02?18,Georgia,Detroit Pistons
+Forward,13, Luigi Datome,80,215,1987?11?27,Italy,Detroit Pistons
+Guard,8, Spencer Dinwiddie,78,205,1993?04?06,Colorado,Detroit Pistons
+Center,0, Andre Drummond,83,270,1993?10?08,Connecticut,Detroit Pistons
+Guard,7, Brandon Jennings,73,169,1989?09?23,Oak Hill Academy (VA),Detroit Pistons
+Forward,33, Jonas Jerebko,82,231,1987?03?02,Sweden,Detroit Pistons
+Swingman,35, Cartier Martin,79,220,1984?11?20,Kansas State,Detroit Pistons
+Guard,20, Jodie Meeks,76,208,1987?08?21,Kentucky,Detroit Pistons
+Forward,9, Tony Mitchell,80,235,1992?04?07,North Texas,Detroit Pistons
+Forward-center,10, Greg Monroe,83,250,1990?06?04,Georgetown,Detroit Pistons
+Swingman,25, Kyle Singler,80,230,1988?05?04,Duke,Detroit Pistons
+Forward,6, Josh Smith,81,225,1985?12?05,Oak Hill Academy (VA),Detroit Pistons
+Forward-center,5, Lavoy Allen,81,255,1989?02?04,Temple,Indiana Pacers
+Forward,22, Chris Copeland,80,235,1984?03?17,Colorado,Indiana Pacers
+Swingman,13, Paul George,81,220,1990?05?02,Fresno State,Indiana Pacers
+Center,55, Roy Hibbert,86,290,1986?12?11,Georgetown,Indiana Pacers
+Guard,3, George Hill,75,188,1986?05?04,IUPUI,Indiana Pacers
+Forward,44, Solomon Hill,79,225,1991?03?18,Arizona,Indiana Pacers
+Center,28, Ian Mahinmi,83,250,1986?11?05,France,Indiana Pacers
+Swingman,0, C. J. Miles,78,231,1987?03?18,Skyline HS (TX),Indiana Pacers
+Guard,12, A. J. Price,74,195,1986?10?07,Connecticut,Indiana Pacers
+Forward,9, Damjan Rude?,82,201,1986?06?17,Croatia,Indiana Pacers
+Forward,4, Luis Scola,81,240,1980?04?30,Argentina,Indiana Pacers
+Guard,15, Donald Sloan,75,205,1988?01?15,Texas A&M,Indiana Pacers
+Guard,2, Rodney Stuckey,77,205,1986?04?21,Eastern Washington,Indiana Pacers
+Guard,32, C. J. Watson,74,175,1984?04?17,Tennessee,Indiana Pacers
+Forward,21, David West,81,250,1980?08?29,Xavier,Indiana Pacers
+Forward-center,42, Shayne Whittington,82,237,1991?03?03,Western Michigan,Indiana Pacers
+Swingman,34, Giannis Antetokounmpo,83,215,1994?12?06,Greece,Milwaukee Bucks
+Guard,19, Jerryd Bayless,75,200,1988?08?20,Arizona,Milwaukee Bucks
+Swingman,9, Jared Dudley,79,225,1985?07?10,Boston College,Milwaukee Bucks
+Forward-center,31, John Henson,83,220,1990?12?28,North Carolina,Milwaukee Bucks
+Forward,7, Ersan ?lyasova,82,235,1987?05?15,Turkey,Milwaukee Bucks
+Forward,17, Damien Inglis,81,240,1995?05?20,INSEP (FRA),Milwaukee Bucks
+Guard,11, Brandon Knight,75,189,1991?12?02,Kentucky,Milwaukee Bucks
+Guard,5, Kendall Marshall,76,195,1991?08?19,North Carolina,Milwaukee Bucks
+Guard,00, O. J. Mayo,76,210,1987?11?05,Southern California,Milwaukee Bucks
+Forward,22, Khris Middleton,80,217,1991?12?08,Texas A&M,Milwaukee Bucks
+Forward,3, Johnny O'Bryant,81,256,1993?06?01,LSU,Milwaukee Bucks
+Forward-center,27, Zaza Pachulia,83,275,1984?10?02,Georgia,Milwaukee Bucks
+Forward,12, Jabari Parker,80,235,1995?03?15,Duke,Milwaukee Bucks
+Forward-center,8, Larry Sanders,83,235,1988?11?21,Virginia Commonwealth,Milwaukee Bucks
+Guard,6, Nate Wolters,76,190,1991?05?15,South Dakota State,Milwaukee Bucks
+Forward-center,6, Pero Anti?,83,260,1982?07?29,Macedonia,Atlanta Hawks
+Guard,24, Kent Bazemore,77,201,1989?07?01,Old Dominion,Atlanta Hawks
+Forward-center,7, Elton Brand,81,254,1979?03?11,Duke,Atlanta Hawks
+Forward,5, DeMarre Carroll,80,212,1986?07?27,Missouri,Atlanta Hawks
+Forward-center,15, Al Horford,82,250,1986?06?03,Florida,Atlanta Hawks
+Guard,12, John Jenkins,76,215,1991?03?06,Vanderbilt,Atlanta Hawks
+Swingman,26, Kyle Korver,79,212,1981?03?17,Creighton,Atlanta Hawks
+Guard,8, Shelvin Mack,75,207,1990?04?22,Butler,Atlanta Hawks
+Forward,4, Paul Millsap,80,253,1985?02?10,Louisiana Tech,Atlanta Hawks
+Forward-center,31, Mike Muscala,83,239,1991?07?01,Bucknell,Atlanta Hawks
+Forward-center,33, Adreian Payne,82,245,1991?02?19,Michigan State,Atlanta Hawks
+Guard,17, Dennis Schr?der,73,168,1993?09?15,Germany,Atlanta Hawks
+Forward,32, Mike Scott,80,237,1988?07?16,Virginia,Atlanta Hawks
+Swingman,25, Thabo Sefolosha,79,222,1984?05?02,Switzerland,Atlanta Hawks
+Guard,0, Jeff Teague,74,181,1988?06?10,Wake Forest,Atlanta Hawks
+Forward-center,8, Bismack Biyombo,81,245,1992?08?28,DR Congo,Charlotte Hornets
+Swingman,19, P. J. Hairston,78,230,1992?12?24,North Carolina,Charlotte Hornets
+Swingman,9, Gerald Henderson,77,215,1987?12?09,Duke,Charlotte Hornets
+Forward-center,25, Al Jefferson,82,289,1985?01?04,Prentiss HS (MS),Charlotte Hornets
+Forward,14, Michael Kidd-Gilchrist,79,232,1993?09?26,Kentucky,Charlotte Hornets
+Forward,54, Jason Maxiell,79,260,1983?02?18,Cincinnati,Charlotte Hornets
+Guard,12, Gary Neal,76,210,1984?10?03,Towson,Charlotte Hornets
+Guard,5, Jannero Pargo,73,185,1979?10?22,Arkansas,Charlotte Hornets
+Guard,22, Brian Roberts,73,173,1985?12?03,Dayton,Charlotte Hornets
+Guard,1, Lance Stephenson,77,230,1990?09?05,Cincinnati,Charlotte Hornets
+Swingman,44, Jeffery Taylor,79,225,1989?05?23,Vanderbilt,Charlotte Hornets
+Forward,11, Noah Vonleh,81,247,1995?08?24,Indiana,Charlotte Hornets
+Guard,15, Kemba Walker,73,184,1990?05?08,Connecticut,Charlotte Hornets
+Forward,2, Marvin Williams,81,237,1986?06?19,North Carolina,Charlotte Hornets
+Forward-center,40, Cody Zeller,84,240,1992?10?05,Indiana,Charlotte Hornets
+Forward-center,11, Chris Andersen,82,245,1978?07?07,Blinn College,Miami Heat
+Forward-center,1, Chris Bosh,83,235,1984?03?24,Georgia Tech,Miami Heat
+Guard,26, Shannon Brown,75,215,1985?11?29,Michigan State,Miami Heat
+Guard,15, Mario Chalmers,74,190,1986?05?19,Kansas,Miami Heat
+Guard,30, Norris Cole,74,175,1988?10?13,Cleveland State,Miami Heat
+Guard,24, Andre Dawkins,77,219,1991?09?19,Duke,Miami Heat
+Forward,9, Luol Deng,81,220,1985?04?16,Duke,Miami Heat
+Forward,32, James Ennis,79,208,1990?07?01,Long Beach State,Miami Heat
+Swingman,22, Danny Granger,81,222,1983?04?20,New Mexico,Miami Heat
+Center,7, Justin Hamilton,84,255,1990?04?01,LSU,Miami Heat
+Forward-center,40, Udonis Haslem,80,235,1980?06?09,Florida,Miami Heat
+Forward,4, Josh McRoberts,82,240,1987?02?28,Duke,Miami Heat
+Guard,13, Shabazz Napier,73,170,1991?07?14,Connecticut,Miami Heat
+Guard,3, Dwyane Wade,76,220,1982?01?17,Marquette,Miami Heat
+Forward,43, Shawne Williams,82,230,1986?02?16,Memphis,Miami Heat
+Center,3, Dewayne Dedmon,84,245,1989?08?12,Southern California,Orlando Magic
+Guard,10, Evan Fournier,79,205,1992?10?29,France,Orlando Magic
+Forward-center,8, Channing Frye,83,255,1983?05?17,Arizona,Orlando Magic
+Forward,00, Aaron Gordon,81,220,1995?09?16,Arizona,Orlando Magic
+Guard,7, Ben Gordon,75,205,1983?04?04,Connecticut,Orlando Magic
+Guard,34, Willie Green,75,205,1981?07?28,Detroit,Orlando Magic
+Forward,21, Maurice Harkless,81,215,1993?05?11,St. John's,Orlando Magic
+Forward,12, Tobias Harris,81,235,1992?07?15,Tennessee,Orlando Magic
+Swingman,11, Roy Devyn Marble,78,200,1992?09?21,Iowa,Orlando Magic
+Forward,44, Andrew Nicholson,81,250,1989?12?08,St. Bonaventure,Orlando Magic
+Forward,2, Kyle O'Quinn,82,250,1990?03?26,Norfolk State,Orlando Magic
+Guard,5, Victor Oladipo,76,210,1992?05?04,Indiana,Orlando Magic
+Guard,4, Elfrid Payton,76,185,1994?02?22,Louisiana-Lafayette,Orlando Magic
+Guard,13, Luke Ridnour,74,175,1981?02?13,Oregon,Orlando Magic
+Center,9, Nikola Vu?evi?,84,260,1990?10?24,Southern California,Orlando Magic
+Guard,3, Bradley Beal,77,207,1993?06?28,Florida,Washington Wizards
+Center,45, DeJuan Blair,79,270,1989?04?22,Pittsburgh,Washington Wizards
+Forward,8, Rasual Butler,79,215,1979?05?23,La Salle,Washington Wizards
+Forward-center,90, Drew Gooden,82,250,1981?09?24,Kansas,Washington Wizards
+Center,4, Marcin Gortat,83,240,1984?02?17,Poland,Washington Wizards
+Forward-center,43, Kris Humphries,81,235,1985?02?06,Minnesota,Washington Wizards
+Guard,24, Andre Miller,74,200,1976?03?19,Utah,Washington Wizards
+Forward-center,42,Nen?,83,250,1982?09?13,Brazil,Washington Wizards
+Forward,34, Paul Pierce,79,235,1977?10?13,Kansas,Washington Wizards
+Forward,22, Otto Porter,80,198,1993?06?03,Georgetown,Washington Wizards
+Swingman,14, Glen Rice,78,206,1991?01?01,Georgia Tech,Washington Wizards
+Forward-center,13, Kevin S?raphin,81,275,1989?12?07,France,Washington Wizards
+Guard,17, Garrett Temple,78,195,1986?05?08,LSU,Washington Wizards
+Guard,2, John Wall,76,195,1990?09?06,Kentucky,Washington Wizards
+Swingman,9, Martell Webster,79,230,1986?12?04,Seattle Preparatory (WA),Washington Wizards
+Forward,7, Al-Farouq Aminu,81,215,1990?09?21,Wake Forest,Dallas Mavericks
+Guard,5, Jos? Juan Barea,72,183,1984?06?26,Northeastern,Dallas Mavericks
+Center,6, Tyson Chandler,85,240,1982?10?02,Dominguez HS (CA),Dallas Mavericks
+Forward,9, Jae Crowder,78,235,1990?04?06,Marquette,Dallas Mavericks
+Guard,11, Monta Ellis,75,185,1985?10?26,Lanier HS (MS),Dallas Mavericks
+Guard,2, Raymond Felton,73,205,1984?06?26,North Carolina,Dallas Mavericks
+Guard,20, Devin Harris,75,192,1983?02?27,Wisconsin,Dallas Mavericks
+Forward,24, Richard Jefferson,79,234,1980?06?21,Arizona,Dallas Mavericks
+Guard,1, Ricky Ledo,79,195,1992?09?10,South Kent HS (CT),Dallas Mavericks
+Guard,14, Jameer Nelson,72,190,1982?02?09,Saint Joseph's,Dallas Mavericks
+Forward,41, Dirk Nowitzki,84,245,1978?06?19,Germany,Dallas Mavericks
+Forward,25, Chandler Parsons,81,227,1988?10?25,Florida,Dallas Mavericks
+Forward-center,4, Greg Smith,82,250,1991?01?08,Fresno State,Dallas Mavericks
+Forward,3, Charlie Villanueva,83,232,1984?08?24,Connecticut,Dallas Mavericks
+Forward-center,34, Brandan Wright,82,210,1987?10?05,North Carolina,Dallas Mavericks
+Swingman,1, Trevor Ariza,80,210,1985?06?30,UCLA,Houston Rockets
+Guard,2, Patrick Beverley,73,185,1988?07?12,Arkansas,Houston Rockets
+Forward-center,10, Tarik Black,83,253,1991?11?22,Kansas,Houston Rockets
+Guard,0, Isaiah Canaan,72,188,1991?05?02,Murray State,Houston Rockets
+Forward,15, Clint Capela,82,211,1994?05?18,INSEP (FRA),Houston Rockets
+Guard,30, Troy Daniels,76,204,1991?07?15,Virginia Commonwealth,Houston Rockets
+Forward-center,8, Joey Dorsey,81,275,1983?12?16,Memphis,Houston Rockets
+Swingman,32, Francisco Garc?a,79,195,1980?12?31,Louisville,Houston Rockets
+Guard,13, James Harden,77,220,1989?08?26,Arizona State,Houston Rockets
+Center,12, Dwight Howard,83,265,1985?12?08,SW Atlanta Academy (GA),Houston Rockets
+Guard,3, Nick Johnson,75,200,1992?12?22,Arizona,Houston Rockets
+Forward,6, Terrence Jones,81,252,1992?01?09,Kentucky,Houston Rockets
+Forward-center,20, Donatas Motiej?nas,84,222,1990?09?20,Lithuania,Houston Rockets
+Forward,16, Kostas Papanikolaou,81,230,1990?07?31,Greece,Houston Rockets
+Guard,31, Jason Terry,74,180,1977?09?15,Arizona,Houston Rockets
+Guard,3, Jordan Adams,77,220,1994?07?08,UCLA,Memphis Grizzlies
+Swingman,9, Tony Allen,76,213,1982?01?11,Oklahoma State,Memphis Grizzlies
+Guard,12, Nick Calathes,78,213,1989?02?07,Florida,Memphis Grizzlies
+Swingman,15, Vince Carter,78,220,1977?01?26,North Carolina,Memphis Grizzlies
+Guard,11, Mike Conley,73,185,1987?10?11,Ohio State,Memphis Grizzlies
+Center,33, Marc Gasol,85,265,1985?01?29,Lausanne CS (TN),Memphis Grizzlies
+Center,41, Kosta Koufos,84,265,1989?02?24,Ohio State,Memphis Grizzlies
+Swingman,5, Courtney Lee,77,200,1985?10?03,Western Kentucky,Memphis Grizzlies
+Forward,30, Jon Leuer,82,228,1989?05?14,Wisconsin,Memphis Grizzlies
+Swingman,8, Quincy Pondexter,78,225,1988?03?10,Washington,Memphis Grizzlies
+Forward,21, Tayshaun Prince,81,215,1980?02?28,Kentucky,Memphis Grizzlies
+Forward,50, Zach Randolph,81,260,1981?07?16,Michigan State,Memphis Grizzlies
+Forward,1, Jarnell Stokes,80,260,1994?01?07,Tennessee,Memphis Grizzlies
+Guard,19, Beno Udrih,75,210,1982?07?05,Slovenia,Memphis Grizzlies
+Center,42, Alexis Ajin?a,86,248,1988?05?06,France,New Orleans Pelicans
+Forward,33, Ryan Anderson,82,240,1988?05?06,California,New Orleans Pelicans
+Center,3, ?mer A??k,84,255,1986?07?04,Turkey,New Orleans Pelicans
+Forward,8, Luke Babbitt,81,225,1989?06?20,Nevada,New Orleans Pelicans
+Forward-center,23, Anthony Davis,82,220,1993?03?11,Kentucky,New Orleans Pelicans
+Swingman,1, Tyreke Evans,78,220,1989?09?19,Memphis,New Orleans Pelicans
+Guard,32, Jimmer Fredette,74,195,1989?02?25,Brigham Young,New Orleans Pelicans
+Guard,10, Eric Gordon,76,215,1988?12?25,Indiana,New Orleans Pelicans
+Guard,11, Jrue Holiday,76,205,1990?06?12,UCLA,New Orleans Pelicans
+Forward,2, Darius Miller,80,225,1990?03?21,Kentucky,New Orleans Pelicans
+Guard,25, Austin Rivers,76,200,1992?08?01,Duke,New Orleans Pelicans
+Swingman,15, John Salmons,78,207,1979?12?12,Miami (FL),New Orleans Pelicans
+Guard,9, Russ Smith,72,170,1991?04?19,Louisville,New Orleans Pelicans
+Center,5, Jeff Withey,84,235,1990?03?07,Kansas,New Orleans Pelicans
+Forward-center,4, Patric Young,81,240,1990?02?01,Florida,New Orleans Pelicans
+Forward,1, Kyle Anderson,81,235,1993?09?20,UCLA,San Antonio Spurs
+Forward-center,11, Jeff Ayres,81,250,1987?04?29,Arizona State,San Antonio Spurs
+Forward-center,16, Aron Baynes,82,260,1986?12?09,Washington State,San Antonio Spurs
+Guard,3, Marco Belinelli,77,210,1986?03?25,Italy,San Antonio Spurs
+Forward-center,15, Matt Bonner,82,235,1980?04?05,Florida,San Antonio Spurs
+Forward-center,23, Austin Daye,83,220,1988?06?05,Gonzaga,San Antonio Spurs
+Forward-center,33, Boris Diaw,80,250,1982?04?16,INSEP (FRA),San Antonio Spurs
+Forward-center,21, Tim Duncan,83,255,1976?04?25,Wake Forest,San Antonio Spurs
+Guard,20, Manu Gin?bili,78,205,1977?07?28,Argentina,San Antonio Spurs
+Swingman,14, Danny Green,78,210,1987?06?22,North Carolina,San Antonio Spurs
+Guard,5, Cory Joseph,75,185,1991?08?20,Texas,San Antonio Spurs
+Swingman,2, Kawhi Leonard,79,230,1991?06?29,San Diego State,San Antonio Spurs
+Guard,8, Patty Mills,72,185,1988?08?11,Saint Mary's,San Antonio Spurs
+Guard,9, Tony Parker,74,185,1982?05?17,INSEP (FRA),San Antonio Spurs
+Center,22, Tiago Splitter,83,245,1985?01?01,Brazil,San Antonio Spurs
+Swingman,10, Arron Afflalo,77,215,1985?10?15,UCLA,Denver Nuggets
+Forward,00, Darrell Arthur,81,235,1988?03?25,Kansas,Denver Nuggets
+Forward,21, Wilson Chandler,80,225,1987?05?10,DePaul,Denver Nuggets
+Forward,35, Kenneth Faried,80,228,1989?11?18,Morehead State,Denver Nuggets
+Guard,4, Randy Foye,76,213,1983?09?24,Villanova,Denver Nuggets
+Forward,8, Danilo Gallinari,82,225,1988?08?08,Italy,Denver Nuggets
+Swingman,1, Alonzo Gee,78,225,1987?05?29,Alabama,Denver Nuggets
+Guard,11, Erick Green,75,185,1991?05?09,Virginia Tech,Denver Nuggets
+Guard,14, Gary Harris,76,210,1994?09?14,Michigan State,Denver Nuggets
+Forward-center,7, JJ Hickson,81,242,1988?09?04,North Carolina State,Denver Nuggets
+Guard,3, Ty Lawson,71,195,1987?11?03,North Carolina,Denver Nuggets
+Center,34, JaVale McGee,84,250,1988?01?19,Nevada,Denver Nuggets
+Center,25, Timofey Mozgov,85,250,1986?07?16,Russia,Denver Nuggets
+Center,23, Jusuf Nurki?,83,280,1994?08?23,Bosnia and Herzegovina,Denver Nuggets
+Guard,5, Nate Robinson,69,180,1984?05?31,Washington,Denver Nuggets
+Forward,24, Anthony Bennett,80,245,1993?03?14,UNLV,Minnesota Timberwolves
+Swingman,13, Corey Brewer,81,186,1986?03?05,Florida,Minnesota Timberwolves
+Forward,10, Chase Budinger,79,209,1988?05?22,Arizona,Minnesota Timberwolves
+Center,5, Gorgui Dieng,83,233,1990?01?18,Louisville,Minnesota Timberwolves
+Forward,4, Robbie Hummel,81,219,1989?03?08,Purdue,Minnesota Timberwolves
+Guard,8, Zach LaVine,77,183,1995?03?30,UCLA,Minnesota Timberwolves
+Guard,23, Kevin Martin,79,204,1983?02?01,Western Carolina,Minnesota Timberwolves
+Swingman,15, Shabazz Muhammad,78,227,1992?11?13,UCLA,Minnesota Timberwolves
+Center,14, Nikola Pekovi?,83,295,1986?01?03,Montenegro,Minnesota Timberwolves
+Forward,1, Glenn Robinson,79,222,1994?01?08,Michigan,Minnesota Timberwolves
+Guard,9, Ricky Rubio,76,192,1990?10?21,Spain,Minnesota Timberwolves
+Center,32, Ronny Turiaf,82,249,1983?01?13,Gonzaga,Minnesota Timberwolves
+Swingman,22, Andrew Wiggins,80,199,1995?02?23,Kansas,Minnesota Timberwolves
+Guard,25, Mo Williams,73,198,1982?12?19,Alabama,Minnesota Timberwolves
+Forward,33, Thaddeus Young,80,221,1988?06?21,Georgia Tech,Minnesota Timberwolves
+Center,12, Steven Adams,84,250,1993?07?28,Pittsburgh,Oklahoma City Thunder
+Forward-center,4, Nick Collison,82,255,1980?10?26,Kansas,Oklahoma City Thunder
+Forward,35, Kevin Durant,83,220,1988?09?29,Texas,Oklahoma City Thunder
+Forward-center,9, Serge Ibaka,82,245,1989?09?18,Spain,Oklahoma City Thunder
+Guard,15, Reggie Jackson,75,208,1990?04?16,Boston College,Oklahoma City Thunder
+Forward,7, Grant Jerrett,82,232,1993?07?08,Arizona,Oklahoma City Thunder
+Forward,3, Perry Jones,83,235,1991?09?24,Baylor,Oklahoma City Thunder
+Swingman,11, Jeremy Lamb,77,185,1992?05?30,Connecticut,Oklahoma City Thunder
+Forward,33, Mitch McGary,82,255,1992?06?06,Michigan,Oklahoma City Thunder
+Guard,2, Anthony Morrow,77,210,1985?09?27,Georgia Tech,Oklahoma City Thunder
+Center,5, Kendrick Perkins,82,270,1984?11?10,Clifton J. Ozen HS (TX),Oklahoma City Thunder
+Swingman,21, Andr? Roberson,79,210,1991?12?04,Colorado,Oklahoma City Thunder
+Guard,8, Ish Smith,72,175,1988?07?05,Wake Forest,Oklahoma City Thunder
+Guard,31, Sebastian Telfair,72,170,1985?06?09,Abraham Lincoln HS (NY),Oklahoma City Thunder
+Forward,42, Lance Thomas,80,225,1988?04?24,Duke,Oklahoma City Thunder
+Guard,0, Russell Westbrook,75,200,1988?11?12,UCLA,Oklahoma City Thunder
+Forward-center,12, LaMarcus Aldridge,83,240,1985?07?19,Texas,Portland Trail Blazers
+Guard,5, Will Barton,78,175,1991?01?06,Memphis,Portland Trail Blazers
+Swingman,88, Nicolas Batum,80,200,1988?12?14,France,Portland Trail Blazers
+Guard,25, Steve Blake,75,172,1980?02?26,Maryland,Portland Trail Blazers
+Forward,18, V?ctor Claver,81,224,1988?08?30,Spain,Portland Trail Blazers
+Guard,23, Allen Crabbe,78,210,1992?04?04,California,Portland Trail Blazers
+Forward-center,19, Joel Freeland,82,225,1987?02?07,FCOT (UK),Portland Trail Blazers
+Center,35, Chris Kaman,84,265,1982?04?28,Central Michigan,Portland Trail Blazers
+Center,11, Meyers Leonard,85,245,1992?02?27,Illinois,Portland Trail Blazers
+Guard,0, Damian Lillard,75,195,1990?07?15,Weber State,Portland Trail Blazers
+Center,42, Robin Lopez,84,255,1988?04?01,Stanford,Portland Trail Blazers
+Swingman,2, Wesley Matthews,77,220,1986?10?14,Marquette,Portland Trail Blazers
+Guard,3, C. J. McCollum,76,200,1991?09?19,Lehigh,Portland Trail Blazers
+Forward,41, Thomas Robinson,82,237,1991?03?17,Kansas,Portland Trail Blazers
+Forward,1, Dorell Wright,81,205,1985?12?02,South Kent (CT),Portland Trail Blazers
+Forward,33, Trevor Booker,80,240,1987?11?25,Clemson,Utah Jazz
+Guard,3, Trey Burke,73,190,1992?11?12,Michigan,Utah Jazz
+Guard,10, Alec Burks,78,211,1991?07?20,Colorado,Utah Jazz
+Guard,21, Ian Clark,75,173,1991?03?07,Belmont,Utah Jazz
+Forward,40, Jeremy Evans,81,197,1987?10?24,Western Kentucky,Utah Jazz
+Guard,11, Dante Exum,77,190,1995?07?13,Lake Ginninderra (AUS),Utah Jazz
+Forward-center,15, Derrick Favors,82,268,1991?07?15,Georgia Tech,Utah Jazz
+Center,27, Rudy Gobert,85,245,1992?06?26,France,Utah Jazz
+Swingman,20, Gordon Hayward,80,220,1990?03?23,Butler,Utah Jazz
+Forward,5, Rodney Hood,80,215,1992?10?20,Duke,Utah Jazz
+Swingman,2, Joe Ingles,80,216,1987?10?02,Lake Ginninderra (AUS),Utah Jazz
+Forward-center,0, Enes Kanter,83,247,1992?05?20,Stoneridge Prep (CA),Utah Jazz
+Guard,23, Toure' Murry,77,195,1989?11?08,Wichita State,Utah Jazz
+Forward,16, Steve Novak,82,235,1983?06?13,Marquette,Utah Jazz
+Guard,19, Leandro Barbosa,75,194,1982?11?28,Brazil,Golden State Warriors
+Forward,40, Harrison Barnes,80,210,1992?05?30,North Carolina,Golden State Warriors
+Center,12, Andrew Bogut,84,260,1984?11?28,Utah,Golden State Warriors
+Guard,30, Stephen Curry,75,185,1988?03?14,Davidson,Golden State Warriors
+Center,31, Festus Ezeli,83,255,1989?10?21,Vanderbilt,Golden State Warriors
+Forward,23, Draymond Green,79,230,1990?03?04,Michigan State,Golden State Warriors
+Swingman,7, Justin Holiday,78,185,1989?04?05,Washington,Golden State Warriors
+Swingman,9, Andre Iguodala,78,207,1984?01?28,Arizona,Golden State Warriors
+Center,1, Ognjen Kuzmi?,85,231,1990?05?16,Serbia,Golden State Warriors
+Forward-center,10, David Lee,81,240,1983?04?29,Florida,Golden State Warriors
+Guard,34, Shaun Livingston,79,175,1985?09?11,Peoria Central HS (IL),Golden State Warriors
+Swingman,4, Brandon Rush,78,233,1985?07?07,Kansas,Golden State Warriors
+Forward-center,5, Marreese Speights,82,255,1987?08?04,Florida,Golden State Warriors
+Swingman,11, Klay Thompson,79,205,1990?02?08,Washington State,Golden State Warriors
+Forward,22, Matt Barnes,79,226,1980?03?09,UCLA,Los Angeles Clippers
+Swingman,25, Reggie Bullock,79,205,1991?03?16,North Carolina,Los Angeles Clippers
+Guard,11, Jamal Crawford,77,200,1980?03?20,Michigan,Los Angeles Clippers
+Guard,9, Jared Cunningham,76,195,1991?05?22,Oregon State,Los Angeles Clippers
+Forward,0, Glen Davis,80,289,1986?01?01,LSU,Los Angeles Clippers
+Swingman,14, Chris Douglas-Roberts,79,210,1987?01?08,Memphis,Los Angeles Clippers
+Guard,1, Jordan Farmar,74,180,1986?11?30,UCLA,Los Angeles Clippers
+Forward,32, Blake Griffin,82,251,1989?03?16,Oklahoma,Los Angeles Clippers
+Center,10, Spencer Hawes,85,245,1988?04?28,Washington,Los Angeles Clippers
+Center,6, DeAndre Jordan,83,265,1988?07?21,Texas A&M,Los Angeles Clippers
+Guard,3, Chris Paul,72,175,1985?05?06,Wake Forest,Los Angeles Clippers
+Guard,4, J. J. Redick,76,190,1984?06?24,Duke,Los Angeles Clippers
+Forward,15, Hedo T?rko?lu,82,220,1979?03?19,Turkey,Los Angeles Clippers
+Center,13, Ekpe Udoh,82,245,1987?05?20,Baylor,Los Angeles Clippers
+Guard,30, C. J. Wilcox,77,201,1990?12?30,Washington,Los Angeles Clippers
+Forward-center,5, Carlos Boozer,81,266,1981?11?20,Duke,Los Angeles Lakers
+Guard,24, Kobe Bryant,78,205,1978?08?23,Lower Merion HS (PA),Los Angeles Lakers
+Guard,6, Jordan Clarkson,77,188,1992?06?07,Missouri,Los Angeles Lakers
+Forward,21, Ed Davis,82,225,1989?06?05,North Carolina,Los Angeles Lakers
+Guard,2, Wayne Ellington,76,200,1987?11?29,North Carolina,Los Angeles Lakers
+Guard,7, Xavier Henry,78,220,1991?03?15,Kansas,Los Angeles Lakers
+Forward-center,27, Jordan Hill,82,235,1987?07?27,Arizona,Los Angeles Lakers
+Forward,11, Wesley Johnson,79,215,1987?07?11,Syracuse,Los Angeles Lakers
+Forward,4, Ryan Kelly,83,230,1991?04?09,Duke,Los Angeles Lakers
+Guard,17, Jeremy Lin,75,200,1988?08?23,Harvard,Los Angeles Lakers
+Guard,10, Steve Nash,75,178,1974?02?07,Santa Clara,Los Angeles Lakers
+Guard,9, Ronnie Price,74,190,1983?06?21,Utah Valley,Los Angeles Lakers
+Forward,30, Julius Randle,81,250,1994?11?29,Kentucky,Los Angeles Lakers
+Center,50, Robert Sacre,84,260,1989?06?06,Gonzaga,Los Angeles Lakers
+Swingman,0, Nick Young,79,210,1985?06?01,Southern California,Los Angeles Lakers
+Guard,2, Eric Bledsoe,73,195,1989?12?09,Kentucky,Phoenix Suns
+Guard,1, Goran Dragi?,75,190,1986?05?06,Slovenia,Phoenix Suns
+Swingman,10, Zoran Dragi?,77,200,1989?06?22,Slovenia,Phoenix Suns
+Guard,4, Tyler Ennis,74,180,1994?08?24,Syracuse,Phoenix Suns
+Guard,20, Archie Goodwin,77,198,1994?08?17,Kentucky,Phoenix Suns
+Swingman,14, Gerald Green,80,210,1986?01?26,Gulf Shores Academy (TX),Phoenix Suns
+Center,21, Alex Len,85,265,1993?06?16,Maryland,Phoenix Suns
+Forward,15, Marcus Morris,81,235,1989?09?02,Kansas,Phoenix Suns
+Forward,11, Markieff Morris,82,245,1989?09?02,Kansas,Phoenix Suns
+Forward-center,22, Miles Plumlee,83,255,1988?09?01,Duke,Phoenix Suns
+Forward,43, Shavlik Randolph,82,236,1983?11?24,Duke,Phoenix Suns
+Guard,3, Isaiah Thomas,69,185,1989?02?07,Washington,Phoenix Suns
+Forward,40, Anthony Tolliver,80,240,1985?06?01,Creighton,Phoenix Suns
+Forward,17, P. J. Tucker,78,224,1985?05?05,Texas,Phoenix Suns
+Forward,12, T. J. Warren,80,220,1993?09?05,North Carolina State,Phoenix Suns
+Forward,18, Omri Casspi,81,225,1988?06?22,Israel,Sacramento Kings
+Guard,7, Darren Collison,72,175,1987?08?23,UCLA,Sacramento Kings
+Center,15, DeMarcus Cousins,83,270,1990?08?13,Kentucky,Sacramento Kings
+Forward,30, Reggie Evans,80,245,1980?05?18,Iowa,Sacramento Kings
+Forward,8, Rudy Gay,80,230,1986?08?17,Connecticut,Sacramento Kings
+Center,5, Ryan Hollins,84,240,1984?10?10,UCLA,Sacramento Kings
+Forward,24, Carl Landry,81,248,1983?09?19,Purdue,Sacramento Kings
+Guard,3, Ray McCallum,75,190,1991?06?12,Detroit,Sacramento Kings
+Guard,23, Ben McLemore,77,195,1993?02?11,Kansas,Sacramento Kings
+Forward-center,25, Eric Moreland,82,218,1991?12?24,Oregon State,Sacramento Kings
+Guard,9, Ramon Sessions,75,190,1986?04?11,Nevada,Sacramento Kings
+Guard,10, Nik Stauskas,78,207,1993?10?07,Michigan,Sacramento Kings
+Forward-center,34, Jason Thompson,83,250,1986?07?21,Rider,Sacramento Kings
+Forward,13, Derrick Williams,80,240,1991?05?25,Arizona,Sacramento Kings
