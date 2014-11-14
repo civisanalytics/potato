@@ -167,6 +167,9 @@
       })(this));
       curr_class = '';
       curr_r = 5;
+      if (this.node_class != null) {
+        curr_class = d[this.node_class];
+      }
       node = {
         id: d.node_id,
         radius: curr_r,
@@ -408,7 +411,7 @@
         return d.id;
       });
       that = this;
-      this.circles.enter().append("circle").attr("r", 0).attr("stroke-width", 3).attr("id", function(d) {
+      this.circles.enter().append("circle").attr("r", 0).attr("stroke-width", 2).attr("id", function(d) {
         return "bubble_" + d.id;
       }).attr("fill", function(d) {
         return d.color;

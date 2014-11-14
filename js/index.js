@@ -40,7 +40,7 @@
         return d3.csv("data/basketball/basketball.csv", function(csv) {
           return render_vis(csv, {
             split: true,
-            color: true,
+            color: false,
             size: true,
             "class": 'team'
           });

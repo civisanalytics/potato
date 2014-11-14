@@ -1,0 +1,122 @@
+/* Custom CSS for football dataset */
+
+.atlanta_hawks {
+  fill: #000080;
+  stroke: #FF0000;
+}
+.boston_celtics {
+  fill: #FFF;
+  stroke: #009E60;
+}
+.brooklyn_nets {
+  fill: #FFF;
+  stroke: #000;
+}
+.charlotte_hornets {
+  fill: #1D8CAA;
+  stroke: #1C0C65;
+}
+.chicago_bulls {
+  fill: #FFF;
+  stroke: #D4001F;
+}
+.cleveland_cavaliers {
+  fill: #B3121D;
+  stroke: #FFD700;
+}
+.dallas_mavericks {
+  fill: #0B60AD;
+  stroke: #072156;
+}
+.denver_nuggets {
+  fill: #FDB827;
+  stroke: #4B90CD;
+}
+.detroit_pistons {
+  fill: #EB0030;
+  stroke: #00519A;
+}
+.golden_state_warriors {
+  fill: #04529C;
+  stroke: #FFCC33;
+}
+.houston_rockets {
+  fill: #CCC;
+  stroke: #CE1138;
+}
+.indiana_pacers {
+  fill: #092C57;
+  stroke: #FFC322;
+}
+.los_angeles_clippers {
+  fill: #EE2944;
+  stroke: #146AA2;
+}
+.los_angeles_lakers {
+  fill: #4A2583;
+  stroke: #F5AF1B;
+}
+.miami_heat {
+  fill: #B62630;
+  stroke: #000;
+}
+.milwaukee_bucks {
+  fill: #003614;
+  stroke: #E32636;
+}
+.minnesota_timberwolves {
+  fill: #FF7518;
+  stroke: #0953A0;
+}
+.memphis_grizzlies {
+  fill: #001F70;
+  stroke: #7399C6;
+}
+.new_orleans_pelicans {
+  fill: #002B5C;
+  stroke: #B4975A;
+}
+.new_york_knicks {
+  fill: #FF7518;
+  stroke: #0953A0;
+}
+.oklahoma_city_thunder {
+  fill: #007DC3;
+  stroke: #F05133;
+}
+.orlando_magic {
+  fill: #FFF;
+  stroke: #0047Ab;
+}
+.philadelphia_76ers {
+  fill: #0046AD;
+  stroke: #D0103A;
+}
+.phoenix_suns {
+  fill: #1C105E;
+  stroke: #E65F20;
+}
+.portland_trail_blazers {
+  fill: #F0163A;
+  stroke: #B6BFBF;
+}
+.sacramento_kings {
+  fill: #753BBD;
+  stroke: #8A8D8F;
+}
+.san_antonio_spurs {
+  fill: #BEC8C9;
+  stroke: #000000;
+}
+.toronto_raptors {
+  fill: #000;
+  stroke: #B31B1B;
+}
+.utah_jazz {
+  fill: #0D4006;
+  stroke: #FF9100;
+}
+.washington_wizards {
+  fill: #C60C30;
+  stroke: #002244;
+}

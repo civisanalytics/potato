@@ -105,8 +105,8 @@ class window.Potato
     curr_r = 5
 
     # this is set by params
-#    if @node_class?
-#      curr_class = d[@node_class]
+    if @node_class?
+      curr_class = d[@node_class]
 
     node = {
       id: d.node_id
@@ -346,7 +346,7 @@ class window.Potato
     that = this
     @circles.enter().append("circle")
       .attr("r", 0)
-      .attr("stroke-width", 3)
+      .attr("stroke-width", 2)
       .attr("id", (d) -> "bubble_#{d.id}")
       .attr("fill", (d) -> d.color)
       .on("mouseover", (d,i) -> that.show_details(d,i,this))
