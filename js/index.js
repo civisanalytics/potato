@@ -28,8 +28,6 @@
         return d3.csv("data/football/players_2.csv", function(csv) {
           return render_vis(csv, {
             split: true,
-            color: false,
-            size: false,
             "class": 'team'
           });
         });
@@ -40,8 +38,8 @@
         return d3.csv("data/basketball/basketball.csv", function(csv) {
           return render_vis(csv, {
             split: true,
-            color: false,
             size: true,
+            order: true,
             "class": 'team'
           });
         });
