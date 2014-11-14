@@ -1,5 +1,5 @@
 class window.Potato
-  constructor: (data, params = {split: true, color: true, size: true, class: null}) ->
+  constructor: (data, params = {split: true, color: true, size: true, order: true, class: null}) ->
     @data = data
     @width = $(window).width()
     @height = $(window).height() - 105
@@ -35,6 +35,7 @@ class window.Potato
     this.split_buttons() if params.split
     this.color_buttons() if params.color
     this.size_buttons() if params.size
+    this.order_buttons() if params.order
 
     this.add_all()
 
@@ -338,6 +339,61 @@ class window.Potato
 
     this.update()
 
+  order_buttons: () =>
+    $("#modifiers").append("<div id='order-wrapper' class='modifier-wrapper'><button id='order-button' class='modifier-button'>Order By<span class='button-arrow'>&#x25BC;</span><span id='order-hint' class='modifier-hint'></span></button><div id='order-menu' class='modifier-menu'></div></div>")
+    $("#order-button").hover () ->
+      $("#order-menu").slideDown(100)
+
+    $("#order-wrapper").mouseleave () ->
+      $("#order-menu").slideUp(100)
+
+    d3.select("#order-menu").selectAll('div').data(@numeric_filters).enter()
+      .append("div")
+      .text((d) -> d.value)
+      .attr("class", 'modifier-option order-option')
+      .attr("id", (d) -> 'order-' + d.value)
+      .on("click", (d) =>
+        this.order_by(d.value)
+      )
+
+  order_by: (split) =>
+    if @circles == undefined || @circles.length == 0
+      return
+
+    $("#order-hint").html("<br>"+split)
+
+    $(".order-option").removeClass('active')
+    $("#order-"+split).addClass('active')
+
+    curr_vals = []
+
+    # first get all the values for this filter
+    @circles.each (c) =>
+      curr_vals.push parseFloat(c['values'][split])
+
+    curr_max = d3.max(curr_vals, (d) -> d)
+    non_zero_min = curr_max
+
+    $.each curr_vals, (k, c) =>
+      if c > 0 && c < non_zero_min
+        non_zero_min = c
+
+    orders = d3.scale.sqrt()
+      .domain([non_zero_min, curr_max])
+      .range([100, @width - 100])
+      .clamp(true) # allows us to handle null values
+
+    # then update all circle positions appropriately
+    @circles.each (c) =>
+      s_val = c['values'][split]
+      if !isNaN(s_val) and s_val != ""
+        c.tarx = orders(parseFloat(s_val))
+      else
+        c.tarx = -100
+
+    this.update()
+
+
   update: () =>
     @circles = @vis.selectAll("circle")
       .data(@nodes, (d) -> d.id)
@@ -434,8 +490,5 @@ class window.Potato
     ttleft = if ((e.pageX + xOffset*2 + ttw) > $(window).width()) then e.pageX - ttw - xOffset*2 else e.pageX + xOffset
     tttop = if ((e.pageY + yOffset*2 + tth) > $(window).height()) then e.pageY - tth - yOffset*2 else e.pageY + yOffset
     $("#node-tooltip").css('top', tttop + 'px').css('left', ttleft + 'px')
-
-  safe_string: (input) =>
-    input.toLowerCase().replace(/\s/g, '_').replace('.','')
 
 root = exports ? this

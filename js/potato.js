@@ -10,16 +10,18 @@
           split: true,
           color: true,
           size: true,
+          order: true,
           "class": null
         };
       }
-      this.safe_string = __bind(this.safe_string, this);
       this.update_position = __bind(this.update_position, this);
       this.hide_details = __bind(this.hide_details, this);
       this.show_details = __bind(this.show_details, this);
       this.move_towards_target = __bind(this.move_towards_target, this);
       this.adjust_label_pos = __bind(this.adjust_label_pos, this);
       this.update = __bind(this.update, this);
+      this.order_by = __bind(this.order_by, this);
+      this.order_buttons = __bind(this.order_buttons, this);
       this.size_by = __bind(this.size_by, this);
       this.size_buttons = __bind(this.size_buttons, this);
       this.color_by = __bind(this.color_by, this);
@@ -56,6 +58,9 @@
       }
       if (params.size) {
         this.size_buttons();
+      }
+      if (params.order) {
+        this.order_buttons();
       }
       this.add_all();
     }
@@ -405,6 +410,65 @@
       return this.update();
     };
 
+    Potato.prototype.order_buttons = function() {
+      $("#modifiers").append("<div id='order-wrapper' class='modifier-wrapper'><button id='order-button' class='modifier-button'>Order By<span class='button-arrow'>&#x25BC;</span><span id='order-hint' class='modifier-hint'></span></button><div id='order-menu' class='modifier-menu'></div></div>");
+      $("#order-button").hover(function() {
+        return $("#order-menu").slideDown(100);
+      });
+      $("#order-wrapper").mouseleave(function() {
+        return $("#order-menu").slideUp(100);
+      });
+      return d3.select("#order-menu").selectAll('div').data(this.numeric_filters).enter().append("div").text(function(d) {
+        return d.value;
+      }).attr("class", 'modifier-option order-option').attr("id", function(d) {
+        return 'order-' + d.value;
+      }).on("click", (function(_this) {
+        return function(d) {
+          return _this.order_by(d.value);
+        };
+      })(this));
+    };
+
+    Potato.prototype.order_by = function(split) {
+      var curr_max, curr_vals, non_zero_min, orders;
+      if (this.circles === void 0 || this.circles.length === 0) {
+        return;
+      }
+      $("#order-hint").html("<br>" + split);
+      $(".order-option").removeClass('active');
+      $("#order-" + split).addClass('active');
+      curr_vals = [];
+      this.circles.each((function(_this) {
+        return function(c) {
+          return curr_vals.push(parseFloat(c['values'][split]));
+        };
+      })(this));
+      curr_max = d3.max(curr_vals, function(d) {
+        return d;
+      });
+      non_zero_min = curr_max;
+      $.each(curr_vals, (function(_this) {
+        return function(k, c) {
+          if (c > 0 && c < non_zero_min) {
+            return non_zero_min = c;
+          }
+        };
+      })(this));
+      orders = d3.scale.sqrt().domain([non_zero_min, curr_max]).range([100, this.width - 100]).clamp(true);
+      this.circles.each((function(_this) {
+        return function(c) {
+          var s_val;
+          s_val = c['values'][split];
+          if (!isNaN(s_val) && s_val !== "") {
+            return c.tarx = orders(parseFloat(s_val));
+          } else {
+            return c.tarx = -100;
+          }
+        };
+      })(this));
+      return this.update();
+    };
+
     Potato.prototype.update = function() {
       var that;
       this.circles = this.vis.selectAll("circle").data(this.nodes, function(d) {
@@ -521,10 +585,6 @@
       ttleft = (e.pageX + xOffset * 2 + ttw) > $(window).width() ? e.pageX - ttw - xOffset * 2 : e.pageX + xOffset;
       tttop = (e.pageY + yOffset * 2 + tth) > $(window).height() ? e.pageY - tth - yOffset * 2 : e.pageY + yOffset;
       return $("#node-tooltip").css('top', tttop + 'px').css('left', ttleft + 'px');
-    };
-
-    Potato.prototype.safe_string = function(input) {
-      return input.toLowerCase().replace(/\s/g, '_').replace('.', '');
     };
 
     return Potato;
