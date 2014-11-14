@@ -9,7 +9,8 @@
         params = {
           split: true,
           color: true,
-          size: true
+          size: true,
+          "class": null
         };
       }
       this.safe_string = __bind(this.safe_string, this);
@@ -32,6 +33,7 @@
       this.data = data;
       this.width = $(window).width();
       this.height = $(window).height() - 105;
+      this.node_class = params["class"];
       $.each(this.data, (function(_this) {
         return function(i, d) {
           return d.node_id = i;
@@ -165,9 +167,6 @@
       })(this));
       curr_class = '';
       curr_r = 5;
-      if (d['team']) {
-        curr_class = d.team;
-      }
       node = {
         id: d.node_id,
         radius: curr_r,

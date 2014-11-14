@@ -29,7 +29,8 @@
           return render_vis(csv, {
             split: true,
             color: false,
-            size: false
+            size: false,
+            "class": 'team'
           });
         });
       };
@@ -37,7 +38,12 @@
     $("#nba-dataset").on('click', (function(_this) {
       return function(e) {
         return d3.csv("data/basketball/basketball.csv", function(csv) {
-          return render_vis(csv);
+          return render_vis(csv, {
+            split: true,
+            color: true,
+            size: true,
+            "class": 'team'
+          });
         });
       };
     })(this));

@@ -1,8 +1,10 @@
 class window.Potato
-  constructor: (data, params = {split: true, color: true, size: true}) ->
+  constructor: (data, params = {split: true, color: true, size: true, class: null}) ->
     @data = data
     @width = $(window).width()
     @height = $(window).height() - 105
+
+    @node_class = params.class
 
     # set node ids
     $.each @data, (i, d) =>
@@ -102,9 +104,9 @@ class window.Potato
     curr_class = ''
     curr_r = 5
 
-    # TODO temp hack for NFL dataset
-    if d['team']
-      curr_class = d.team
+    # this is set by params
+#    if @node_class?
+#      curr_class = d[@node_class]
 
     node = {
       id: d.node_id
