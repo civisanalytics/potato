@@ -20,13 +20,14 @@ In other words, any uploaded data is relatively secure.
 
 All demo datasets are derived from publically available data.
 - Football: ESPN.go.com
+- Basketball: stats.nba.com + http://www.basketball-reference.com/contracts/players.html
 - Billionaire: bloomberg.com + forbes.com
 - Automobile: [UCI Machine Learning Repository](https://archive.ics.uci.edu/ml/datasets/Automobile)
 All datasets and the contents/names/rights are owned by their respective owners.
 
 Wishlist:
-- [ ] Data doesn't always fit on the screen well.
+- [ ] "Zoom" of some sort.  Probably just size circles with mousewheel
+  (as opposed to actual positional frame zooming)
 - [ ] Limit number of filters/categories for a given column/category
 - [ ] Catch massive datasets to prevent browser from crashing
-- [ ] click and drag RTS style rectangle selector
 - [ ] color by continuous variables

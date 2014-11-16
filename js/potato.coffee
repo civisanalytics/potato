@@ -92,6 +92,7 @@ class window.Potato
 
       @circles.each (c) =>
         if c.x > sx && c.x < sx2 && c.y > sy && c.y < sy2
+          # TODO this is hugely inefficient
           this.remove_node(c.id)
 
       s.remove()
