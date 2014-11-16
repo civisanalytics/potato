@@ -43,7 +43,6 @@ class window.Potato
 
   # initialize drag select
   drag_select: () =>
-    console.log(@vis)
     @vis.on("mousedown", ->
       p = d3.mouse(this)
 
@@ -95,6 +94,9 @@ class window.Potato
         if c.x > sx && c.x < sx2 && c.y > sy && c.y < sy2
           this.remove_node(c.id)
 
+      s.remove()
+    ).on("mouseleave", =>
+      s = @vis.select("rect.select-box")
       s.remove()
     )
 

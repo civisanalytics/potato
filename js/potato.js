@@ -68,7 +68,6 @@
     }
 
     Potato.prototype.drag_select = function() {
-      console.log(this.vis);
       return this.vis.on("mousedown", function() {
         var p;
         p = d3.mouse(this);
@@ -123,6 +122,12 @@
               return _this.remove_node(c.id);
             }
           });
+          return s.remove();
+        };
+      })(this)).on("mouseleave", (function(_this) {
+        return function() {
+          var s;
+          s = _this.vis.select("rect.select-box");
           return s.remove();
         };
       })(this));
