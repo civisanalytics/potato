@@ -23,16 +23,6 @@
         }
       };
     })(this));
-    $("#nfl-dataset").on('click', (function(_this) {
-      return function(e) {
-        return d3.csv("data/football/players_2.csv", function(csv) {
-          return render_vis(csv, {
-            split: true,
-            "class": 'team'
-          });
-        });
-      };
-    })(this));
     $("#nba-dataset").on('click', (function(_this) {
       return function(e) {
         return d3.csv("data/basketball/basketball.csv", function(csv) {

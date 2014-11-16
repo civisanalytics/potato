@@ -14,9 +14,6 @@ $ ->
         render_vis(d3.csv.parse(fileReader.result))
       fileReader.readAsText(file)
 
-  $("#nfl-dataset").on 'click', (e) =>
-    d3.csv "data/football/players_2.csv", (csv) ->
-      render_vis(csv, {split: true, class: 'team'})
   $("#nba-dataset").on 'click', (e) =>
     d3.csv "data/basketball/basketball.csv", (csv) ->
       render_vis(csv, {split: true, size: true, order: true, class: 'team'})
