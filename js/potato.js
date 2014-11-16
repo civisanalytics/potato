@@ -32,6 +32,7 @@
       this.add_node = __bind(this.add_node, this);
       this.add_all = __bind(this.add_all, this);
       this.create_filters = __bind(this.create_filters, this);
+      this.drag_select = __bind(this.drag_select, this);
       this.data = data;
       this.width = $(window).width();
       this.height = $(window).height() - 105;
@@ -47,6 +48,7 @@
       this.force = d3.layout.force().gravity(-0.01).charge(function(d) {
         return -Math.pow(d.radius, 2.0) * 1.5;
       }).size([this.width, this.height]);
+      this.drag_select();
       this.nodes = this.force.nodes();
       this.labels = [];
       this.create_filters();
@@ -64,6 +66,54 @@
       }
       this.add_all();
     }
+
+    Potato.prototype.drag_select = function() {
+      console.log(this.vis);
+      return this.vis.on("mousedown", function() {
+        var p;
+        p = d3.mouse(this);
+        return d3.select(this).append("rect").attr({
+          rx: 6,
+          ry: 6,
+          "class": "select-box",
+          x: p[0],
+          y: p[1],
+          width: 0,
+          height: 0
+        });
+      }).on("mousemove", function() {
+        var d, move, p, s;
+        s = d3.select(this).select("rect.select-box");
+        if (!s.empty()) {
+          p = d3.mouse(this);
+          d = {
+            x: parseInt(s.attr("x"), 10),
+            y: parseInt(s.attr("y"), 10),
+            width: parseInt(s.attr("width"), 10),
+            height: parseInt(s.attr("height"), 10)
+          };
+          move = {
+            x: p[0] - d.x,
+            y: p[1] - d.y
+          };
+          if (move.x < 1 || (move.x * 2 < d.width)) {
+            d.x = p[0];
+            d.width -= move.x;
+          } else {
+            d.width = move.x;
+          }
+          if (move.y < 1 || (move.y * 2 < d.height)) {
+            d.y = p[1];
+            d.height -= move.y;
+          } else {
+            d.height = move.y;
+          }
+          return s.attr(d);
+        }
+      }).on("mouseup", function() {
+        return d3.select(this).selectAll("rect.select-box").remove();
+      });
+    };
 
     Potato.prototype.create_filters = function() {
       var filter_button, sorted_filters;

@@ -24,6 +24,8 @@ class window.Potato
       .charge((d) -> -Math.pow(d.radius, 2.0) * 1.5)
       .size([@width, @height])
 
+    this.drag_select()
+
     # this is necessary so graph and model stay in sync
     # http://stackoverflow.com/questions/9539294/adding-new-nodes-to-force-directed-layout
     @nodes = @force.nodes()
@@ -38,6 +40,57 @@ class window.Potato
     this.order_buttons() if params.order
 
     this.add_all()
+
+  # initialize drag select
+  drag_select: () =>
+    console.log(@vis)
+    @vis.on("mousedown", ->
+      p = d3.mouse(this)
+
+      d3.select(this).append("rect")
+        .attr({
+          rx: 6
+          ry: 6
+          class: "select-box"
+          x: p[0]
+          y: p[1]
+          width: 0
+          height: 0
+        })
+    ).on("mousemove", ->
+      s = d3.select(this).select("rect.select-box")
+
+      if !s.empty()
+        p = d3.mouse(this)
+        d = {
+          x: parseInt( s.attr( "x"), 10)
+          y: parseInt( s.attr( "y"), 10)
+          width: parseInt( s.attr( "width"), 10)
+          height: parseInt( s.attr( "height"), 10)
+        }
+        move = {
+          x : p[0] - d.x
+          y : p[1] - d.y
+        }
+
+        if( move.x < 1 || (move.x*2<d.width))
+          d.x = p[0]
+          d.width -= move.x
+        else
+          d.width = move.x
+
+        if( move.y < 1 || (move.y*2<d.height))
+          d.y = p[1]
+          d.height -= move.y
+        else
+          d.height = move.y
+
+        s.attr(d)
+    ).on("mouseup", ->
+      d3.select(this).selectAll("rect.select-box").remove()
+    )
+
+
 
   # the logic behind taking the csv and determining what the categorical data is
   create_filters: () =>

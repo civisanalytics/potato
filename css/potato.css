@@ -196,3 +196,10 @@ button:hover {
 .active:hover {
   background-color: #0194D3;
 }
+
+.select-box {
+  stroke: gray;
+  fill: gray;
+  fill-opacity: 0.2;
+}
+
