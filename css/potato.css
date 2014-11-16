@@ -1,5 +1,14 @@
 /* styling specifically for the potato library */
 
+#vis {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
 #toolbar {
   width: 100%;
   top: 0;
@@ -7,6 +16,7 @@
 }
 #vis-svg {
   position: absolute;
+  cursor: default;
 }
 
 .pull-left {
@@ -34,6 +44,17 @@ button:hover {
   background-color: #eee;
 }
 
+#reset-button {
+  padding-right: 20px;
+}
+
+#reset-icon {
+  font-size: 1.5em;
+  position: absolute;
+  right: 18px;
+  top: 7px;
+}
+
 .color-button {
   font-variant: small-caps;
   margin-right: 5px;
@@ -41,6 +62,8 @@ button:hover {
 
 #filter-select-buttons {
   display: inline-block;
+  float: right;
+  margin-right: 20px;
 }
 
 #modifiers {

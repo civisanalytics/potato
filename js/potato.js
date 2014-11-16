@@ -193,7 +193,7 @@
           });
         };
       })(this));
-      filter_button = $("<button class='active filter-button filter-0'>Reset Nodes</button>");
+      filter_button = $("<button id='reset-button' class='modifier-button'><span id='reset-icon'>&#8635;</span> Reset Nodes</button>");
       filter_button.on("click", (function(_this) {
         return function(e) {
           return _this.add_all();

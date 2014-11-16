@@ -138,7 +138,7 @@ class window.Potato
       sorted_filters[v.value].sort (a, b) ->
         return if a.value == b.value then 0 else (a.value > b.value) || -1
 
-    filter_button = $("<button class='active filter-button filter-0'>Reset Nodes</button>")
+    filter_button = $("<button id='reset-button' class='modifier-button'><span id='reset-icon'>&#8635;</span> Reset Nodes</button>")
     filter_button.on "click", (e) =>
       this.add_all()
     $("#filter-select-buttons").append(filter_button)
