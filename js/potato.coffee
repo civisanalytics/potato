@@ -68,29 +68,35 @@ class window.Potato
           width: parseInt( s.attr( "width"), 10)
           height: parseInt( s.attr( "height"), 10)
         }
-        move = {
-          x : p[0] - d.x
-          y : p[1] - d.y
-        }
+        move = {x: p[0] - d.x, y : p[1] - d.y}
 
-        if( move.x < 1 || (move.x*2<d.width))
+        if( move.x < 1 || (move.x*2 < d.width))
           d.x = p[0]
           d.width -= move.x
         else
           d.width = move.x
 
-        if( move.y < 1 || (move.y*2<d.height))
+        if( move.y < 1 || (move.y*2 < d.height))
           d.y = p[1]
           d.height -= move.y
         else
           d.height = move.y
 
         s.attr(d)
-    ).on("mouseup", ->
-      d3.select(this).selectAll("rect.select-box").remove()
+    ).on("mouseup", =>
+      s = @vis.select("rect.select-box")
+
+      sx = parseInt(s.attr('x'),10)
+      sx2 = sx + parseInt(s.attr('width'),10)
+      sy = parseInt(s.attr('y'),10)
+      sy2 = sy + parseInt(s.attr('height'),10)
+
+      @circles.each (c) =>
+        if c.x > sx && c.x < sx2 && c.y > sy && c.y < sy2
+          this.remove_node(c.id)
+
+      s.remove()
     )
-
-
 
   # the logic behind taking the csv and determining what the categorical data is
   create_filters: () =>

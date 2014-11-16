@@ -110,9 +110,22 @@
           }
           return s.attr(d);
         }
-      }).on("mouseup", function() {
-        return d3.select(this).selectAll("rect.select-box").remove();
-      });
+      }).on("mouseup", (function(_this) {
+        return function() {
+          var s, sx, sx2, sy, sy2;
+          s = _this.vis.select("rect.select-box");
+          sx = parseInt(s.attr('x'), 10);
+          sx2 = sx + parseInt(s.attr('width'), 10);
+          sy = parseInt(s.attr('y'), 10);
+          sy2 = sy + parseInt(s.attr('height'), 10);
+          _this.circles.each(function(c) {
+            if (c.x > sx && c.x < sx2 && c.y > sy && c.y < sy2) {
+              return _this.remove_node(c.id);
+            }
+          });
+          return s.remove();
+        };
+      })(this));
     };
 
     Potato.prototype.create_filters = function() {
