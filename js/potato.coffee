@@ -24,13 +24,16 @@ class window.Potato
       .charge((d) -> -Math.pow(d.radius, 2.0) * 1.5)
       .size([@width, @height])
 
-    this.drag_select()
 
     # this is necessary so graph and model stay in sync
     # http://stackoverflow.com/questions/9539294/adding-new-nodes-to-force-directed-layout
     @nodes = @force.nodes()
 
     @labels = []
+
+    @dragging = false
+    this.drag_select()
+    this.zoom()
 
     this.create_filters()
 
@@ -41,9 +44,41 @@ class window.Potato
 
     this.add_all()
 
+  zoom: () =>
+    zoomListener = d3.behavior.zoom()
+      .scaleExtent([0, 1])
+      .on("zoom", =>
+        console.log(@dragging)
+        if @dragging
+          return
+
+        trans = "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")"
+
+        # positive is scroll up which on a map is zoom out
+        dy = d3.event.sourceEvent.deltaY
+
+        radius_change = if dy > 0 then 0.95 else 1.05
+
+        # lower bound
+        if (@nodes[0].radius < 2 and radius_change < 1) or (@nodes[0].radius > 100 and radius_change > 1)
+          return
+
+        $.each @nodes, (i, n) =>
+          n.radius *= radius_change
+
+        this.update()
+      )
+
+    @vis.call(zoomListener)
+
   # initialize drag select
   drag_select: () =>
+    that = this
     @vis.on("mousedown", ->
+      that.dragging = true
+      s = d3.select(this).select("rect.select-box")
+      s.remove()
+
       p = d3.mouse(this)
 
       d3.select(this).append("rect")
@@ -96,9 +131,11 @@ class window.Potato
           this.remove_node(c.id)
 
       s.remove()
+      @dragging = false
     ).on("mouseleave", =>
       s = @vis.select("rect.select-box")
       s.remove()
+      @dragging = false
     )
 
   # the logic behind taking the csv and determining what the categorical data is
@@ -442,7 +479,7 @@ class window.Potato
 
     orders = d3.scale.sqrt()
       .domain([non_zero_min, curr_max])
-      .range([100, @width - 100])
+      .range([220, @width - 160])
       .clamp(true) # allows us to handle null values
 
     # then update all circle positions appropriately

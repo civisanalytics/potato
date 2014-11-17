@@ -33,6 +33,7 @@
       this.add_all = __bind(this.add_all, this);
       this.create_filters = __bind(this.create_filters, this);
       this.drag_select = __bind(this.drag_select, this);
+      this.zoom = __bind(this.zoom, this);
       this.data = data;
       this.width = $(window).width();
       this.height = $(window).height() - 105;
@@ -48,9 +49,11 @@
       this.force = d3.layout.force().gravity(-0.01).charge(function(d) {
         return -Math.pow(d.radius, 2.0) * 1.5;
       }).size([this.width, this.height]);
-      this.drag_select();
       this.nodes = this.force.nodes();
       this.labels = [];
+      this.dragging = false;
+      this.drag_select();
+      this.zoom();
       this.create_filters();
       if (params.split) {
         this.split_buttons();
@@ -67,9 +70,38 @@
       this.add_all();
     }
 
+    Potato.prototype.zoom = function() {
+      var zoomListener;
+      zoomListener = d3.behavior.zoom().scaleExtent([0, 1]).on("zoom", (function(_this) {
+        return function() {
+          var dy, radius_change, trans;
+          console.log(_this.dragging);
+          if (_this.dragging) {
+            return;
+          }
+          trans = "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")";
+          dy = d3.event.sourceEvent.deltaY;
+          radius_change = dy > 0 ? 0.95 : 1.05;
+          if ((_this.nodes[0].radius < 2 && radius_change < 1) || (_this.nodes[0].radius > 100 && radius_change > 1)) {
+            return;
+          }
+          $.each(_this.nodes, function(i, n) {
+            return n.radius *= radius_change;
+          });
+          return _this.update();
+        };
+      })(this));
+      return this.vis.call(zoomListener);
+    };
+
     Potato.prototype.drag_select = function() {
+      var that;
+      that = this;
       return this.vis.on("mousedown", function() {
-        var p;
+        var p, s;
+        that.dragging = true;
+        s = d3.select(this).select("rect.select-box");
+        s.remove();
         p = d3.mouse(this);
         return d3.select(this).append("rect").attr({
           rx: 6,
@@ -122,13 +154,15 @@
               return _this.remove_node(c.id);
             }
           });
-          return s.remove();
+          s.remove();
+          return _this.dragging = false;
         };
       })(this)).on("mouseleave", (function(_this) {
         return function() {
           var s;
           s = _this.vis.select("rect.select-box");
-          return s.remove();
+          s.remove();
+          return _this.dragging = false;
         };
       })(this));
     };
@@ -522,7 +556,7 @@
           }
         };
       })(this));
-      orders = d3.scale.sqrt().domain([non_zero_min, curr_max]).range([100, this.width - 100]).clamp(true);
+      orders = d3.scale.sqrt().domain([non_zero_min, curr_max]).range([220, this.width - 160]).clamp(true);
       this.circles.each((function(_this) {
         return function(c) {
           var s_val;
