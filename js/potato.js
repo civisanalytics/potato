@@ -160,13 +160,6 @@
           s.remove();
           return _this.dragging = false;
         };
-      })(this)).on("mouseleave", (function(_this) {
-        return function() {
-          var s;
-          s = _this.vis.select("rect.select-box");
-          s.remove();
-          return _this.dragging = false;
-        };
       })(this));
     };
 
@@ -652,11 +645,7 @@
         return d.color;
       }).on("mouseover", function(d, i) {
         return that.show_details(d, i, this);
-      }).on("mousemove", (function(_this) {
-        return function(d, i) {
-          return _this.update_position(d3.event);
-        };
-      })(this)).on("mouseout", function(d, i) {
+      }).on("mouseout", function(d, i) {
         return that.hide_details(d, i, this);
       }).on("click", (function(_this) {
         return function(d) {
