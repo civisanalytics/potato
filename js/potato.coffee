@@ -505,6 +505,7 @@ class window.Potato
       .attr("id", (d) -> "bubble_#{d.id}")
       .attr("fill", (d) -> d.color)
       .on("mouseover", (d,i) -> that.show_details(d,i,this))
+      .on("mousemove", (d,i) => this.update_position(d3.event))
       .on("mouseout", (d,i) -> that.hide_details(d,i,this))
       .on("click", (d) => this.remove_node(d.id))
       .attr("class", (d) ->

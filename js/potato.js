@@ -583,7 +583,11 @@
         return d.color;
       }).on("mouseover", function(d, i) {
         return that.show_details(d, i, this);
-      }).on("mouseout", function(d, i) {
+      }).on("mousemove", (function(_this) {
+        return function(d, i) {
+          return _this.update_position(d3.event);
+        };
+      })(this)).on("mouseout", function(d, i) {
         return that.hide_details(d, i, this);
       }).on("click", (function(_this) {
         return function(d) {
