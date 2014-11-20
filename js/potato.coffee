@@ -48,9 +48,7 @@ class window.Potato
     zoomListener = d3.behavior.zoom()
       .scaleExtent([0, 1])
       .on("zoom", =>
-        console.log(@dragging)
-        if @dragging
-          return
+        return if @dragging
 
         trans = "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")"
 
@@ -320,12 +318,22 @@ class window.Potato
     $("#color-wrapper").mouseleave () ->
       $("#color-menu").slideUp(100)
 
+    $("#color-button").on "click", () =>
+      this.reset_color()
+
     d3.select("#color-menu").selectAll('div').data(@categorical_filters).enter()
       .append("div")
       .text((d) -> d.value)
       .attr("class", 'modifier-option color-option')
       .attr("id", (d) -> 'color-' + d.value)
       .on("click", (d) => this.color_by(d.value) )
+
+  reset_color: () =>
+    # remove the current legend
+    d3.select("#color-legend").selectAll("*").remove()
+    $(".color-option").removeClass('active')
+    $("#color-hint").html("")
+    @circles.attr("fill", "#777")
 
   color_by: (split) =>
     if @circles == undefined || @circles.length == 0
@@ -394,12 +402,22 @@ class window.Potato
     $("#size-wrapper").mouseleave () ->
       $("#size-menu").slideUp(100)
 
+    $("#size-button").on "click", () =>
+      this.reset_size()
+
     d3.select("#size-menu").selectAll('div').data(@numeric_filters).enter()
       .append("div")
       .text((d) -> d.value)
       .attr("class", 'modifier-option size-option')
       .attr("id", (d) -> 'size-' + d.value)
       .on("click", (d) => this.size_by(d.value))
+
+  reset_size: () =>
+    $(".size-option").removeClass('active')
+    $("#size-hint").html("")
+    @circles.each (c) =>
+      c.radius = 5
+    this.update()
 
   size_by: (split) =>
     if @circles == undefined || @circles.length == 0

@@ -23,8 +23,10 @@
       this.order_by = __bind(this.order_by, this);
       this.order_buttons = __bind(this.order_buttons, this);
       this.size_by = __bind(this.size_by, this);
+      this.reset_size = __bind(this.reset_size, this);
       this.size_buttons = __bind(this.size_buttons, this);
       this.color_by = __bind(this.color_by, this);
+      this.reset_color = __bind(this.reset_color, this);
       this.color_buttons = __bind(this.color_buttons, this);
       this.split_by = __bind(this.split_by, this);
       this.split_buttons = __bind(this.split_buttons, this);
@@ -75,7 +77,6 @@
       zoomListener = d3.behavior.zoom().scaleExtent([0, 1]).on("zoom", (function(_this) {
         return function() {
           var dy, radius_change, trans;
-          console.log(_this.dragging);
           if (_this.dragging) {
             return;
           }
@@ -394,6 +395,11 @@
       $("#color-wrapper").mouseleave(function() {
         return $("#color-menu").slideUp(100);
       });
+      $("#color-button").on("click", (function(_this) {
+        return function() {
+          return _this.reset_color();
+        };
+      })(this));
       return d3.select("#color-menu").selectAll('div').data(this.categorical_filters).enter().append("div").text(function(d) {
         return d.value;
       }).attr("class", 'modifier-option color-option').attr("id", function(d) {
@@ -403,6 +409,13 @@
           return _this.color_by(d.value);
         };
       })(this));
+    };
+
+    Potato.prototype.reset_color = function() {
+      d3.select("#color-legend").selectAll("*").remove();
+      $(".color-option").removeClass('active');
+      $("#color-hint").html("");
+      return this.circles.attr("fill", "#777");
     };
 
     Potato.prototype.color_by = function(split) {
@@ -461,6 +474,11 @@
       $("#size-wrapper").mouseleave(function() {
         return $("#size-menu").slideUp(100);
       });
+      $("#size-button").on("click", (function(_this) {
+        return function() {
+          return _this.reset_size();
+        };
+      })(this));
       return d3.select("#size-menu").selectAll('div').data(this.numeric_filters).enter().append("div").text(function(d) {
         return d.value;
       }).attr("class", 'modifier-option size-option').attr("id", function(d) {
@@ -470,6 +488,17 @@
           return _this.size_by(d.value);
         };
       })(this));
+    };
+
+    Potato.prototype.reset_size = function() {
+      $(".size-option").removeClass('active');
+      $("#size-hint").html("");
+      this.circles.each((function(_this) {
+        return function(c) {
+          return c.radius = 5;
+        };
+      })(this));
+      return this.update();
     };
 
     Potato.prototype.size_by = function(split) {
