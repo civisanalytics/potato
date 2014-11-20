@@ -21,6 +21,7 @@
       this.adjust_label_pos = __bind(this.adjust_label_pos, this);
       this.update = __bind(this.update, this);
       this.order_by = __bind(this.order_by, this);
+      this.reset_order = __bind(this.reset_order, this);
       this.order_buttons = __bind(this.order_buttons, this);
       this.size_by = __bind(this.size_by, this);
       this.reset_size = __bind(this.reset_size, this);
@@ -29,6 +30,7 @@
       this.reset_color = __bind(this.reset_color, this);
       this.color_buttons = __bind(this.color_buttons, this);
       this.split_by = __bind(this.split_by, this);
+      this.reset_split = __bind(this.reset_split, this);
       this.split_buttons = __bind(this.split_buttons, this);
       this.remove_node = __bind(this.remove_node, this);
       this.add_node = __bind(this.add_node, this);
@@ -312,6 +314,11 @@
       $("#split-wrapper").mouseleave(function() {
         return $("#split-menu").slideUp(100);
       });
+      $("#split-button").on("click", (function(_this) {
+        return function() {
+          return _this.reset_split();
+        };
+      })(this));
       return d3.select("#split-menu").selectAll('div').data(this.categorical_filters).enter().append("div").text(function(d) {
         return d.value;
       }).attr("class", 'modifier-option split-option').attr("id", function(d) {
@@ -323,11 +330,27 @@
       })(this));
     };
 
+    Potato.prototype.reset_split = function() {
+      $(".split-option").removeClass('active');
+      $("#split-hint").html("");
+      while (this.labels.length > 0) {
+        this.labels.pop();
+      }
+      this.circles.each((function(_this) {
+        return function(c) {
+          c.tarx = _this.width / 2.0;
+          return c.tary = _this.height / 2.0;
+        };
+      })(this));
+      return this.update();
+    };
+
     Potato.prototype.split_by = function(split) {
       var curr_col, curr_row, curr_vals, height_2, num_cols, num_rows, width_2;
       if (this.circles === void 0 || this.circles.length === 0) {
         return;
       }
+      this.reset_order();
       $("#split-hint").html("<br>" + split);
       $(".split-option").removeClass('active');
       $("#split-" + split).addClass('active');
@@ -549,6 +572,11 @@
       $("#order-wrapper").mouseleave(function() {
         return $("#order-menu").slideUp(100);
       });
+      $("#order-button").on("click", (function(_this) {
+        return function() {
+          return _this.reset_order();
+        };
+      })(this));
       return d3.select("#order-menu").selectAll('div').data(this.numeric_filters).enter().append("div").text(function(d) {
         return d.value;
       }).attr("class", 'modifier-option order-option').attr("id", function(d) {
@@ -560,11 +588,23 @@
       })(this));
     };
 
+    Potato.prototype.reset_order = function() {
+      $(".order-option").removeClass('active');
+      $("#order-hint").html("");
+      this.circles.each((function(_this) {
+        return function(c) {
+          return c.tarx = _this.width / 2.0;
+        };
+      })(this));
+      return this.update();
+    };
+
     Potato.prototype.order_by = function(split) {
       var curr_max, curr_vals, non_zero_min, orders;
       if (this.circles === void 0 || this.circles.length === 0) {
         return;
       }
+      this.reset_split();
       $("#order-hint").html("<br>" + split);
       $(".order-option").removeClass('active');
       $("#order-" + split).addClass('active');

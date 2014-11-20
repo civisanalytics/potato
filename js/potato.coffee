@@ -237,6 +237,9 @@ class window.Potato
     $("#split-wrapper").mouseleave () ->
       $("#split-menu").slideUp(100)
 
+    $("#split-button").on "click", () =>
+      this.reset_split()
+
     d3.select("#split-menu").selectAll('div').data(@categorical_filters).enter()
       .append("div")
       .text((d) -> d.value)
@@ -246,9 +249,21 @@ class window.Potato
         this.split_by(d.value)
       )
 
+  reset_split: () =>
+    $(".split-option").removeClass('active')
+    $("#split-hint").html("")
+    while @labels.length > 0
+      @labels.pop()
+    @circles.each (c) =>
+      c.tarx = @width/2.0
+      c.tary = @height/2.0
+    this.update()
+
   split_by: (split) =>
     if @circles == undefined || @circles.length == 0
       return
+
+    this.reset_order()
 
     $("#split-hint").html("<br>"+split)
 
@@ -464,6 +479,9 @@ class window.Potato
     $("#order-wrapper").mouseleave () ->
       $("#order-menu").slideUp(100)
 
+    $("#order-button").on "click", () =>
+      this.reset_order()
+
     d3.select("#order-menu").selectAll('div').data(@numeric_filters).enter()
       .append("div")
       .text((d) -> d.value)
@@ -473,9 +491,18 @@ class window.Potato
         this.order_by(d.value)
       )
 
+  reset_order: () =>
+    $(".order-option").removeClass('active')
+    $("#order-hint").html("")
+    @circles.each (c) =>
+      c.tarx = @width/2.0
+    this.update()
+
   order_by: (split) =>
     if @circles == undefined || @circles.length == 0
       return
+
+    this.reset_split()
 
     $("#order-hint").html("<br>"+split)
 
