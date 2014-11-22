@@ -22,16 +22,13 @@
       this.update = __bind(this.update, this);
       this.order_by = __bind(this.order_by, this);
       this.reset_order = __bind(this.reset_order, this);
-      this.order_buttons = __bind(this.order_buttons, this);
       this.size_by = __bind(this.size_by, this);
       this.reset_size = __bind(this.reset_size, this);
-      this.size_buttons = __bind(this.size_buttons, this);
       this.color_by = __bind(this.color_by, this);
       this.reset_color = __bind(this.reset_color, this);
-      this.color_buttons = __bind(this.color_buttons, this);
       this.split_by = __bind(this.split_by, this);
       this.reset_split = __bind(this.reset_split, this);
-      this.split_buttons = __bind(this.split_buttons, this);
+      this.create_buttons = __bind(this.create_buttons, this);
       this.remove_node = __bind(this.remove_node, this);
       this.add_node = __bind(this.add_node, this);
       this.add_all = __bind(this.add_all, this);
@@ -60,16 +57,16 @@
       this.zoom();
       this.create_filters();
       if (params.split) {
-        this.split_buttons();
+        this.create_buttons('split');
       }
       if (params.color) {
-        this.color_buttons();
+        this.create_buttons('color');
       }
       if (params.size) {
-        this.size_buttons();
+        this.create_buttons('size');
       }
       if (params.order) {
-        this.order_buttons();
+        this.create_buttons('order');
       }
       this.add_all();
     }
@@ -85,7 +82,7 @@
           trans = "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")";
           dy = d3.event.sourceEvent.deltaY;
           radius_change = dy > 0 ? 0.95 : 1.05;
-          if ((_this.nodes[0].radius < 2 && radius_change < 1) || (_this.nodes[0].radius > 100 && radius_change > 1)) {
+          if ((_this.nodes[0].radius < 2 && radius_change < 1) || (_this.nodes[0].radius > 75 && radius_change > 1)) {
             return;
           }
           $.each(_this.nodes, function(i, n) {
@@ -299,26 +296,55 @@
       return this.update();
     };
 
-    Potato.prototype.split_buttons = function() {
-      $("#modifiers").append("<div id='split-wrapper' class='modifier-wrapper'><button id='split-button' class='modifier-button'>Split By<span class='button-arrow'>&#x25BC;</span><span id='split-hint' class='modifier-hint'></span></button><div id='split-menu' class='modifier-menu'></div></div>");
-      $("#split-button").hover(function() {
-        return $("#split-menu").slideDown(100);
+    Potato.prototype.create_buttons = function(type) {
+      var button_filters;
+      $("#modifiers").append("<div id='" + type + "-wrapper' class='modifier-wrapper'><button id='" + type + "-button' class='modifier-button'>" + type + " By<span class='button-arrow'>&#x25BC;</span><span id='" + type + "-hint' class='modifier-hint'></span></button><div id='" + type + "-menu' class='modifier-menu'></div></div>");
+      $("#" + type + "-button").hover(function() {
+        return $("#" + type + "-menu").slideDown(100);
       });
-      $("#split-wrapper").mouseleave(function() {
-        return $("#split-menu").slideUp(100);
+      $("#" + type + "-wrapper").mouseleave(function() {
+        return $("#" + type + "-menu").slideUp(100);
       });
-      $("#split-button").on("click", (function(_this) {
+      $("#" + type + "-button").on("click", (function(_this) {
         return function() {
-          return _this.reset_split();
+          if (type === "split") {
+            _this.reset_split();
+          }
+          if (type === "color") {
+            _this.reset_color();
+          }
+          if (type === "size") {
+            _this.reset_size();
+          }
+          if (type === "order") {
+            return _this.reset_order();
+          }
         };
       })(this));
-      return d3.select("#split-menu").selectAll('div').data(this.categorical_filters).enter().append("div").text(function(d) {
+      if (type === "split" || type === "color") {
+        button_filters = this.categorical_filters;
+      }
+      if (type === "size" || type === "order") {
+        button_filters = this.numeric_filters;
+      }
+      return d3.select("#" + type + "-menu").selectAll('div').data(button_filters).enter().append("div").text(function(d) {
         return d.value;
-      }).attr("class", 'modifier-option split-option').attr("id", function(d) {
-        return 'split-' + d.value;
+      }).attr("class", "modifier-option " + type + "-option").attr("id", function(d) {
+        return "" + type + "-" + d.value;
       }).on("click", (function(_this) {
         return function(d) {
-          return _this.split_by(d.value);
+          if (type === "split") {
+            _this.split_by(d.value);
+          }
+          if (type === "color") {
+            _this.color_by(d.value);
+          }
+          if (type === "size") {
+            _this.size_by(d.value);
+          }
+          if (type === "order") {
+            return _this.order_by(d.value);
+          }
         };
       })(this));
     };
@@ -402,31 +428,6 @@
       return this.update();
     };
 
-    Potato.prototype.color_buttons = function() {
-      $("#vis").append("<div id='color-legend'></div>");
-      $("#modifiers").append("<div id='color-wrapper' class='modifier-wrapper'><button id='color-button' class='modifier-button'>Color By<span class='button-arrow'>&#x25BC;</span><span id='color-hint' class='modifier-hint'></span></button><div id='color-menu' class='modifier-menu'></div></div>");
-      $("#color-button").hover(function() {
-        return $("#color-menu").slideDown(100);
-      });
-      $("#color-wrapper").mouseleave(function() {
-        return $("#color-menu").slideUp(100);
-      });
-      $("#color-button").on("click", (function(_this) {
-        return function() {
-          return _this.reset_color();
-        };
-      })(this));
-      return d3.select("#color-menu").selectAll('div').data(this.categorical_filters).enter().append("div").text(function(d) {
-        return d.value;
-      }).attr("class", 'modifier-option color-option').attr("id", function(d) {
-        return 'color-' + d.value;
-      }).on("click", (function(_this) {
-        return function(d) {
-          return _this.color_by(d.value);
-        };
-      })(this));
-    };
-
     Potato.prototype.reset_color = function() {
       d3.select("#color-legend").selectAll("*").remove();
       $(".color-option").removeClass('active');
@@ -438,6 +439,9 @@
       var colors, curr_vals, g, l_size, legend, num_colors;
       if (this.circles === void 0 || this.circles.length === 0) {
         return;
+      }
+      if ($("#color-legend").length < 1) {
+        $("#vis").append("<div id='color-legend'></div>");
       }
       $("#color-hint").html("<br>" + split);
       $(".color-option").removeClass('active');
@@ -480,30 +484,6 @@
       return this.circles.attr("fill", function(d) {
         return d.color;
       });
-    };
-
-    Potato.prototype.size_buttons = function() {
-      $("#modifiers").append("<div id='size-wrapper' class='modifier-wrapper'><button id='size-button' class='modifier-button'>Size By<span class='button-arrow'>&#x25BC;</span><span id='size-hint' class='modifier-hint'></span></button><div id='size-menu' class='modifier-menu'></div></div>");
-      $("#size-button").hover(function() {
-        return $("#size-menu").slideDown(100);
-      });
-      $("#size-wrapper").mouseleave(function() {
-        return $("#size-menu").slideUp(100);
-      });
-      $("#size-button").on("click", (function(_this) {
-        return function() {
-          return _this.reset_size();
-        };
-      })(this));
-      return d3.select("#size-menu").selectAll('div').data(this.numeric_filters).enter().append("div").text(function(d) {
-        return d.value;
-      }).attr("class", 'modifier-option size-option').attr("id", function(d) {
-        return 'size-' + d.value;
-      }).on("click", (function(_this) {
-        return function(d) {
-          return _this.size_by(d.value);
-        };
-      })(this));
     };
 
     Potato.prototype.reset_size = function() {
@@ -555,30 +535,6 @@
         };
       })(this));
       return this.update();
-    };
-
-    Potato.prototype.order_buttons = function() {
-      $("#modifiers").append("<div id='order-wrapper' class='modifier-wrapper'><button id='order-button' class='modifier-button'>Order By<span class='button-arrow'>&#x25BC;</span><span id='order-hint' class='modifier-hint'></span></button><div id='order-menu' class='modifier-menu'></div></div>");
-      $("#order-button").hover(function() {
-        return $("#order-menu").slideDown(100);
-      });
-      $("#order-wrapper").mouseleave(function() {
-        return $("#order-menu").slideUp(100);
-      });
-      $("#order-button").on("click", (function(_this) {
-        return function() {
-          return _this.reset_order();
-        };
-      })(this));
-      return d3.select("#order-menu").selectAll('div').data(this.numeric_filters).enter().append("div").text(function(d) {
-        return d.value;
-      }).attr("class", 'modifier-option order-option').attr("id", function(d) {
-        return 'order-' + d.value;
-      }).on("click", (function(_this) {
-        return function(d) {
-          return _this.order_by(d.value);
-        };
-      })(this));
     };
 
     Potato.prototype.reset_order = function() {

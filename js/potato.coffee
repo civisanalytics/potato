@@ -37,10 +37,10 @@ class window.Potato
 
     this.create_filters()
 
-    this.split_buttons() if params.split
-    this.color_buttons() if params.color
-    this.size_buttons() if params.size
-    this.order_buttons() if params.order
+    this.create_buttons('split') if params.split
+    this.create_buttons('color') if params.color
+    this.create_buttons('size') if params.size
+    this.create_buttons('order') if params.order
 
     this.add_all()
 
@@ -58,7 +58,7 @@ class window.Potato
         radius_change = if dy > 0 then 0.95 else 1.05
 
         # lower bound
-        if (@nodes[0].radius < 2 and radius_change < 1) or (@nodes[0].radius > 100 and radius_change > 1)
+        if (@nodes[0].radius < 2 and radius_change < 1) or (@nodes[0].radius > 75 and radius_change > 1)
           return
 
         $.each @nodes, (i, n) =>
@@ -225,24 +225,33 @@ class window.Potato
 
     this.update()
 
-  split_buttons: () =>
-    $("#modifiers").append("<div id='split-wrapper' class='modifier-wrapper'><button id='split-button' class='modifier-button'>Split By<span class='button-arrow'>&#x25BC;</span><span id='split-hint' class='modifier-hint'></span></button><div id='split-menu' class='modifier-menu'></div></div>")
-    $("#split-button").hover () ->
-      $("#split-menu").slideDown(100)
+  create_buttons: (type) =>
+    $("#modifiers").append("<div id='#{type}-wrapper' class='modifier-wrapper'><button id='#{type}-button' class='modifier-button'>#{type} By<span class='button-arrow'>&#x25BC;</span><span id='#{type}-hint' class='modifier-hint'></span></button><div id='#{type}-menu' class='modifier-menu'></div></div>")
+    $("##{type}-button").hover () ->
+      $("##{type}-menu").slideDown(100)
 
-    $("#split-wrapper").mouseleave () ->
-      $("#split-menu").slideUp(100)
+    $("##{type}-wrapper").mouseleave () ->
+      $("##{type}-menu").slideUp(100)
 
-    $("#split-button").on "click", () =>
-      this.reset_split()
+    $("##{type}-button").on "click", () =>
+      this.reset_split() if type == "split"
+      this.reset_color() if type == "color"
+      this.reset_size() if type == "size"
+      this.reset_order() if type == "order"
 
-    d3.select("#split-menu").selectAll('div').data(@categorical_filters).enter()
+    button_filters = @categorical_filters if type == "split" || type == "color"
+    button_filters = @numeric_filters if type == "size" || type == "order"
+
+    d3.select("##{type}-menu").selectAll('div').data(button_filters).enter()
       .append("div")
       .text((d) -> d.value)
-      .attr("class", 'modifier-option split-option')
-      .attr("id", (d) -> 'split-' + d.value)
+      .attr("class", "modifier-option #{type}-option")
+      .attr("id", (d) -> "#{type}-#{d.value}")
       .on("click", (d) =>
-        this.split_by(d.value)
+        this.split_by(d.value) if type == "split"
+        this.color_by(d.value) if type == "color"
+        this.size_by(d.value) if type == "size"
+        this.order_by(d.value) if type == "order"
       )
 
   reset_split: () =>
@@ -320,25 +329,6 @@ class window.Potato
     # then update
     this.update()
 
-  color_buttons: () =>
-    $("#vis").append("<div id='color-legend'></div>")
-    $("#modifiers").append("<div id='color-wrapper' class='modifier-wrapper'><button id='color-button' class='modifier-button'>Color By<span class='button-arrow'>&#x25BC;</span><span id='color-hint' class='modifier-hint'></span></button><div id='color-menu' class='modifier-menu'></div></div>")
-    $("#color-button").hover () ->
-      $("#color-menu").slideDown(100)
-
-    $("#color-wrapper").mouseleave () ->
-      $("#color-menu").slideUp(100)
-
-    $("#color-button").on "click", () =>
-      this.reset_color()
-
-    d3.select("#color-menu").selectAll('div').data(@categorical_filters).enter()
-      .append("div")
-      .text((d) -> d.value)
-      .attr("class", 'modifier-option color-option')
-      .attr("id", (d) -> 'color-' + d.value)
-      .on("click", (d) => this.color_by(d.value) )
-
   reset_color: () =>
     # remove the current legend
     d3.select("#color-legend").selectAll("*").remove()
@@ -349,6 +339,8 @@ class window.Potato
   color_by: (split) =>
     if @circles == undefined || @circles.length == 0
       return
+
+    $("#vis").append("<div id='color-legend'></div>") if $("#color-legend").length < 1
 
     $("#color-hint").html("<br>"+split)
 
@@ -405,24 +397,6 @@ class window.Potato
 
     @circles.attr("fill", (d) -> d.color)
 
-  size_buttons: () =>
-    $("#modifiers").append("<div id='size-wrapper' class='modifier-wrapper'><button id='size-button' class='modifier-button'>Size By<span class='button-arrow'>&#x25BC;</span><span id='size-hint' class='modifier-hint'></span></button><div id='size-menu' class='modifier-menu'></div></div>")
-    $("#size-button").hover () ->
-      $("#size-menu").slideDown(100)
-
-    $("#size-wrapper").mouseleave () ->
-      $("#size-menu").slideUp(100)
-
-    $("#size-button").on "click", () =>
-      this.reset_size()
-
-    d3.select("#size-menu").selectAll('div').data(@numeric_filters).enter()
-      .append("div")
-      .text((d) -> d.value)
-      .attr("class", 'modifier-option size-option')
-      .attr("id", (d) -> 'size-' + d.value)
-      .on("click", (d) => this.size_by(d.value))
-
   reset_size: () =>
     $(".size-option").removeClass('active')
     $("#size-hint").html("")
@@ -466,26 +440,6 @@ class window.Potato
         c.radius = 0
 
     this.update()
-
-  order_buttons: () =>
-    $("#modifiers").append("<div id='order-wrapper' class='modifier-wrapper'><button id='order-button' class='modifier-button'>Order By<span class='button-arrow'>&#x25BC;</span><span id='order-hint' class='modifier-hint'></span></button><div id='order-menu' class='modifier-menu'></div></div>")
-    $("#order-button").hover () ->
-      $("#order-menu").slideDown(100)
-
-    $("#order-wrapper").mouseleave () ->
-      $("#order-menu").slideUp(100)
-
-    $("#order-button").on "click", () =>
-      this.reset_order()
-
-    d3.select("#order-menu").selectAll('div').data(@numeric_filters).enter()
-      .append("div")
-      .text((d) -> d.value)
-      .attr("class", 'modifier-option order-option')
-      .attr("id", (d) -> 'order-' + d.value)
-      .on("click", (d) =>
-        this.order_by(d.value)
-      )
 
   reset_order: () =>
     $(".order-option").removeClass('active')
