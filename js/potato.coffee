@@ -124,10 +124,14 @@ class window.Potato
       sy = parseInt(s.attr('y'),10)
       sy2 = sy + parseInt(s.attr('height'),10)
 
+      nodes_to_remove = []
+
       @circles.each (c) =>
         if c.x > sx && c.x < sx2 && c.y > sy && c.y < sy2
           # TODO this is hugely inefficient
-          this.remove_node(c.id)
+          nodes_to_remove.push(c.id)
+
+      this.remove_nodes(nodes_to_remove)
 
       s.remove()
       @dragging = false
@@ -218,18 +222,17 @@ class window.Potato
     }
     @nodes.push node
 
-  remove_node: (id) =>
+  remove_nodes: (nodes_to_remove) =>
     # this was the only array iterator + removal I could get to work
     len = @nodes.length
     while (len--)
-      if @nodes[len]['id'] == id # node with offending value found
+      if nodes_to_remove.indexOf(@nodes[len]['id']) >= 0 # node with offending value found
         @nodes.splice(len, 1)
-        break
 
     order_id = $(".order-option.active").attr('id')
     this.order_by(order_id.substr(order_id.indexOf("-") + 1)) if order_id != undefined
 
-#    this.update()
+    this.update()
 
   create_buttons: (type) =>
     $("#modifiers").append("<div id='#{type}-wrapper' class='modifier-wrapper'><button id='#{type}-button' class='modifier-button'>#{type} By<span class='button-arrow'>&#x25BC;</span><span id='#{type}-hint' class='modifier-hint'></span></button><div id='#{type}-menu' class='modifier-menu'></div></div>")
@@ -547,13 +550,13 @@ class window.Potato
       .attr("fill", (d) -> d.color)
       .on("mouseover", (d,i) -> that.show_details(d,i,this))
       .on("mouseout", (d,i) -> that.hide_details(d,i,this))
-      .on("click", (d) => this.remove_node(d.id))
       .attr("class", (d) ->
         if d.class.length > 0
           d.class.toLowerCase().replace(/\s/g, '_').replace('.','')
         else
           ''
       )
+#      .on("click", (d) => this.remove_node(d.id))
 
     # Fancy transition to make bubbles appear to 'grow in'
     @circles.transition().duration(2000).attr("r", (d) -> d.radius)

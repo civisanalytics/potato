@@ -29,7 +29,7 @@
       this.split_by = __bind(this.split_by, this);
       this.reset_split = __bind(this.reset_split, this);
       this.create_buttons = __bind(this.create_buttons, this);
-      this.remove_node = __bind(this.remove_node, this);
+      this.remove_nodes = __bind(this.remove_nodes, this);
       this.add_node = __bind(this.add_node, this);
       this.add_all = __bind(this.add_all, this);
       this.create_filters = __bind(this.create_filters, this);
@@ -144,17 +144,19 @@
         }
       }).on("mouseup", (function(_this) {
         return function() {
-          var s, sx, sx2, sy, sy2;
+          var nodes_to_remove, s, sx, sx2, sy, sy2;
           s = _this.vis.select("rect.select-box");
           sx = parseInt(s.attr('x'), 10);
           sx2 = sx + parseInt(s.attr('width'), 10);
           sy = parseInt(s.attr('y'), 10);
           sy2 = sy + parseInt(s.attr('height'), 10);
+          nodes_to_remove = [];
           _this.circles.each(function(c) {
             if (c.x > sx && c.x < sx2 && c.y > sy && c.y < sy2) {
-              return _this.remove_node(c.id);
+              return nodes_to_remove.push(c.id);
             }
           });
+          _this.remove_nodes(nodes_to_remove);
           s.remove();
           return _this.dragging = false;
         };
@@ -289,19 +291,19 @@
       return this.nodes.push(node);
     };
 
-    Potato.prototype.remove_node = function(id) {
+    Potato.prototype.remove_nodes = function(nodes_to_remove) {
       var len, order_id;
       len = this.nodes.length;
       while (len--) {
-        if (this.nodes[len]['id'] === id) {
+        if (nodes_to_remove.indexOf(this.nodes[len]['id']) >= 0) {
           this.nodes.splice(len, 1);
-          break;
         }
       }
       order_id = $(".order-option.active").attr('id');
       if (order_id !== void 0) {
-        return this.order_by(order_id.substr(order_id.indexOf("-") + 1));
+        this.order_by(order_id.substr(order_id.indexOf("-") + 1));
       }
+      return this.update();
     };
 
     Potato.prototype.create_buttons = function(type) {
@@ -678,11 +680,7 @@
         return that.show_details(d, i, this);
       }).on("mouseout", function(d, i) {
         return that.hide_details(d, i, this);
-      }).on("click", (function(_this) {
-        return function(d) {
-          return _this.remove_node(d.id);
-        };
-      })(this)).attr("class", function(d) {
+      }).attr("class", function(d) {
         if (d["class"].length > 0) {
           return d["class"].toLowerCase().replace(/\s/g, '_').replace('.', '');
         } else {
