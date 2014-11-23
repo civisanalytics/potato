@@ -240,8 +240,9 @@ class window.Potato
       this.reset_size() if type == "size"
       this.reset_order() if type == "order"
 
-    button_filters = @categorical_filters if type == "split" || type == "color"
+    button_filters = @categorical_filters if type == "split"
     button_filters = @numeric_filters if type == "size" || type == "order"
+    button_filters = @categorical_filters.concat(@numeric_filters) if type == "color"
 
     d3.select("##{type}-menu").selectAll('div').data(button_filters).enter()
       .append("div")
@@ -302,7 +303,7 @@ class window.Potato
 
     # calculate positions for each filter group
     curr_vals.forEach (s, i) =>
-      curr_vals[i] = { split: s, tarx: (@width*0.08) + (0.5 + curr_col) * (width_2 / num_cols), tary: (@height*0.15) + (0.5 + curr_row) * (height_2 / num_rows)}
+      curr_vals[i] = { split: s, tarx: (@width*0.07) + (0.5 + curr_col) * (width_2 / num_cols), tary: (@height*0.18) + (0.5 + curr_row) * (height_2 / num_rows)}
 
       label = {
         val: s
@@ -350,17 +351,36 @@ class window.Potato
 
     curr_vals = []
 
+    numeric = true
+
     # first get number of unique values in the filter
     @circles.each (c) =>
       if curr_vals.indexOf(c['values'][split]) < 0
         curr_vals.push c['values'][split]
+        # if you find any non numerics, set numeric flag
+        if c['values'][split] != "" && $.isNumeric(c['values'][split]) == false
+          numeric = false
 
     num_colors = curr_vals.length
 
-    colors = d3.scale.ordinal()
-      .domain(curr_vals)
-      .range(['#1f77b4','#ff7f0e','#2ca02c','#d62728','#9467bd','#8c564b','#e377c2','#7f7f7f','#bcbd22','#17becf',
-              '#aec7e8','#ffbb78','#98df8a','#ff9896','#c5b0d5','#c49c94','#f7b6d2','#c7c7c7','#dbdb8d','#9edae5'])
+    curr_vals.sort()
+
+    curr_max = d3.max(curr_vals, (d) -> parseFloat(d))
+    non_zero_min = curr_max
+
+    $.each curr_vals, (k, c) =>
+      if c > 0 && c < non_zero_min
+        non_zero_min = c
+
+    if numeric == true
+      colors = d3.scale.linear()
+        .domain([non_zero_min, curr_max])
+        .range(["#ccc", "#1f77b4"])
+    else
+      colors = d3.scale.ordinal()
+        .domain(curr_vals)
+        .range(['#1f77b4','#ff7f0e','#2ca02c','#d62728','#9467bd','#8c564b','#e377c2','#7f7f7f','#bcbd22','#17becf',
+                '#aec7e8','#ffbb78','#98df8a','#ff9896','#c5b0d5','#c49c94','#f7b6d2','#c7c7c7','#dbdb8d','#9edae5'])
 
     # remove the current legend
     d3.select("#color-legend").selectAll("*").remove()
@@ -420,7 +440,7 @@ class window.Potato
     @circles.each (c) =>
       curr_vals.push parseFloat(c['values'][split])
 
-    curr_max = d3.max(curr_vals, (d) -> d)
+    curr_max = d3.max(curr_vals, (d) -> parseFloat(d))
     non_zero_min = curr_max
 
     $.each curr_vals, (k, c) =>

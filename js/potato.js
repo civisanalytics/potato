@@ -322,11 +322,14 @@
           }
         };
       })(this));
-      if (type === "split" || type === "color") {
+      if (type === "split") {
         button_filters = this.categorical_filters;
       }
       if (type === "size" || type === "order") {
         button_filters = this.numeric_filters;
+      }
+      if (type === "color") {
+        button_filters = this.categorical_filters.concat(this.numeric_filters);
       }
       return d3.select("#" + type + "-menu").selectAll('div').data(button_filters).enter().append("div").text(function(d) {
         return d.value;
@@ -397,8 +400,8 @@
           var label;
           curr_vals[i] = {
             split: s,
-            tarx: (_this.width * 0.08) + (0.5 + curr_col) * (width_2 / num_cols),
-            tary: (_this.height * 0.15) + (0.5 + curr_row) * (height_2 / num_rows)
+            tarx: (_this.width * 0.07) + (0.5 + curr_col) * (width_2 / num_cols),
+            tary: (_this.height * 0.18) + (0.5 + curr_row) * (height_2 / num_rows)
           };
           label = {
             val: s,
@@ -437,7 +440,7 @@
     };
 
     Potato.prototype.color_by = function(split) {
-      var colors, curr_vals, g, l_size, legend, num_colors;
+      var colors, curr_max, curr_vals, g, l_size, legend, non_zero_min, num_colors, numeric;
       if (this.circles === void 0 || this.circles.length === 0) {
         return;
       }
@@ -448,15 +451,35 @@
       $(".color-option").removeClass('active');
       $("#color-" + split).addClass('active');
       curr_vals = [];
+      numeric = true;
       this.circles.each((function(_this) {
         return function(c) {
           if (curr_vals.indexOf(c['values'][split]) < 0) {
-            return curr_vals.push(c['values'][split]);
+            curr_vals.push(c['values'][split]);
+            if (c['values'][split] !== "" && $.isNumeric(c['values'][split]) === false) {
+              return numeric = false;
+            }
           }
         };
       })(this));
       num_colors = curr_vals.length;
-      colors = d3.scale.ordinal().domain(curr_vals).range(['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf', '#aec7e8', '#ffbb78', '#98df8a', '#ff9896', '#c5b0d5', '#c49c94', '#f7b6d2', '#c7c7c7', '#dbdb8d', '#9edae5']);
+      curr_vals.sort();
+      curr_max = d3.max(curr_vals, function(d) {
+        return parseFloat(d);
+      });
+      non_zero_min = curr_max;
+      $.each(curr_vals, (function(_this) {
+        return function(k, c) {
+          if (c > 0 && c < non_zero_min) {
+            return non_zero_min = c;
+          }
+        };
+      })(this));
+      if (numeric === true) {
+        colors = d3.scale.linear().domain([non_zero_min, curr_max]).range(["#ccc", "#1f77b4"]);
+      } else {
+        colors = d3.scale.ordinal().domain(curr_vals).range(['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf', '#aec7e8', '#ffbb78', '#98df8a', '#ff9896', '#c5b0d5', '#c49c94', '#f7b6d2', '#c7c7c7', '#dbdb8d', '#9edae5']);
+      }
       d3.select("#color-legend").selectAll("*").remove();
       l_size = 30;
       legend = d3.select("#color-legend").append("svg").attr("width", 150).attr("height", colors.domain().length * l_size).style("padding", "20px 0 0 20px");
@@ -513,7 +536,7 @@
         };
       })(this));
       curr_max = d3.max(curr_vals, function(d) {
-        return d;
+        return parseFloat(d);
       });
       non_zero_min = curr_max;
       $.each(curr_vals, (function(_this) {
