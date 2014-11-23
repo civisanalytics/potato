@@ -231,7 +231,7 @@
     };
 
     Potato.prototype.add_all = function() {
-      var color_id, size_id, split_id;
+      var color_id, order_id, size_id, split_id;
       if (this.nodes.length !== this.data.length) {
         this.data.forEach((function(_this) {
           return function(d) {
@@ -254,7 +254,11 @@
       }
       size_id = $(".size-option.active").attr('id');
       if (size_id !== void 0) {
-        return this.size_by(size_id.substr(size_id.indexOf("-") + 1));
+        this.size_by(size_id.substr(size_id.indexOf("-") + 1));
+      }
+      order_id = $(".order-option.active").attr('id');
+      if (order_id !== void 0) {
+        return this.order_by(order_id.substr(order_id.indexOf("-") + 1));
       }
     };
 
@@ -286,7 +290,7 @@
     };
 
     Potato.prototype.remove_node = function(id) {
-      var len;
+      var len, order_id;
       len = this.nodes.length;
       while (len--) {
         if (this.nodes[len]['id'] === id) {
@@ -294,7 +298,10 @@
           break;
         }
       }
-      return this.update();
+      order_id = $(".order-option.active").attr('id');
+      if (order_id !== void 0) {
+        return this.order_by(order_id.substr(order_id.indexOf("-") + 1));
+      }
     };
 
     Potato.prototype.create_buttons = function(type) {

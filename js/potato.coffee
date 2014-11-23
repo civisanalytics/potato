@@ -190,6 +190,8 @@ class window.Potato
     this.color_by(color_id.substr(color_id.indexOf("-") + 1)) if color_id != undefined
     size_id = $(".size-option.active").attr('id')
     this.size_by(size_id.substr(size_id.indexOf("-") + 1)) if size_id != undefined
+    order_id = $(".order-option.active").attr('id')
+    this.order_by(order_id.substr(order_id.indexOf("-") + 1)) if order_id != undefined
 
   add_node: (d) =>
     vals = {} # create a hash with the appropriate filters
@@ -224,7 +226,10 @@ class window.Potato
         @nodes.splice(len, 1)
         break
 
-    this.update()
+    order_id = $(".order-option.active").attr('id')
+    this.order_by(order_id.substr(order_id.indexOf("-") + 1)) if order_id != undefined
+
+#    this.update()
 
   create_buttons: (type) =>
     $("#modifiers").append("<div id='#{type}-wrapper' class='modifier-wrapper'><button id='#{type}-button' class='modifier-button'>#{type} By<span class='button-arrow'>&#x25BC;</span><span id='#{type}-hint' class='modifier-hint'></span></button><div id='#{type}-menu' class='modifier-menu'></div></div>")
