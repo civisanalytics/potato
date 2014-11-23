@@ -30,6 +30,7 @@ class window.Potato
     @nodes = @force.nodes()
 
     @labels = []
+    @axis = []
 
     @dragging = false
     this.drag_select()
@@ -444,6 +445,8 @@ class window.Potato
   reset_order: () =>
     $(".order-option").removeClass('active')
     $("#order-hint").html("")
+    while @axis.length > 0
+      @axis.pop()
     while @labels.length > 0
       @labels.pop()
     @circles.each (c) =>
@@ -480,8 +483,6 @@ class window.Potato
       if c > 0 && c < non_zero_min
         non_zero_min = c
 
-#      @labels.push {val: c, split: split, x: @width / 2.0, y: 0, tarx: @width / 2.0, tary: 0}
-
     orders = d3.scale.sqrt()
       .domain([non_zero_min, curr_max])
       .range([220, @width - 160])
@@ -495,11 +496,18 @@ class window.Potato
       else
         c.tarx = -100
 
-    @labels.push {val: non_zero_min, split: split, x: 220, y: 0, tarx: 220, tary: 0}
-    @labels.push {val: curr_max, split: split, x: @width - 160, y: 0, tarx: @width - 160, tary: 0}
+    @labels.push {type: "order", val: non_zero_min, label_id: "head-label", split: split, x: 220, y: 0, tarx: 220, tary: 0}
+    @labels.push {type: "order", val: curr_max, label_id: "tail-label", split: split, x: @width - 160, y: 0, tarx: @width - 160, tary: 0}
+    @labels.push {type: "order", val: split, label_id: "text-label", x: @width / 2.0, y: 0, tarx: @width / 2.0, tary: 0}
+
+    @axis.push {
+      x1: 220
+      x2: @width - 160
+      y1: 0
+      y2: 0
+    }
 
     this.update()
-
 
   update: () =>
     @circles = @vis.selectAll("circle")
@@ -539,9 +547,23 @@ class window.Potato
       .attr("x", (d) -> d.x)
       .attr("y", (d) -> d.y)
       .attr("class", 'split-labels')
+      .attr("id", (d) -> d.label_id)
       .text((d) -> d.val)
 
     text.exit().remove()
+
+    @vis.selectAll(".axis-label").remove()
+
+    axis = @vis.selectAll(".axis-label")
+      .data(@axis)
+
+    axis.enter().append("line")
+      .attr("x1", (d) -> d.x1)
+      .attr("x2", (d) -> d.x2)
+      .attr("y1", (d) -> d.y1)
+      .attr("y2", (d) -> d.y2)
+      .attr("stroke", "#999")
+      .attr("class", "axis-label")
 
     @force.on "tick", (e) =>
       @circles.each(this.move_towards_target(e.alpha))
@@ -552,6 +574,15 @@ class window.Potato
         .attr("x", (d) -> d.x)
         .attr("y", (d) -> d.y)
 
+      head_label = @vis.select("#head-label")
+      tail_label = @vis.select("#tail-label")
+
+      if head_label[0][0]?
+        axis.attr("x1", parseInt(head_label.attr('x')) + 35)
+        axis.attr("y1", head_label.attr('y') - 7)
+        axis.attr("x2", tail_label.attr('x') - 40)
+        axis.attr("y2", tail_label.attr('y') - 7)
+
     @force.start()
 
   adjust_label_pos: () =>
@@ -560,19 +591,22 @@ class window.Potato
       min_x = 10000
       max_x = 0
 
-      if parseFloat(d.val) == d.val # an order by label, not a split
+      if d.type == "order" # an order by label, not a split
         totx = 0
         count = 0
         @circles.each (c) =>
           if (c.y - c.radius) < min_y
             min_y = (c.y - c.radius)
 
-          if d.val == parseFloat(c['values'][d.split])
+          if d.label_id != "text-label" && d.val == parseFloat(c['values'][d.split])
             totx += c.x
             count += 1
 
-        d.tary = min_y
-        d.tarx = totx / count
+        if d.label_id == "text-label"
+          d.tary = min_y - 40
+        else
+          d.tary = min_y - 20
+          d.tarx = totx / count
 
       else
         @circles.each (c) =>

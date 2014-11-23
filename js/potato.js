@@ -52,6 +52,7 @@
       }).size([this.width, this.height]);
       this.nodes = this.force.nodes();
       this.labels = [];
+      this.axis = [];
       this.dragging = false;
       this.drag_select();
       this.zoom();
@@ -540,6 +541,9 @@
     Potato.prototype.reset_order = function() {
       $(".order-option").removeClass('active');
       $("#order-hint").html("");
+      while (this.axis.length > 0) {
+        this.axis.pop();
+      }
       while (this.labels.length > 0) {
         this.labels.pop();
       }
@@ -593,7 +597,9 @@
         };
       })(this));
       this.labels.push({
+        type: "order",
         val: non_zero_min,
+        label_id: "head-label",
         split: split,
         x: 220,
         y: 0,
@@ -601,18 +607,35 @@
         tary: 0
       });
       this.labels.push({
+        type: "order",
         val: curr_max,
+        label_id: "tail-label",
         split: split,
         x: this.width - 160,
         y: 0,
         tarx: this.width - 160,
         tary: 0
       });
+      this.labels.push({
+        type: "order",
+        val: split,
+        label_id: "text-label",
+        x: this.width / 2.0,
+        y: 0,
+        tarx: this.width / 2.0,
+        tary: 0
+      });
+      this.axis.push({
+        x1: 220,
+        x2: this.width - 160,
+        y1: 0,
+        y2: 0
+      });
       return this.update();
     };
 
     Potato.prototype.update = function() {
-      var text, that;
+      var axis, text, that;
       this.circles = this.vis.selectAll("circle").data(this.nodes, function(d) {
         return d.id;
       });
@@ -646,23 +669,45 @@
         return d.x;
       }).attr("y", function(d) {
         return d.y;
-      }).attr("class", 'split-labels').text(function(d) {
+      }).attr("class", 'split-labels').attr("id", function(d) {
+        return d.label_id;
+      }).text(function(d) {
         return d.val;
       });
       text.exit().remove();
+      this.vis.selectAll(".axis-label").remove();
+      axis = this.vis.selectAll(".axis-label").data(this.axis);
+      axis.enter().append("line").attr("x1", function(d) {
+        return d.x1;
+      }).attr("x2", function(d) {
+        return d.x2;
+      }).attr("y1", function(d) {
+        return d.y1;
+      }).attr("y2", function(d) {
+        return d.y2;
+      }).attr("stroke", "#999").attr("class", "axis-label");
       this.force.on("tick", (function(_this) {
         return function(e) {
+          var head_label, tail_label;
           _this.circles.each(_this.move_towards_target(e.alpha)).attr("cx", function(d) {
             return d.x;
           }).attr("cy", function(d) {
             return d.y;
           });
           text.each(_this.adjust_label_pos());
-          return text.each(_this.move_towards_target(e.alpha)).attr("x", function(d) {
+          text.each(_this.move_towards_target(e.alpha)).attr("x", function(d) {
             return d.x;
           }).attr("y", function(d) {
             return d.y;
           });
+          head_label = _this.vis.select("#head-label");
+          tail_label = _this.vis.select("#tail-label");
+          if (head_label[0][0] != null) {
+            axis.attr("x1", parseInt(head_label.attr('x')) + 35);
+            axis.attr("y1", head_label.attr('y') - 7);
+            axis.attr("x2", tail_label.attr('x') - 40);
+            return axis.attr("y2", tail_label.attr('y') - 7);
+          }
         };
       })(this));
       return this.force.start();
@@ -675,20 +720,24 @@
           min_y = 10000;
           min_x = 10000;
           max_x = 0;
-          if (parseFloat(d.val) === d.val) {
+          if (d.type === "order") {
             totx = 0;
             count = 0;
             _this.circles.each(function(c) {
               if ((c.y - c.radius) < min_y) {
                 min_y = c.y - c.radius;
               }
-              if (d.val === parseFloat(c['values'][d.split])) {
+              if (d.label_id !== "text-label" && d.val === parseFloat(c['values'][d.split])) {
                 totx += c.x;
                 return count += 1;
               }
             });
-            d.tary = min_y;
-            return d.tarx = totx / count;
+            if (d.label_id === "text-label") {
+              return d.tary = min_y - 40;
+            } else {
+              d.tary = min_y - 20;
+              return d.tarx = totx / count;
+            }
           } else {
             _this.circles.each(function(c) {
               if (d.val === c['values'][d.split]) {
