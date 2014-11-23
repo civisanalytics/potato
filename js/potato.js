@@ -540,6 +540,9 @@
     Potato.prototype.reset_order = function() {
       $(".order-option").removeClass('active');
       $("#order-hint").html("");
+      while (this.labels.length > 0) {
+        this.labels.pop();
+      }
       this.circles.each((function(_this) {
         return function(c) {
           return c.tarx = _this.width / 2.0;
@@ -557,6 +560,9 @@
       $("#order-hint").html("<br>" + split);
       $(".order-option").removeClass('active');
       $("#order-" + split).addClass('active');
+      while (this.labels.length > 0) {
+        this.labels.pop();
+      }
       curr_vals = [];
       this.circles.each((function(_this) {
         return function(c) {
@@ -586,11 +592,27 @@
           }
         };
       })(this));
+      this.labels.push({
+        val: non_zero_min,
+        split: split,
+        x: 220,
+        y: 0,
+        tarx: 220,
+        tary: 0
+      });
+      this.labels.push({
+        val: curr_max,
+        split: split,
+        x: this.width - 160,
+        y: 0,
+        tarx: this.width - 160,
+        tary: 0
+      });
       return this.update();
     };
 
     Potato.prototype.update = function() {
-      var that;
+      var text, that;
       this.circles = this.vis.selectAll("circle").data(this.nodes, function(d) {
         return d.id;
       });
@@ -619,15 +641,15 @@
       });
       this.circles.exit().remove();
       this.vis.selectAll(".split-labels").remove();
-      this.text = this.vis.selectAll(".split-labels").data(this.labels);
-      this.text.enter().append("text").attr("x", function(d) {
+      text = this.vis.selectAll(".split-labels").data(this.labels);
+      text.enter().append("text").attr("x", function(d) {
         return d.x;
       }).attr("y", function(d) {
         return d.y;
       }).attr("class", 'split-labels').text(function(d) {
         return d.val;
       });
-      this.text.exit().remove();
+      text.exit().remove();
       this.force.on("tick", (function(_this) {
         return function(e) {
           _this.circles.each(_this.move_towards_target(e.alpha)).attr("cx", function(d) {
@@ -635,8 +657,8 @@
           }).attr("cy", function(d) {
             return d.y;
           });
-          _this.text.each(_this.adjust_label_pos());
-          return _this.text.each(_this.move_towards_target(e.alpha)).attr("x", function(d) {
+          text.each(_this.adjust_label_pos());
+          return text.each(_this.move_towards_target(e.alpha)).attr("x", function(d) {
             return d.x;
           }).attr("y", function(d) {
             return d.y;
@@ -649,25 +671,41 @@
     Potato.prototype.adjust_label_pos = function() {
       return (function(_this) {
         return function(d) {
-          var max_x, min_x, min_y;
+          var count, max_x, min_x, min_y, totx;
           min_y = 10000;
           min_x = 10000;
           max_x = 0;
-          _this.circles.each(function(c) {
-            if (d.val === c['values'][d.split]) {
+          if (parseFloat(d.val) === d.val) {
+            totx = 0;
+            count = 0;
+            _this.circles.each(function(c) {
               if ((c.y - c.radius) < min_y) {
                 min_y = c.y - c.radius;
               }
-              if ((c.x - c.radius) < min_x) {
-                min_x = c.x - c.radius;
+              if (d.val === parseFloat(c['values'][d.split])) {
+                totx += c.x;
+                return count += 1;
               }
-              if ((c.x + c.radius) > max_x) {
-                return max_x = c.x + c.radius;
+            });
+            d.tary = min_y;
+            return d.tarx = totx / count;
+          } else {
+            _this.circles.each(function(c) {
+              if (d.val === c['values'][d.split]) {
+                if ((c.y - c.radius) < min_y) {
+                  min_y = c.y - c.radius;
+                }
+                if ((c.x - c.radius) < min_x) {
+                  min_x = c.x - c.radius;
+                }
+                if ((c.x + c.radius) > max_x) {
+                  return max_x = c.x + c.radius;
+                }
               }
-            }
-          });
-          d.tary = min_y - 10;
-          return d.tarx = (max_x - min_x) / 2.0 + min_x;
+            });
+            d.tary = min_y - 10;
+            return d.tarx = (max_x - min_x) / 2.0 + min_x;
+          }
         };
       })(this);
     };

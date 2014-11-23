@@ -444,6 +444,8 @@ class window.Potato
   reset_order: () =>
     $(".order-option").removeClass('active')
     $("#order-hint").html("")
+    while @labels.length > 0
+      @labels.pop()
     @circles.each (c) =>
       c.tarx = @width/2.0
     this.update()
@@ -459,6 +461,9 @@ class window.Potato
     $(".order-option").removeClass('active')
     $("#order-"+split).addClass('active')
 
+    while @labels.length > 0
+      @labels.pop()
+
     curr_vals = []
 
     # first get all the values for this filter
@@ -468,9 +473,14 @@ class window.Potato
     curr_max = d3.max(curr_vals, (d) -> d)
     non_zero_min = curr_max
 
+    #TODO sort curr_vals and then take some segment, maybe 4? 5?
+    #and add those selected variables to labels....
+
     $.each curr_vals, (k, c) =>
       if c > 0 && c < non_zero_min
         non_zero_min = c
+
+#      @labels.push {val: c, split: split, x: @width / 2.0, y: 0, tarx: @width / 2.0, tary: 0}
 
     orders = d3.scale.sqrt()
       .domain([non_zero_min, curr_max])
@@ -484,6 +494,9 @@ class window.Potato
         c.tarx = orders(parseFloat(s_val))
       else
         c.tarx = -100
+
+    @labels.push {val: non_zero_min, split: split, x: 220, y: 0, tarx: 220, tary: 0}
+    @labels.push {val: curr_max, split: split, x: @width - 160, y: 0, tarx: @width - 160, tary: 0}
 
     this.update()
 
@@ -518,24 +531,24 @@ class window.Potato
     # remove any currently present split labels
     @vis.selectAll(".split-labels").remove()
 
-    @text = @vis.selectAll(".split-labels")
+    text = @vis.selectAll(".split-labels")
       .data(@labels)
 
     # now do the text labels
-    @text.enter().append("text")
+    text.enter().append("text")
       .attr("x", (d) -> d.x)
       .attr("y", (d) -> d.y)
       .attr("class", 'split-labels')
       .text((d) -> d.val)
 
-    @text.exit().remove()
+    text.exit().remove()
 
     @force.on "tick", (e) =>
       @circles.each(this.move_towards_target(e.alpha))
         .attr("cx", (d) -> d.x)
         .attr("cy", (d) -> d.y)
-      @text.each(this.adjust_label_pos())
-      @text.each(this.move_towards_target(e.alpha))
+      text.each(this.adjust_label_pos())
+      text.each(this.move_towards_target(e.alpha))
         .attr("x", (d) -> d.x)
         .attr("y", (d) -> d.y)
 
@@ -546,17 +559,33 @@ class window.Potato
       min_y = 10000
       min_x = 10000
       max_x = 0
-      @circles.each (c) =>
-        if d.val == c['values'][d.split]
+
+      if parseFloat(d.val) == d.val # an order by label, not a split
+        totx = 0
+        count = 0
+        @circles.each (c) =>
           if (c.y - c.radius) < min_y
             min_y = (c.y - c.radius)
-          if (c.x - c.radius) < min_x
-            min_x = (c.x - c.radius)
-          if (c.x + c.radius) > max_x
-            max_x = (c.x + c.radius)
 
-      d.tary = min_y - 10
-      d.tarx = (max_x - min_x) / 2.0 + min_x
+          if d.val == parseFloat(c['values'][d.split])
+            totx += c.x
+            count += 1
+
+        d.tary = min_y
+        d.tarx = totx / count
+
+      else
+        @circles.each (c) =>
+          if d.val == c['values'][d.split]
+            if (c.y - c.radius) < min_y
+              min_y = (c.y - c.radius)
+            if (c.x - c.radius) < min_x
+              min_x = (c.x - c.radius)
+            if (c.x + c.radius) > max_x
+              max_x = (c.x + c.radius)
+
+        d.tary = min_y - 10
+        d.tarx = (max_x - min_x) / 2.0 + min_x
 
   # move node towards the target defined in (tarx,tary)
   move_towards_target: (alpha) =>
