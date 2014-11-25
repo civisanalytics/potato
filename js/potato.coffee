@@ -131,7 +131,8 @@ class window.Potato
           # TODO this is hugely inefficient
           nodes_to_remove.push(c.id)
 
-      this.remove_nodes(nodes_to_remove)
+      if nodes_to_remove.length > 0
+        this.remove_nodes(nodes_to_remove)
 
       s.remove()
       @dragging = false
@@ -235,7 +236,8 @@ class window.Potato
     this.update()
 
   create_buttons: (type) =>
-    $("#modifiers").append("<div id='#{type}-wrapper' class='modifier-wrapper'><button id='#{type}-button' class='modifier-button'>#{type} By<span class='button-arrow'>&#x25BC;</span><span id='#{type}-hint' class='modifier-hint'></span></button><div id='#{type}-menu' class='modifier-menu'></div></div>")
+    type_upper = type[0].toUpperCase() + type.slice(1);
+    $("#modifiers").append("<div id='#{type}-wrapper' class='modifier-wrapper'><button id='#{type}-button' class='modifier-button'>#{type_upper}<span class='button-arrow'>&#x25BC;</span><span id='#{type}-hint' class='modifier-hint'></span></button><div id='#{type}-menu' class='modifier-menu'></div></div>")
     $("##{type}-button").hover () ->
       $("##{type}-menu").slideDown(100)
 

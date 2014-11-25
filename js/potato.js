@@ -156,7 +156,9 @@
               return nodes_to_remove.push(c.id);
             }
           });
-          _this.remove_nodes(nodes_to_remove);
+          if (nodes_to_remove.length > 0) {
+            _this.remove_nodes(nodes_to_remove);
+          }
           s.remove();
           return _this.dragging = false;
         };
@@ -307,8 +309,9 @@
     };
 
     Potato.prototype.create_buttons = function(type) {
-      var button_filters;
-      $("#modifiers").append("<div id='" + type + "-wrapper' class='modifier-wrapper'><button id='" + type + "-button' class='modifier-button'>" + type + " By<span class='button-arrow'>&#x25BC;</span><span id='" + type + "-hint' class='modifier-hint'></span></button><div id='" + type + "-menu' class='modifier-menu'></div></div>");
+      var button_filters, type_upper;
+      type_upper = type[0].toUpperCase() + type.slice(1);
+      $("#modifiers").append("<div id='" + type + "-wrapper' class='modifier-wrapper'><button id='" + type + "-button' class='modifier-button'>" + type_upper + "<span class='button-arrow'>&#x25BC;</span><span id='" + type + "-hint' class='modifier-hint'></span></button><div id='" + type + "-menu' class='modifier-menu'></div></div>");
       $("#" + type + "-button").hover(function() {
         return $("#" + type + "-menu").slideDown(100);
       });
