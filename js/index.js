@@ -23,7 +23,7 @@
         }
       };
     })(this));
-    $("#nba-dataset").on('click', (function(_this) {
+    $("#basketball-dataset").on('click', (function(_this) {
       return function(e) {
         return d3.csv("data/basketball/basketball.csv", function(csv) {
           return render_vis(csv, {

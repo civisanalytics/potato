@@ -25,3 +25,18 @@ All datasets and the contents/names/rights are owned by their respective owners.
 Wishlist:
 - [ ] Limit number of filters/categories for a given column/category
 - [ ] Catch massive datasets to prevent browser from crashing
+- [ ] Menu Button with settings, about, reset, expose hook to
+  programmatically to reset the vis
+- [ ] Size scale when size filter is set (aka size legend?)
+- [ ] Allow users to change the colors.... perhaps by interacting with
+  the color legend?
+- [ ] More intelligent placement of split groups to better make use of
+  available screen space
+- [ ] Hints/tutorial for csv upload as well as for first time dataset
+  exploration.  (ie. billionaire: Try splitting by source and coloring
+by gender)
+- [ ] Hint about zooming?...
+- [ ] simultaneous split + ordering?
+- [ ] interaction on hover over a node
+- [ ] hightlight nodes when selecting (with the click & drag select box)
+- [ ] Allow users to either keep or remove selection?
