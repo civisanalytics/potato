@@ -21,13 +21,10 @@
       this.adjust_label_pos = __bind(this.adjust_label_pos, this);
       this.update = __bind(this.update, this);
       this.order_by = __bind(this.order_by, this);
-      this.reset_order = __bind(this.reset_order, this);
       this.size_by = __bind(this.size_by, this);
-      this.reset_size = __bind(this.reset_size, this);
       this.color_by = __bind(this.color_by, this);
-      this.reset_color = __bind(this.reset_color, this);
       this.split_by = __bind(this.split_by, this);
-      this.reset_split = __bind(this.reset_split, this);
+      this.reset = __bind(this.reset, this);
       this.create_buttons = __bind(this.create_buttons, this);
       this.remove_nodes = __bind(this.remove_nodes, this);
       this.add_node = __bind(this.add_node, this);
@@ -335,18 +332,7 @@
       });
       $("#" + type + "-button").on("click", (function(_this) {
         return function() {
-          if (type === "split") {
-            _this.reset_split();
-          }
-          if (type === "color") {
-            _this.reset_color();
-          }
-          if (type === "size") {
-            _this.reset_size();
-          }
-          if (type === "order") {
-            return _this.reset_order();
-          }
+          return _this.reset(type);
         };
       })(this));
       if (type === "split") {
@@ -380,18 +366,46 @@
       })(this));
     };
 
-    Potato.prototype.reset_split = function() {
-      $(".split-option").removeClass('active');
-      $("#split-hint").html("");
-      while (this.labels.length > 0) {
-        this.labels.pop();
+    Potato.prototype.reset = function(type) {
+      $("." + type + "-option").removeClass('active');
+      $("#" + type + "-hint").html("");
+      if (type === 'split') {
+        while (this.labels.length > 0) {
+          this.labels.pop();
+        }
+        this.circles.each((function(_this) {
+          return function(c) {
+            c.tarx = _this.width / 2.0;
+            return c.tary = _this.height / 2.0;
+          };
+        })(this));
+      } else if (type === 'color') {
+        d3.select("#color-legend").selectAll("*").remove();
+        this.circles.each(function(c) {
+          return c.color = "#777";
+        });
+        this.circles.attr("fill", function(d) {
+          return d.color;
+        });
+      } else if (type === 'size') {
+        this.circles.each((function(_this) {
+          return function(c) {
+            return c.radius = 5;
+          };
+        })(this));
+      } else if (type === 'order') {
+        while (this.axis.length > 0) {
+          this.axis.pop();
+        }
+        while (this.labels.length > 0) {
+          this.labels.pop();
+        }
+        this.circles.each((function(_this) {
+          return function(c) {
+            return c.tarx = _this.width / 2.0;
+          };
+        })(this));
       }
-      this.circles.each((function(_this) {
-        return function(c) {
-          c.tarx = _this.width / 2.0;
-          return c.tary = _this.height / 2.0;
-        };
-      })(this));
       return this.update();
     };
 
@@ -400,13 +414,9 @@
       if (this.circles === void 0 || this.circles.length === 0) {
         return;
       }
-      this.reset_order();
+      this.reset('order');
       $("#split-hint").html("<br>" + split);
-      $(".split-option").removeClass('active');
       $("#split-" + split).addClass('active');
-      while (this.labels.length > 0) {
-        this.labels.pop();
-      }
       curr_vals = [];
       this.circles.each((function(_this) {
         return function(c) {
@@ -459,25 +469,16 @@
       return this.update();
     };
 
-    Potato.prototype.reset_color = function() {
-      d3.select("#color-legend").selectAll("*").remove();
-      $(".color-option").removeClass('active');
-      $("#color-hint").html("");
-      return this.circles.each(function(c) {
-        return c.color = "#777";
-      });
-    };
-
     Potato.prototype.color_by = function(split) {
       var colors, curr_max, curr_vals, curr_vals_tuples, curr_vals_with_count, g, l_size, legend, non_zero_min, num_colors, numeric;
       if (this.circles === void 0 || this.circles.length === 0) {
         return;
       }
-      this.reset_color();
+      this.reset('color');
       if ($("#color-legend").length < 1) {
         $("#vis").append("<div id='color-legend'></div>");
       }
-      $(".color-option").removeClass('active');
+      $("#color-hint").html("<br>" + split);
       $("#color-" + split).addClass('active');
       curr_vals_with_count = {};
       numeric = true;
@@ -560,24 +561,12 @@
       });
     };
 
-    Potato.prototype.reset_size = function() {
-      $(".size-option").removeClass('active');
-      $("#size-hint").html("");
-      this.circles.each((function(_this) {
-        return function(c) {
-          return c.radius = 5;
-        };
-      })(this));
-      return this.update();
-    };
-
     Potato.prototype.size_by = function(split) {
       var curr_max, curr_vals, non_zero_min, sizes;
       if (this.circles === void 0 || this.circles.length === 0) {
         return;
       }
       $("#size-hint").html("<br>" + split);
-      $(".size-option").removeClass('active');
       $("#size-" + split).addClass('active');
       curr_vals = [];
       this.circles.each((function(_this) {
@@ -611,35 +600,14 @@
       return this.update();
     };
 
-    Potato.prototype.reset_order = function() {
-      $(".order-option").removeClass('active');
-      $("#order-hint").html("");
-      while (this.axis.length > 0) {
-        this.axis.pop();
-      }
-      while (this.labels.length > 0) {
-        this.labels.pop();
-      }
-      this.circles.each((function(_this) {
-        return function(c) {
-          return c.tarx = _this.width / 2.0;
-        };
-      })(this));
-      return this.update();
-    };
-
     Potato.prototype.order_by = function(split) {
       var curr_max, curr_vals, non_zero_min, orders;
       if (this.circles === void 0 || this.circles.length === 0) {
         return;
       }
-      this.reset_split();
+      this.reset('split');
       $("#order-hint").html("<br>" + split);
-      $(".order-option").removeClass('active');
       $("#order-" + split).addClass('active');
-      while (this.labels.length > 0) {
-        this.labels.pop();
-      }
       curr_vals = [];
       this.circles.each((function(_this) {
         return function(c) {

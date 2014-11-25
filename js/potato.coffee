@@ -258,10 +258,7 @@ class window.Potato
       $("##{type}-menu").slideUp(100)
 
     $("##{type}-button").on "click", () =>
-      this.reset_split() if type == "split"
-      this.reset_color() if type == "color"
-      this.reset_size() if type == "size"
-      this.reset_order() if type == "order"
+      this.reset(type)
 
     button_filters = @categorical_filters if type == "split"
     button_filters = @numeric_filters if type == "size" || type == "order"
@@ -279,30 +276,45 @@ class window.Potato
         this.order_by(d.value) if type == "order"
       )
 
-  reset_split: () =>
-    $(".split-option").removeClass('active')
-    $("#split-hint").html("")
-    while @labels.length > 0
-      @labels.pop()
-    @circles.each (c) =>
-      c.tarx = @width/2.0
-      c.tary = @height/2.0
+  reset: (type) =>
+    $(".#{type}-option").removeClass('active')
+    $("##{type}-hint").html("")
+
+    if type == 'split'
+      while @labels.length > 0
+        @labels.pop()
+      @circles.each (c) =>
+        c.tarx = @width/2.0
+        c.tary = @height/2.0
+
+    else if type == 'color'
+      d3.select("#color-legend").selectAll("*").remove()
+      @circles.each (c) ->
+        c.color = "#777"
+      @circles.attr("fill", (d) -> d.color)
+
+    else if type == 'size'
+      @circles.each (c) =>
+        c.radius = 5
+
+    else if type == 'order'
+      while @axis.length > 0
+        @axis.pop()
+      while @labels.length > 0
+        @labels.pop()
+      @circles.each (c) =>
+        c.tarx = @width/2.0
+
     this.update()
 
   split_by: (split) =>
     if @circles == undefined || @circles.length == 0
       return
 
-    this.reset_order()
+    this.reset('order')
 
     $("#split-hint").html("<br>"+split)
-
-    $(".split-option").removeClass('active')
     $("#split-"+split).addClass('active')
-
-    # reset the @labels array
-    while @labels.length > 0
-      @labels.pop()
 
     curr_vals = []
 
@@ -354,23 +366,14 @@ class window.Potato
     # then update
     this.update()
 
-  reset_color: () =>
-    # remove the current legend
-    d3.select("#color-legend").selectAll("*").remove()
-    $(".color-option").removeClass('active')
-    $("#color-hint").html("")
-    @circles.each (c) ->
-      c.color = "#777"
-
   color_by: (split) =>
     if @circles == undefined || @circles.length == 0
       return
 
-    this.reset_color()
+    this.reset('color')
 
     $("#vis").append("<div id='color-legend'></div>") if $("#color-legend").length < 1
-
-    $(".color-option").removeClass('active')
+    $("#color-hint").html("<br>"+split)
     $("#color-"+split).addClass('active')
 
     curr_vals_with_count = {}
@@ -457,20 +460,11 @@ class window.Potato
 
     @circles.attr("fill", (d) -> d.color)
 
-  reset_size: () =>
-    $(".size-option").removeClass('active')
-    $("#size-hint").html("")
-    @circles.each (c) =>
-      c.radius = 5
-    this.update()
-
   size_by: (split) =>
     if @circles == undefined || @circles.length == 0
       return
 
     $("#size-hint").html("<br>"+split)
-
-    $(".size-option").removeClass('active')
     $("#size-"+split).addClass('active')
 
     curr_vals = []
@@ -501,30 +495,14 @@ class window.Potato
 
     this.update()
 
-  reset_order: () =>
-    $(".order-option").removeClass('active')
-    $("#order-hint").html("")
-    while @axis.length > 0
-      @axis.pop()
-    while @labels.length > 0
-      @labels.pop()
-    @circles.each (c) =>
-      c.tarx = @width/2.0
-    this.update()
-
   order_by: (split) =>
     if @circles == undefined || @circles.length == 0
       return
 
-    this.reset_split()
+    this.reset('split')
 
     $("#order-hint").html("<br>"+split)
-
-    $(".order-option").removeClass('active')
     $("#order-"+split).addClass('active')
-
-    while @labels.length > 0
-      @labels.pop()
 
     curr_vals = []
 
