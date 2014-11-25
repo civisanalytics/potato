@@ -1,0 +1,448 @@
+position,number,name,height-in,weight-lb,age,from,team,salary-14-15
+Forward,30,Brandon Bass,80,250,29,LSU,Boston Celtics,6900000
+Guard,0,Avery Bradley,74,180,24,Texas,Boston Celtics,7191011
+Forward-center,38,Vitor Faverani,83,260,26,Brazil,Boston Celtics,2090000
+Forward,8,Jeff Green,81,235,28,Georgetown,Boston Celtics,9445000
+Forward-center,41,Kelly Olynyk,84,238,23,Gonzaga,Boston Celtics,2075760
+Forward,12,Dwight Powell,83,240,23,Stanford,Boston Celtics,507336
+Guard,26,Phil Pressey,71,175,23,Missouri,Boston Celtics,816482
+Guard,9,Rajon Rondo,73,186,28,Kentucky,Boston Celtics,12909091
+Guard,36,Marcus Smart,75,227,20,Oklahoma State,Boston Celtics,3283320
+Forward,7,Jared Sullinger,81,260,22,Ohio State,Boston Celtics,1424520
+Guard,4,Marcus Thornton,76,205,27,LSU,Boston Celtics,8575000
+Swingman,11,Evan Turner,79,220,26,Ohio State,Boston Celtics,3278000
+Forward,45,Gerald Wallace,79,220,32,Alabama,Boston Celtics,10105855
+Swingman,13,James Young,78,215,19,Kentucky,Boston Celtics,1674480
+Forward-center,44,Tyler Zeller,84,253,24,North Carolina,Boston Celtics,1703760
+Swingman,6,Alan Anderson,78,220,32,Michigan State,Brooklyn Nets,1276061
+Swingman,44,Bojan Bogdanovic,80,216,25,Croatia,Brooklyn Nets,3278000
+Guard,22,Markel Brown,76,185,22,Oklahoma State,Brooklyn Nets,507336
+Forward-center,2,Kevin Garnett,83,253,38,Farragut HS (IL),Brooklyn Nets,12000000
+Guard,13,Jorge Gutierrez,75,195,26,California,Brooklyn Nets,816482
+Guard,0,Jarrett Jack,75,200,31,Georgia Tech,Brooklyn Nets,6300000
+Forward,21,Cory Jefferson,81,220,24,Baylor,Brooklyn Nets,507336
+Swingman,7,Joe Johnson,79,240,33,Arkansas,Brooklyn Nets,23180790
+Center,9,Jerome Jordan,84,253,28,Tulsa,Brooklyn Nets,915243
+Swingman,10,Sergey Karasev,79,196,21,Russia,Brooklyn Nets,1533840
+Forward,47,Andrei Kirilenko,81,235,33,Russia,Brooklyn Nets,3326235
+Center,11,Brook Lopez,84,275,26,Stanford,Brooklyn Nets,15719063
+Forward-center,1,Mason Plumlee,83,235,24,Duke,Brooklyn Nets,1357080
+Forward,33,Mirza Teletovic,81,255,29,Bosnia and Herzegovina,Brooklyn Nets,3368100
+Guard,8,Deron Williams,75,209,30,Illinois,Brooklyn Nets,19754465
+Forward,4,Quincy Acy,79,225,24,Baylor,New York Knicks,915243
+Center,45,Cole Aldrich,83,245,26,Kansas,New York Knicks,981084
+Forward,7,Carmelo Anthony,80,235,30,Syracuse,New York Knicks,22458000
+Forward-center,77,Andrea Bargnani,84,250,29,Italy,New York Knicks,11500000
+Guard,3,Jose Calderon,75,211,33,Spain,New York Knicks,7097191
+Center,11,Samuel Dalembert,83,250,33,Seton Hall,New York Knicks,3867282
+Forward,17,Cleanthony Early,80,219,23,Wichita State,New York Knicks,507336
+Guard,5,Tim Hardaway,78,205,22,Michigan,New York Knicks,1250640
+Guard,0,Shane Larkin,71,176,22,Miami (FL),New York Knicks,1606080
+Guard,9,Pablo Prigioni,75,185,37,Argentina,New York Knicks,1662961
+Swingman,21,Iman Shumpert,77,220,24,Georgia Tech,New York Knicks,2616975
+Swingman,8,J. R. Smith,78,220,29,St. Benedict's Prep (NJ),New York Knicks,5982375
+Forward-center,14,Jason Smith,84,240,28,Colorado State,New York Knicks,3278000
+Forward-center,1,Amar'e Stoudemire,83,245,32,Cypress Creek HS (FL),New York Knicks,23410988
+Forward,6,Travis Wear,82,230,24,UCLA,New York Knicks,507336
+Guard,1,Michael Carter-Williams,78,185,23,Syracuse,Philadelphia 76ers,2300040
+Forward,0,Brandon Davies,82,240,23,Brigham Young,Philadelphia 76ers,816482
+Center,21,Joel Embiid,84,250,20,Kansas,Philadelphia 76ers,4427640
+Forward,30,Drew Gordon,81,245,24,New Mexico,Philadelphia 76ers,462571
+Forward,39,Jerami Grant,80,210,20,Syracuse,Philadelphia 76ers,884879
+Swingman,16,Chris Johnson,78,201,24,Dayton,Philadelphia 76ers,915243
+Forward,12,Luc Mbah a Moute,80,230,28,UCLA,Philadelphia 76ers,4382576
+Forward,14,K. J. McDaniels,78,200,21,Clemson,Philadelphia 76ers,507336
+Forward-center,4,Nerlens Noel,83,228,20,Kentucky,Philadelphia 76ers,3315120
+Swingman,23,Jason Richardson,78,225,33,Michigan State,Philadelphia 76ers,6601125
+Forward,9,JaKarr Sampson,81,214,21,St. John's,Philadelphia 76ers,507336
+Guard,88,Alexey Shved,78,187,26,Russia,Philadelphia 76ers,3282056
+Forward-center,35,Henry Sims,82,248,24,Georgetown,Philadelphia 76ers,915243
+Swingman,31,Hollis Thompson,80,206,23,Georgetown,Philadelphia 76ers,816482
+Guard,8,Tony Wroten,78,205,21,Washington,Philadelphia 76ers,1210080
+Forward,5,Bruno Caboclo,81,200,19,Brazil,Toronto Raptors,1458360
+Swingman,10,DeMar DeRozan,79,216,25,Southern California,Toronto Raptors,9500000
+Swingman,2,Landry Fields,79,215,26,Stanford,Toronto Raptors,6250000
+Forward-center,50,Tyler Hansbrough,81,250,29,North Carolina,Toronto Raptors,3326235
+Center,44,Chuck Hayes,78,250,31,Kentucky,Toronto Raptors,5958750
+Forward-center,15,Amir Johnson,81,210,27,Westchester HS (CA),Toronto Raptors,7000000
+Forward,3,James Johnson,81,248,27,Wake Forest,Toronto Raptors,2500000
+Guard,7,Kyle Lowry,72,205,28,Villanova,Toronto Raptors,12000000
+Center,92,Lucas Nogueira,84,220,22,Brazil,Toronto Raptors,1762680
+Forward-center,54,Patrick Patterson,81,235,25,Kentucky,Toronto Raptors,5831326
+Swingman,31,Terrence Ross,78,195,23,Washington,Toronto Raptors,2793960
+Center,34,Greg Stiemsma,83,260,29,Wisconsin,Toronto Raptors,981084
+Center,17,Jonas Valanciunas,84,255,22,Lithuania,Toronto Raptors,3678360
+Guard,21,Greivis Vasquez,78,211,27,Maryland,Toronto Raptors,6400000
+Guard,23,Louis Williams,74,175,28,South Gwinnett HS (GA),Toronto Raptors,5450000
+Forward-center,41,Cameron Bairstow,82,250,24,New Mexico,Chicago Bulls,507336
+Guard,0,Aaron Brooks,72,161,29,Oregon,Chicago Bulls,1145685
+Swingman,21,Jimmy Butler,79,220,25,Marquette,Chicago Bulls,2008748
+Swingman,34,Mike Dunleavy,81,230,34,Duke,Chicago Bulls,3326235
+Forward-center,16,Pau Gasol,84,250,34,Spain,Chicago Bulls,7128000
+Forward,22,Taj Gibson,81,225,29,Southern California,Chicago Bulls,8000000
+Guard,12,Kirk Hinrich,76,190,33,Kansas,Chicago Bulls,2730000
+Forward,3,Doug McDermott,80,225,22,Creighton,Chicago Bulls,2277960
+Forward,44,Nikola Mirotic,82,236,23,Spain,Chicago Bulls,5305000
+Center,48,Nazr Mohammed,82,250,37,Kentucky,Chicago Bulls,1448490
+Guard,55,E'Twaun Moore,76,191,25,Purdue,Chicago Bulls,948163
+Center,13,Joakim Noah,83,232,29,Florida,Chicago Bulls,12200000
+Guard,1,Derrick Rose,75,190,26,Memphis,Chicago Bulls,18862875
+Swingman,20,Tony Snell,79,215,23,New Mexico,Chicago Bulls,1472400
+Forward,89,Lou Amundson,81,225,32,UNLV,Cleveland Cavaliers,1310286
+Guard,5,Will Cherry,73,176,23,Montana,Cleveland Cavaliers,492414
+Guard,8,Matthew Dellavedova,76,200,24,St. Mary's (CA),Cleveland Cavaliers,816482
+Guard,12,Joe Harris,78,215,23,Virginia,Cleveland Cavaliers,884879
+Center,33,Brendan Haywood,84,263,35,North Carolina,Cleveland Cavaliers,2213688
+Guard,2,Kyrie Irving,75,193,22,Duke,Cleveland Cavaliers,7070730
+Forward,23,LeBron James,80,250,30,St. Vincent?St. Mary HS (OH),Cleveland Cavaliers,20644400
+Swingman,1,James Jones,80,215,34,Miami (FL),Cleveland Cavaliers,1448490
+Center,53,Alex Kirk,84,245,23,New Mexico,Cleveland Cavaliers,507336
+Forward-center,0,Kevin Love,82,243,26,UCLA,Cleveland Cavaliers,15719062
+Swingman,31,Shawn Marion,79,228,36,UNLV,Cleveland Cavaliers,1448490
+Swingman,18,Mike Miller,80,218,34,Florida,Cleveland Cavaliers,2732000
+Forward-center,13,Tristan Thompson,82,238,23,Texas,Cleveland Cavaliers,5138430
+Forward-center,17,Anderson Varej?o,83,267,32,Brazil,Cleveland Cavaliers
+Guard,3,Dion Waiters,75,225,23,Syracuse,Cleveland Cavaliers,4062000
+Center,50,Joel Anthony,81,245,32,UNLV,Detroit Pistons,3800000
+Guard,14,D. J. Augustin,72,183,27,Texas,Detroit Pistons,3000000
+Forward,31,Caron Butler,79,221,34,Connecticut,Detroit Pistons,4500000
+Guard,5,Kentavious Caldwell-Pope,77,205,21,Georgia,Detroit Pistons,2772480
+Forward,13,Luigi Datome,80,215,27,Italy,Detroit Pistons,1750000
+Guard,8,Spencer Dinwiddie,78,205,21,Colorado,Detroit Pistons,700000
+Center,0,Andre Drummond,83,270,21,Connecticut,Detroit Pistons,2568360
+Guard,7,Brandon Jennings,73,169,25,Oak Hill Academy (VA),Detroit Pistons,8000000
+Forward,33,Jonas Jerebko,82,231,27,Sweden,Detroit Pistons,4500000
+Swingman,35,Cartier Martin,79,220,30,Kansas State,Detroit Pistons,1145685
+Guard,20,Jodie Meeks,76,208,27,Kentucky,Detroit Pistons,6000000
+Forward,9,Tony Mitchell,80,235,22,North Texas,Detroit Pistons,816482
+Forward-center,10,Greg Monroe,83,250,24,Georgetown,Detroit Pistons,5479934
+Swingman,25,Kyle Singler,80,230,26,Duke,Detroit Pistons,1090000
+Forward,6,Josh Smith,81,225,29,Oak Hill Academy (VA),Detroit Pistons,14000000
+Forward-center,5,Lavoy Allen,81,255,25,Temple,Indiana Pacers,948163
+Forward,22,Chris Copeland,80,235,30,Colorado,Indiana Pacers,3135000
+Swingman,13,Paul George,81,220,24,Fresno State,Indiana Pacers,15925680
+Center,55,Roy Hibbert,86,290,28,Georgetown,Indiana Pacers,14898938
+Guard,3,George Hill,75,188,28,IUPUI,Indiana Pacers,8000000
+Forward,44,Solomon Hill,79,225,23,Arizona,Indiana Pacers,1302840
+Center,28,Ian Mahinmi,83,250,28,France,Indiana Pacers,4000000
+Swingman,0,C. J. Miles,78,231,27,Skyline HS (TX),Indiana Pacers,4205000
+Guard,12,A. J. Price,74,195,28,Connecticut,Indiana Pacers,915243
+Forward,9,Damjan Rudez,82,201,28,Croatia,Indiana Pacers,1100000
+Forward,4,Luis Scola,81,240,34,Argentina,Indiana Pacers,4868499
+Guard,15,Donald Sloan,75,205,26,Texas A&M,Indiana Pacers,948163
+Guard,2,Rodney Stuckey,77,205,28,Eastern Washington,Indiana Pacers,1227985
+Guard,32,C. J. Watson,74,175,30,Tennessee,Indiana Pacers,2106720
+Forward,21,David West,81,250,34,Xavier,Indiana Pacers,12000000
+Forward-center,42,Shayne Whittington,82,237,23,Western Michigan,Indiana Pacers,507336
+Swingman,34,Giannis Antetokounmpo,83,215,20,Greece,Milwaukee Bucks,1873200
+Guard,19,Jerryd Bayless,75,200,26,Arizona,Milwaukee Bucks,3000000
+Swingman,9,Jared Dudley,79,225,29,Boston College,Milwaukee Bucks,4250000
+Forward-center,31,John Henson,83,220,24,North Carolina,Milwaukee Bucks,1987320
+Forward,7,Ersan Ilyasova,82,235,27,Turkey,Milwaukee Bucks,7900000
+Forward,17,Damien Inglis,81,240,19,INSEP (FRA),Milwaukee Bucks,820000
+Guard,11,Brandon Knight,75,189,23,Kentucky,Milwaukee Bucks,3553917
+Guard,5,Kendall Marshall,76,195,23,North Carolina,Milwaukee Bucks,915243
+Guard,00,O. J. Mayo,76,210,27,Southern California,Milwaukee Bucks,8000000
+Forward,22,Khris Middleton,80,217,23,Texas A&M,Milwaukee Bucks,915243
+Forward,3,Johnny O'Bryant,81,256,21,LSU,Milwaukee Bucks,600000
+Forward-center,27,Zaza Pachulia,83,275,30,Georgia,Milwaukee Bucks,5200000
+Forward,12,Jabari Parker,80,235,19,Duke,Milwaukee Bucks,4930560
+Forward-center,8,Larry Sanders,83,235,26,Virginia Commonwealth,Milwaukee Bucks,11000000
+Guard,6,Nate Wolters,76,190,23,South Dakota State,Milwaukee Bucks,816482
+Forward-center,6,Pero Antic,83,260,32,Macedonia,Atlanta Hawks,1250000
+Guard,24,Kent Bazemore,77,201,25,Old Dominion,Atlanta Hawks,2000000
+Forward-center,7,Elton Brand,81,254,35,Duke,Atlanta Hawks,2000000
+Forward,5,DeMarre Carroll,80,212,28,Missouri,Atlanta Hawks,2442455
+Forward-center,15,Al Horford,82,250,28,Florida,Atlanta Hawks,12000000
+Guard,12,John Jenkins,76,215,23,Vanderbilt,Atlanta Hawks,1312920
+Swingman,26,Kyle Korver,79,212,33,Creighton,Atlanta Hawks,6253521
+Guard,8,Shelvin Mack,75,207,24,Butler,Atlanta Hawks,2433333
+Forward,4,Paul Millsap,80,253,29,Louisiana Tech,Atlanta Hawks,9500000
+Forward-center,31,Mike Muscala,83,239,23,Bucknell,Atlanta Hawks,816482
+Forward-center,33,Adreian Payne,82,245,23,Michigan State,Atlanta Hawks,1855320
+Guard,17,Dennis Schroder,73,168,21,Germany,Atlanta Hawks,1690680
+Forward,32,Mike Scott,80,237,26,Virginia,Atlanta Hawks,3333333
+Swingman,25,Thabo Sefolosha,79,222,30,Switzerland,Atlanta Hawks,4150000
+Guard,0,Jeff Teague,74,181,26,Wake Forest,Atlanta Hawks,8000000
+Forward-center,8,Bismack Biyombo,81,245,22,DR Congo,Charlotte Hornets,3873398
+Swingman,19,P. J. Hairston,78,230,22,North Carolina,Charlotte Hornets,1149720
+Swingman,9,Gerald Henderson,77,215,27,Duke,Charlotte Hornets,6000000
+Forward-center,25,Al Jefferson,82,289,29,Prentiss HS (MS),Charlotte Hornets,13666667
+Forward,14,Michael Kidd-Gilchrist,79,232,21,Kentucky,Charlotte Hornets,5016960
+Forward,54,Jason Maxiell,79,260,31,Cincinnati,Charlotte Hornets,1316809
+Guard,12,Gary Neal,76,210,30,Towson,Charlotte Hornets,3250000
+Guard,5,Jannero Pargo,73,185,35,Arkansas,Charlotte Hornets,1448490
+Guard,22,Brian Roberts,73,173,29,Dayton,Charlotte Hornets,2732000
+Guard,1,Lance Stephenson,77,230,24,Cincinnati,Charlotte Hornets,9000000
+Swingman,44,Jeffery Taylor,79,225,25,Vanderbilt,Charlotte Hornets,915243
+Forward,11,Noah Vonleh,81,247,19,Indiana,Charlotte Hornets,2524200
+Guard,15,Kemba Walker,73,184,24,Connecticut,Charlotte Hornets,3272091
+Forward,2,Marvin Williams,81,237,28,North Carolina,Charlotte Hornets,7000000
+Forward-center,40,Cody Zeller,84,240,22,Indiana,Charlotte Hornets,4030560
+Forward-center,11,Chris Andersen,82,245,36,Blinn College,Miami Heat,5375000
+Forward-center,1,Chris Bosh,83,235,30,Georgia Tech,Miami Heat,20644400
+Guard,26,Shannon Brown,75,215,29,Michigan State,Miami Heat,1310286
+Guard,15,Mario Chalmers,74,190,28,Kansas,Miami Heat,4000000
+Guard,30,Norris Cole,74,175,26,Cleveland State,Miami Heat,2038206
+Guard,24,Andre Dawkins,77,219,23,Duke,Miami Heat,507336
+Forward,9,Luol Deng,81,220,29,Duke,Miami Heat,9714461
+Forward,32,James Ennis,79,208,24,Long Beach State,Miami Heat,507336
+Swingman,22,Danny Granger,81,222,31,New Mexico,Miami Heat,2077000
+Center,7,Justin Hamilton,84,255,24,LSU,Miami Heat,816482
+Forward-center,40,Udonis Haslem,80,235,34,Florida,Miami Heat,2732000
+Forward,4,Josh McRoberts,82,240,27,Duke,Miami Heat,5305000
+Guard,13,Shabazz Napier,73,170,23,Connecticut,Miami Heat,1238640
+Guard,3,Dwyane Wade,76,220,32,Marquette,Miami Heat,15000000
+Forward,43,Shawne Williams,82,230,28,Memphis,Miami Heat,1227985
+Center,3,Dewayne Dedmon,84,245,25,Southern California,Orlando Magic,816482
+Guard,10,Evan Fournier,79,205,22,France,Orlando Magic,1483920
+Forward-center,8,Channing Frye,83,255,31,Arizona,Orlando Magic,8175476
+Forward,00,Aaron Gordon,81,220,19,Arizona,Orlando Magic,3992040
+Guard,7,Ben Gordon,75,205,31,Connecticut,Orlando Magic,4500000
+Guard,34,Willie Green,75,205,33,Detroit,Orlando Magic,1448490
+Forward,21,Maurice Harkless,81,215,21,St. John's,Orlando Magic,1887840
+Forward,12,Tobias Harris,81,235,22,Tennessee,Orlando Magic,2380594
+Swingman,11,Roy Devyn Marble,78,200,22,Iowa,Orlando Magic,884879
+Forward,44,Andrew Nicholson,81,250,25,St. Bonaventure,Orlando Magic,1545840
+Forward,2,Kyle O'Quinn,82,250,24,Norfolk State,Orlando Magic,915243
+Guard,5,Victor Oladipo,76,210,22,Indiana,Orlando Magic,4978200
+Guard,4,Elfrid Payton,76,185,20,Louisiana-Lafayette,Orlando Magic,2397840
+Guard,13,Luke Ridnour,74,175,33,Oregon,Orlando Magic,2750000
+Center,9,Nikola Vucevic,84,260,24,Southern California,Orlando Magic,2751260
+Guard,3,Bradley Beal,77,207,21,Florida,Washington Wizards,4505280
+Center,45,DeJuan Blair,79,270,25,Pittsburgh,Washington Wizards,2000000
+Forward,8,Rasual Butler,79,215,35,La Salle,Washington Wizards,1448490
+Forward-center,90,Drew Gooden,82,250,33,Kansas,Washington Wizards,1448000
+Center,4,Marcin Gortat,83,240,30,Poland,Washington Wizards,10434782
+Forward-center,43,Kris Humphries,81,235,29,Minnesota,Washington Wizards,4300000
+Guard,24,Andre Miller,74,200,38,Utah,Washington Wizards,4625000
+Forward-center,42,Nene,83,250,32,Brazil,Washington Wizards,13000000
+Forward,34,Paul Pierce,79,235,37,Kansas,Washington Wizards,5305000
+Forward,22,Otto Porter,80,198,21,Georgetown,Washington Wizards,4470480
+Swingman,14,Glen Rice,78,206,23,Georgia Tech,Washington Wizards,816482
+Forward-center,13,Kevin Seraphin,81,275,25,France,Washington Wizards,3898692
+Guard,17,Garrett Temple,78,195,28,LSU,Washington Wizards,981084
+Guard,2,John Wall,76,195,24,Kentucky,Washington Wizards,14746000
+Swingman,9,Martell Webster,79,230,28,Seattle Preparatory (WA),Washington Wizards,5381750
+Forward,7,Al-Farouq Aminu,81,215,24,Wake Forest,Dallas Mavericks,1100602
+Guard,5,Jose Juan Barea,72,183,30,Northeastern,Dallas Mavericks,1310286
+Center,6,Tyson Chandler,85,240,32,Dominguez HS (CA),Dallas Mavericks,14598888
+Forward,9,Jae Crowder,78,235,24,Marquette,Dallas Mavericks,915243
+Guard,11,Monta Ellis,75,185,29,Lanier HS (MS),Dallas Mavericks,8360000
+Guard,2,Raymond Felton,73,205,30,North Carolina,Dallas Mavericks,3793693
+Guard,20,Devin Harris,75,192,31,Wisconsin,Dallas Mavericks,3878000
+Forward,24,Richard Jefferson,79,234,34,Arizona,Dallas Mavericks,1448490
+Guard,1,Ricky Ledo,79,195,22,South Kent HS (CT),Dallas Mavericks,816482
+Guard,14,Jameer Nelson,72,190,32,Saint Joseph's,Dallas Mavericks,2732000
+Forward,41,Dirk Nowitzki,84,245,36,Germany,Dallas Mavericks,7974482
+Forward,25,Chandler Parsons,81,227,26,Florida,Dallas Mavericks,14700000
+Forward-center,4,Greg Smith,82,250,23,Fresno State,Dallas Mavericks,948163
+Forward,3,Charlie Villanueva,83,232,30,Connecticut,Dallas Mavericks,1316809
+Forward-center,34,Brandan Wright,82,210,27,North Carolina,Dallas Mavericks,5000000
+Swingman,1,Trevor Ariza,80,210,29,UCLA,Houston Rockets,8579089
+Guard,2,Patrick Beverley,73,185,26,Arkansas,Houston Rockets,915243
+Forward-center,10,Tarik Black,83,253,23,Kansas,Houston Rockets,507336
+Guard,0,Isaiah Canaan,72,188,23,Murray State,Houston Rockets,816482
+Forward,15,Clint Capela,82,211,20,INSEP (FRA),Houston Rockets,1189200
+Guard,30,Troy Daniels,76,204,23,Virginia Commonwealth,Houston Rockets,816482
+Forward-center,8,Joey Dorsey,81,275,31,Memphis,Houston Rockets,948163
+Swingman,32,Francisco Garcia,79,195,34,Louisville,Houston Rockets,1316809
+Guard,13,James Harden,77,220,25,Arizona State,Houston Rockets,14728844
+Center,12,Dwight Howard,83,265,29,SW Atlanta Academy (GA),Houston Rockets,21436271
+Guard,3,Nick Johnson,75,200,22,Arizona,Houston Rockets,507336
+Forward,6,Terrence Jones,81,252,22,Kentucky,Houston Rockets,1618680
+Forward-center,20,Donatas Motiejunas,84,222,24,Lithuania,Houston Rockets,1483920
+Forward,16,Kostas Papanikolaou,81,230,24,Greece,Houston Rockets,4800000
+Guard,31,Jason Terry,74,180,37,Arizona,Houston Rockets,5850313
+Guard,3,Jordan Adams,77,220,20,UCLA,Memphis Grizzlies,1344120
+Swingman,9,Tony Allen,76,213,32,Oklahoma State,Memphis Grizzlies,4831461
+Guard,12,Nick Calathes,78,213,25,Florida,Memphis Grizzlies,816482
+Swingman,15,Vince Carter,78,220,37,North Carolina,Memphis Grizzlies,3911981
+Guard,11,Mike Conley,73,185,27,Ohio State,Memphis Grizzlies,8894216
+Center,33,Marc Gasol,85,265,29,Lausanne CS (TN),Memphis Grizzlies,15829688
+Center,41,Kosta Koufos,84,265,25,Ohio State,Memphis Grizzlies,3000000
+Swingman,5,Courtney Lee,77,200,29,Western Kentucky,Memphis Grizzlies,5450000
+Forward,30,Jon Leuer,82,228,25,Wisconsin,Memphis Grizzlies,967500
+Swingman,8,Quincy Pondexter,78,225,26,Washington,Memphis Grizzlies,3146068
+Forward,21,Tayshaun Prince,81,215,34,Kentucky,Memphis Grizzlies,7707865
+Forward,50,Zach Randolph,81,260,33,Michigan State,Memphis Grizzlies,16500000
+Forward,1,Jarnell Stokes,80,260,20,Tennessee,Memphis Grizzlies,725000
+Guard,19,Beno Udrih,75,210,32,Slovenia,Memphis Grizzlies,2077000
+Center,42,Alexis Ajinca,86,248,26,France,New Orleans Pelicans,981084
+Forward,33,Ryan Anderson,82,240,26,California,New Orleans Pelicans,8491500
+Center,3,Omer Asik,84,255,28,Turkey,New Orleans Pelicans,8374646
+Forward,8,Luke Babbitt,81,225,25,Nevada,New Orleans Pelicans,981084
+Forward-center,23,Anthony Davis,82,220,21,Kentucky,New Orleans Pelicans,5607240
+Swingman,1,Tyreke Evans,78,220,25,Memphis,New Orleans Pelicans,10763500
+Guard,32,Jimmer Fredette,74,195,25,Brigham Young,New Orleans Pelicans,948163
+Guard,10,Eric Gordon,76,215,26,Indiana,New Orleans Pelicans,14898938
+Guard,11,Jrue Holiday,76,205,24,UCLA,New Orleans Pelicans,9904495
+Forward,2,Darius Miller,80,225,24,Kentucky,New Orleans Pelicans,915243
+Guard,25,Austin Rivers,76,200,22,Duke,New Orleans Pelicans,2439840
+Swingman,15,John Salmons,78,207,35,Miami (FL),New Orleans Pelicans,2000000
+Guard,9,Russ Smith,72,170,23,Louisville,New Orleans Pelicans,816482
+Center,5,Jeff Withey,84,235,24,Kansas,New Orleans Pelicans,816482
+Forward-center,4,Patric Young,81,240,24,Florida,New Orleans Pelicans,507336
+Forward,1,Kyle Anderson,81,235,21,UCLA,San Antonio Spurs,1093680
+Forward-center,11,Jeff Ayres,81,250,27,Arizona State,San Antonio Spurs,1828750
+Forward-center,16,Aron Baynes,82,260,28,Washington State,San Antonio Spurs,2077000
+Guard,3,Marco Belinelli,77,210,28,Italy,San Antonio Spurs,2873750
+Forward-center,15,Matt Bonner,82,235,34,Florida,San Antonio Spurs,1448490
+Forward-center,23,Austin Daye,83,220,26,Gonzaga,San Antonio Spurs,1063384
+Forward-center,33,Boris Diaw,80,250,32,INSEP (FRA),San Antonio Spurs,7500000
+Forward-center,21,Tim Duncan,83,255,38,Wake Forest,San Antonio Spurs,10000000
+Guard,20,Manu Ginobili,78,205,37,Argentina,San Antonio Spurs,7000000
+Swingman,14,Danny Green,78,210,27,North Carolina,San Antonio Spurs,4025000
+Guard,5,Cory Joseph,75,185,23,Texas,San Antonio Spurs,2023261
+Swingman,2,Kawhi Leonard,79,230,23,San Diego State,San Antonio Spurs,2894059
+Guard,8,Patty Mills,72,185,26,Saint Mary's,San Antonio Spurs,3842105
+Guard,9,Tony Parker,74,185,32,INSEP (FRA),San Antonio Spurs,12500000
+Center,22,Tiago Splitter,83,245,29,Brazil,San Antonio Spurs,9250000
+Swingman,10,Arron Afflalo,77,215,29,UCLA,Denver Nuggets,7750000
+Forward,00,Darrell Arthur,81,235,26,Kansas,Denver Nuggets,3457149
+Forward,21,Wilson Chandler,80,225,27,DePaul,Denver Nuggets,6757913
+Forward,35,Kenneth Faried,80,228,25,Morehead State,Denver Nuggets,2249768
+Guard,4,Randy Foye,76,213,31,Villanova,Denver Nuggets,3135000
+Forward,8,Danilo Gallinari,82,225,26,Italy,Denver Nuggets,10854850
+Swingman,1,Alonzo Gee,78,225,27,Alabama,Denver Nuggets,1063384
+Guard,11,Erick Green,75,185,23,Virginia Tech,Denver Nuggets,507336
+Guard,14,Gary Harris,76,210,20,Michigan State,Denver Nuggets,1519200
+Forward-center,7,JJ Hickson,81,242,26,North Carolina State,Denver Nuggets,5381750
+Guard,3,Ty Lawson,71,195,27,North Carolina,Denver Nuggets,11595506
+Center,34,JaVale McGee,84,250,26,Nevada,Denver Nuggets,11250000
+Center,25,Timofey Mozgov,85,250,28,Russia,Denver Nuggets,4650000
+Center,23,Jusuf Nurkic,83,280,20,Bosnia and Herzegovina,Denver Nuggets,1762680
+Guard,5,Nate Robinson,69,180,30,Washington,Denver Nuggets,2106720
+Forward,24,Anthony Bennett,80,245,21,UNLV,Minnesota Timberwolves,5563920
+Swingman,13,Corey Brewer,81,186,28,Florida,Minnesota Timberwolves,4702500
+Forward,10,Chase Budinger,79,209,26,Arizona,Minnesota Timberwolves,5000000
+Center,5,Gorgui Dieng,83,233,24,Louisville,Minnesota Timberwolves,1413480
+Forward,4,Robbie Hummel,81,219,25,Purdue,Minnesota Timberwolves,880000
+Guard,8,Zach LaVine,77,183,19,UCLA,Minnesota Timberwolves,2055840
+Guard,23,Kevin Martin,79,204,31,Western Carolina,Minnesota Timberwolves,6792500
+Swingman,15,Shabazz Muhammad,78,227,22,UCLA,Minnesota Timberwolves,1971960
+Center,14,Nikola Pekovic,83,295,28,Montenegro,Minnesota Timberwolves,12100000
+Forward,1,Glenn Robinson,79,222,20,Michigan,Minnesota Timberwolves,507336
+Guard,9,Ricky Rubio,76,192,24,Spain,Minnesota Timberwolves,5070686
+Center,32,Ronny Turiaf,82,249,31,Gonzaga,Minnesota Timberwolves,1500000
+Swingman,22,Andrew Wiggins,80,199,19,Kansas,Minnesota Timberwolves,5510640
+Guard,25,Mo Williams,73,198,32,Alabama,Minnesota Timberwolves,3750000
+Forward,33,Thaddeus Young,80,221,26,Georgia Tech,Minnesota Timberwolves,9410870
+Center,12,Steven Adams,84,250,21,Pittsburgh,Oklahoma City Thunder,2184960
+Forward-center,4,Nick Collison,82,255,34,Kansas,Oklahoma City Thunder,2242003
+Forward,35,Kevin Durant,83,220,26,Texas,Oklahoma City Thunder,18995624
+Forward-center,9,Serge Ibaka,82,245,25,Spain,Oklahoma City Thunder,12350000
+Guard,15,Reggie Jackson,75,208,24,Boston College,Oklahoma City Thunder,2204370
+Forward,7,Grant Jerrett,82,232,21,Arizona,Oklahoma City Thunder,816481
+Forward,3,Perry Jones,83,235,23,Baylor,Oklahoma City Thunder,1129200
+Swingman,11,Jeremy Lamb,77,185,22,Connecticut,Oklahoma City Thunder,2202000
+Forward,33,Mitch McGary,82,255,22,Michigan,Oklahoma City Thunder,1400040
+Guard,2,Anthony Morrow,77,210,29,Georgia Tech,Oklahoma City Thunder,3200000
+Center,5,Kendrick Perkins,82,270,30,Clifton J. Ozen HS (TX),Oklahoma City Thunder,9654342
+Swingman,21,Andre Roberson,79,210,23,Colorado,Oklahoma City Thunder,1160880
+Guard,8,Ish Smith,72,175,26,Wake Forest,Oklahoma City Thunder,981084
+Guard,31,Sebastian Telfair,72,170,29,Abraham Lincoln HS (NY),Oklahoma City Thunder,1316809
+Forward,42,Lance Thomas,80,225,26,Duke,Oklahoma City Thunder,948163
+Guard,0,Russell Westbrook,75,200,26,UCLA,Oklahoma City Thunder,15719062
+Forward-center,12,LaMarcus Aldridge,83,240,29,Texas,Portland Trail Blazers,16006000
+Guard,5,Will Barton,78,175,23,Memphis,Portland Trail Blazers,915243
+Swingman,88,Nicolas Batum,80,200,26,France,Portland Trail Blazers,11765500
+Guard,25,Steve Blake,75,172,34,Maryland,Portland Trail Blazers,2077000
+Forward,18,Victor Claver,81,224,26,Spain,Portland Trail Blazers,1370000
+Guard,23,Allen Crabbe,78,210,22,California,Portland Trail Blazers,862000
+Forward-center,19,Joel Freeland,82,225,27,FCOT (UK),Portland Trail Blazers,3013512
+Center,35,Chris Kaman,84,265,32,Central Michigan,Portland Trail Blazers,4800000
+Center,11,Meyers Leonard,85,245,22,Illinois,Portland Trail Blazers,2317920
+Guard,0,Damian Lillard,75,195,24,Weber State,Portland Trail Blazers,3340920
+Center,42,Robin Lopez,84,255,26,Stanford,Portland Trail Blazers,6124728
+Swingman,2,Wesley Matthews,77,220,28,Marquette,Portland Trail Blazers,7245640
+Guard,3,C. J. McCollum,76,200,23,Lehigh,Portland Trail Blazers,2421000
+Forward,41,Thomas Robinson,82,237,23,Kansas,Portland Trail Blazers,3678360
+Forward,1,Dorell Wright,81,205,29,South Kent (CT),Portland Trail Blazers,3150000
+Forward,33,Trevor Booker,80,240,27,Clemson,Utah Jazz,5000000
+Guard,3,Trey Burke,73,190,22,Michigan,Utah Jazz,2548560
+Guard,10,Alec Burks,78,211,23,Colorado,Utah Jazz,3034356
+Guard,21,Ian Clark,75,173,23,Belmont,Utah Jazz,816482
+Forward,40,Jeremy Evans,81,197,27,Western Kentucky,Utah Jazz,1794871
+Guard,11,Dante Exum,77,190,19,Lake Ginninderra (AUS),Utah Jazz,3615000
+Forward-center,15,Derrick Favors,82,268,23,Georgia Tech,Utah Jazz,12833333
+Center,27,Rudy Gobert,85,245,22,France,Utah Jazz,1127400
+Swingman,20,Gordon Hayward,80,220,24,Butler,Utah Jazz,14746000
+Forward,5,Rodney Hood,80,215,22,Duke,Utah Jazz,1290360
+Swingman,2,Joe Ingles,80,216,27,Lake Ginninderra (AUS),Utah Jazz,507336
+Forward-center,0,Enes Kanter,83,247,22,Stoneridge Prep (CA),Utah Jazz,5694674
+Guard,23,Toure' Murry,77,195,25,Wichita State,Utah Jazz,1000000
+Forward,16,Steve Novak,82,235,31,Marquette,Utah Jazz,3445946
+Guard,19,Leandro Barbosa,75,194,32,Brazil,Golden State Warriors,1448490
+Forward,40,Harrison Barnes,80,210,22,North Carolina,Golden State Warriors,3049920
+Center,12,Andrew Bogut,84,260,30,Utah,Golden State Warriors,12972973
+Guard,30,Stephen Curry,75,185,26,Davidson,Golden State Warriors,10629213
+Center,31,Festus Ezeli,83,255,25,Vanderbilt,Golden State Warriors,1112880
+Forward,23,Draymond Green,79,230,24,Michigan State,Golden State Warriors,915243
+Swingman,7,Justin Holiday,78,185,25,Washington,Golden State Warriors,816482
+Swingman,9,Andre Iguodala,78,207,30,Arizona,Golden State Warriors,12289544
+Center,1,Ognjen Kuzmic,85,231,24,Serbia,Golden State Warriors,816482
+Forward-center,10,David Lee,81,240,31,Florida,Golden State Warriors,15012000
+Guard,34,Shaun Livingston,79,175,29,Peoria Central HS (IL),Golden State Warriors,5305000
+Swingman,4,Brandon Rush,78,233,29,Kansas,Golden State Warriors,1145685
+Forward-center,5,Marreese Speights,82,255,27,Florida,Golden State Warriors,3657500
+Swingman,11,Klay Thompson,79,205,24,Washington State,Golden State Warriors,3075880
+Forward,22,Matt Barnes,79,226,34,UCLA,Los Angeles Clippers,3396250
+Swingman,25,Reggie Bullock,79,205,23,North Carolina,Los Angeles Clippers,1200720
+Guard,11,Jamal Crawford,77,200,34,Michigan,Los Angeles Clippers,5450000
+Guard,9,Jared Cunningham,76,195,23,Oregon State,Los Angeles Clippers,915243
+Forward,0,Glen Davis,80,289,28,LSU,Los Angeles Clippers,1227985
+Swingman,14,Chris Douglas-Roberts,79,210,27,Memphis,Los Angeles Clippers,915243
+Guard,1,Jordan Farmar,74,180,28,UCLA,Los Angeles Clippers,2077000
+Forward,32,Blake Griffin,82,251,25,Oklahoma,Los Angeles Clippers,17674612
+Center,10,Spencer Hawes,85,245,26,Washington,Los Angeles Clippers,5305000
+Center,6,DeAndre Jordan,83,265,26,Texas A&M,Los Angeles Clippers,11440124
+Guard,3,Chris Paul,72,175,29,Wake Forest,Los Angeles Clippers,20068563
+Guard,4,J. J. Redick,76,190,30,Duke,Los Angeles Clippers,6583500
+Forward,15,Hedo Turkoglu,82,220,35,Turkey,Los Angeles Clippers,1448490
+Center,13,Ekpe Udoh,82,245,27,Baylor,Los Angeles Clippers,981084
+Guard,30,C. J. Wilcox,77,201,24,Washington,Los Angeles Clippers,1109760
+Forward-center,5,Carlos Boozer,81,266,33,Duke,Los Angeles Lakers,3250000
+Guard,24,Kobe Bryant,78,205,36,Lower Merion HS (PA),Los Angeles Lakers,23500000
+Guard,6,Jordan Clarkson,77,188,22,Missouri,Los Angeles Lakers,507336
+Forward,21,Ed Davis,82,225,25,North Carolina,Los Angeles Lakers,981084
+Guard,2,Wayne Ellington,76,200,27,North Carolina,Los Angeles Lakers,1063384
+Guard,7,Xavier Henry,78,220,23,Kansas,Los Angeles Lakers,1082000
+Forward-center,27,Jordan Hill,82,235,27,Arizona,Los Angeles Lakers,9000000
+Forward,11,Wesley Johnson,79,215,27,Syracuse,Los Angeles Lakers,981084
+Forward,4,Ryan Kelly,83,230,23,Duke,Los Angeles Lakers,1650000
+Guard,17,Jeremy Lin,75,200,26,Harvard,Los Angeles Lakers,8374646
+Guard,10,Steve Nash,75,178,40,Santa Clara,Los Angeles Lakers,9701000
+Guard,9,Ronnie Price,74,190,31,Utah Valley,Los Angeles Lakers,1316809
+Forward,30,Julius Randle,81,250,20,Kentucky,Los Angeles Lakers,2997360
+Center,50,Robert Sacre,84,260,25,Gonzaga,Los Angeles Lakers,915243
+Swingman,0,Nick Young,79,210,29,Southern California,Los Angeles Lakers,4994420
+Guard,2,Eric Bledsoe,73,195,25,Kentucky,Phoenix Suns,12173913
+Guard,1,Goran Dragic,75,190,28,Slovenia,Phoenix Suns,7500000
+Swingman,10,Zoran Dragic,77,200,25,Slovenia,Phoenix Suns,1962103
+Guard,4,Tyler Ennis,74,180,20,Syracuse,Phoenix Suns,1590720
+Guard,20,Archie Goodwin,77,198,20,Kentucky,Phoenix Suns,1112280
+Swingman,14,Gerald Green,80,210,28,Gulf Shores Academy (TX),Phoenix Suns,3500000
+Center,21,Alex Len,85,265,21,Maryland,Phoenix Suns,3649920
+Forward,15,Marcus Morris,81,235,25,Kansas,Phoenix Suns,2943221
+Forward,11,Markieff Morris,82,245,25,Kansas,Phoenix Suns,2989239
+Forward-center,22,Miles Plumlee,83,255,26,Duke,Phoenix Suns,1169880
+Forward,43,Shavlik Randolph,82,236,31,Duke,Phoenix Suns,1227985
+Guard,3,Isaiah Thomas,69,185,25,Washington,Phoenix Suns,7238606
+Forward,40,Anthony Tolliver,80,240,29,Creighton,Phoenix Suns,3000000
+Forward,17,P. J. Tucker,78,224,29,Texas,Phoenix Suns,5700000
+Forward,12,T. J. Warren,80,220,21,North Carolina State,Phoenix Suns,1953120
+Forward,18,Omri Casspi,81,225,26,Israel,Sacramento Kings,1063384
+Guard,7,Darren Collison,72,175,27,UCLA,Sacramento Kings,4797664
+Center,15,DeMarcus Cousins,83,270,24,Kentucky,Sacramento Kings,13701250
+Forward,30,Reggie Evans,80,245,34,Iowa,Sacramento Kings,1768653
+Forward,8,Rudy Gay,80,230,28,Connecticut,Sacramento Kings,19317325
+Center,5,Ryan Hollins,84,240,30,UCLA,Sacramento Kings,1316809
+Forward,24,Carl Landry,81,248,31,Purdue,Sacramento Kings,6500000
+Guard,3,Ray McCallum,75,190,23,Detroit,Sacramento Kings,816482
+Guard,23,Ben McLemore,77,195,21,Kansas,Sacramento Kings,3026280
+Forward-center,25,Eric Moreland,82,218,23,Oregon State,Sacramento Kings,507336
+Guard,9,Ramon Sessions,75,190,28,Nevada,Sacramento Kings,2077000
+Guard,10,Nik Stauskas,78,207,21,Michigan,Sacramento Kings,2745840
+Forward-center,34,Jason Thompson,83,250,28,Rider,Sacramento Kings,6037500
+Forward,13,Derrick Williams,80,240,23,Arizona,Sacramento Kings,6331404

@@ -1,8 +1,10 @@
 class window.Potato
-  constructor: (data, params = {split: true, color: true, size: true}) ->
+  constructor: (data, params = {split: true, color: true, size: true, order: true, class: null}) ->
     @data = data
     @width = $(window).width()
     @height = $(window).height() - 105
+
+    @node_class = params.class
 
     # set node ids
     $.each @data, (i, d) =>
@@ -22,247 +24,191 @@ class window.Potato
       .charge((d) -> -Math.pow(d.radius, 2.0) * 1.5)
       .size([@width, @height])
 
+
     # this is necessary so graph and model stay in sync
     # http://stackoverflow.com/questions/9539294/adding-new-nodes-to-force-directed-layout
     @nodes = @force.nodes()
 
     @labels = []
+    @axis = []
 
-    @curr_filters = []
+    @dragging = false
+    this.drag_select()
+    this.zoom()
+
     this.create_filters()
 
-    this.split_buttons() if params.split
-    this.color_buttons() if params.color
-    this.size_buttons() if params.size
+    this.create_buttons('split') if params.split
+    this.create_buttons('color') if params.color
+    this.create_buttons('size') if params.size
+    this.create_buttons('order') if params.order
 
-    this.subset_selection()
+    this.add_all()
+
+  zoom: () =>
+    zoomListener = d3.behavior.zoom()
+      .scaleExtent([0, 1])
+      .on("zoom", =>
+        return if @dragging
+
+        trans = "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")"
+
+        # positive is scroll up which on a map is zoom out
+        dy = d3.event.sourceEvent.deltaY
+
+        radius_change = if dy > 0 then 0.95 else 1.05
+
+        # lower bound
+        if (@nodes[0].radius < 2 and radius_change < 1) or (@nodes[0].radius > 75 and radius_change > 1)
+          return
+
+        $.each @nodes, (i, n) =>
+          n.radius *= radius_change
+
+        this.update()
+      )
+
+    @vis.call(zoomListener)
+
+  # initialize drag select
+  drag_select: () =>
+    that = this
+    @vis.on("mousedown", ->
+      that.dragging = true
+      s = d3.select(this).select("rect.select-box")
+      s.remove()
+
+      p = d3.mouse(this)
+
+      d3.select(this).append("rect")
+        .attr({
+          rx: 6
+          ry: 6
+          class: "select-box"
+          x: p[0]
+          y: p[1]
+          width: 0
+          height: 0
+        })
+    ).on("mousemove", ->
+      s = d3.select(this).select("rect.select-box")
+
+      if !s.empty()
+        p = d3.mouse(this)
+        d = {
+          x: parseInt( s.attr( "x"), 10)
+          y: parseInt( s.attr( "y"), 10)
+          width: parseInt( s.attr( "width"), 10)
+          height: parseInt( s.attr( "height"), 10)
+        }
+        move = {x: p[0] - d.x, y : p[1] - d.y}
+
+        if( move.x < 1 || (move.x*2 < d.width))
+          d.x = p[0]
+          d.width -= move.x
+        else
+          d.width = move.x
+
+        if( move.y < 1 || (move.y*2 < d.height))
+          d.y = p[1]
+          d.height -= move.y
+        else
+          d.height = move.y
+
+        s.attr(d)
+    ).on("mouseup", =>
+      s = @vis.select("rect.select-box")
+
+      sx = parseInt(s.attr('x'),10)
+      sx2 = sx + parseInt(s.attr('width'),10)
+      sy = parseInt(s.attr('y'),10)
+      sy2 = sy + parseInt(s.attr('height'),10)
+
+      nodes_to_remove = []
+
+      @circles.each (c) =>
+        if c.x > sx && c.x < sx2 && c.y > sy && c.y < sy2
+          # TODO this is hugely inefficient
+          nodes_to_remove.push(c.id)
+
+      if nodes_to_remove.length > 0
+        this.remove_nodes(nodes_to_remove)
+
+      s.remove()
+      @dragging = false
+    )
 
   # the logic behind taking the csv and determining what the categorical data is
   create_filters: () =>
-
     # a hash where the key is the filter type and the value is an array of filters
     # used only in construction to determine filter attributes and allow for faster filter creation
-    @sorted_filters = {}
-
-    # a hash where the key is the filter id and the value is the filter
-    # used post construction for all add/remove interactions, as its a faster lookup
-    @filters = {}
+    sorted_filters = {}
 
     # get filter names from header row
     @filter_names = []
     $.each @data[0], (d) =>
       if d != 'node_id'
         @filter_names.push {value: d}
-        @sorted_filters[d] = []
-
-    filter_counter = 1
+        sorted_filters[d] = []
 
     # populate the filters from the dataset
     @data.forEach (d) =>
       $.each d, (k, v) =>
         if k != 'node_id'
-          filter_exists = $.grep @sorted_filters[k], (e) =>
+          filter_exists = $.grep sorted_filters[k], (e) =>
             return e.filter == k && e.value == v
           if filter_exists.length == 0
-            curr_filter = {id: filter_counter, filter: k, value: v}
-            @sorted_filters[k].push(curr_filter)
-            @filters[filter_counter] = curr_filter
-            filter_counter += 1
+            sorted_filters[k].push({filter: k, value: v})
 
     @categorical_filters = []
     @numeric_filters = []
 
-    $.each @sorted_filters, (f, v) =>
+    $.each sorted_filters, (f, v) =>
       if isNaN(v[0].value)
-        if v.length != @data.length  && v.length < 500 # every filter value is not unique
+        if v.length != @data.length && v.length < 500 # every filter value is not unique
           @categorical_filters.push({value: f})
       else
         @numeric_filters.push({value: f})
 
     # for the categoricals, put them in sorted alpha order
     $.each @categorical_filters, (k, v) =>
-      @sorted_filters[v.value].sort (a, b) ->
+      sorted_filters[v.value].sort (a, b) ->
         return if a.value == b.value then 0 else (a.value > b.value) || -1
 
-  # given the filters, create the subset selection modal
-  subset_selection: () =>
-    $("#vis").append("<div id='subset-wrapper'><div id='subset-selection'>
-        <div id='subset-help-text'>
-          <button id='all-data'>Display All Data</button>
-          <p>OR</p>
-          Display data matching any of the selected values:
-        </div>
-        <div id='numeric-filters'></div>
-        <div id='categorical-filters'></div>
-      </div></div>")
+    reset_tooltip = $("<div class='tooltip' id='reset-tooltip'>Click and drag on the canvas to remove nodes.</div>")
+    $("#vis").append(reset_tooltip)
+    reset_tooltip.hide()
 
-    subset_select_button = $("<button id='subset-select-button'>Data Selection</button>")
-    subset_select_button.click () ->
-      $("#subset-wrapper").toggle()
-    $("#modifiers").append(subset_select_button)
-
-    # move the subset selection under the toolbar
-    $("#subset-selection").height($(window).height() - 200)
-      .width($(window).width() - 300)
-      .css("margin-left", 100)
-      .css("margin-top", $("#toolbar").outerHeight() + 25)
-
-    # close modal if clicked on wrapper, but not inner
-    $("#subset-selection").click (e) ->
-      e.stopPropagation()
-    $("#subset-wrapper").click () ->
-      $("#subset-wrapper").hide()
-
-    that = this
-    $("#all-data").addClass("filter-0").on "click", (e) ->
-      if $(this).hasClass("active")
-        that.remove_all()
-      else
-        $(this).addClass("active")
-        that.add_all()
-        $("#subset-wrapper").hide()
-
-    $.each @numeric_filters, (k, v) =>
-      this.add_numeric_filter(v.value, @sorted_filters[v.value])
-
-    $.each @categorical_filters, (k, v) =>
-      this.add_categorical_filter(v.value, @sorted_filters[v.value])
-
-    $("#subset-wrapper").show()
-
-  add_numeric_filter: (k, v) =>
-    filter_id = "filter" + k
-    filter_group = $("<div class='filter-group-wrapper'><div class='filter-group-header'>"+k+"</div><form class='filter-numeric' id='"+filter_id+"'></form></div>")
-    $("#numeric-filters").append(filter_group)
-
-    filter_min = Math.floor(d3.min(v, (d) -> parseFloat(d.value)))
-    filter_max = Math.ceil(d3.max(v, (d) -> parseFloat(d.value)))
-
-    input_min = $("<input type='number' name='"+k+"' value="+filter_min+" min="+filter_min+" max="+filter_max+">")
-    dash = $("<span>-</span>")
-    input_max = $("<input type='number' name='"+k+"' value="+filter_max+" min="+filter_min+" max="+filter_max+">")
-    $("#"+filter_id).append(input_min)
-      .append(dash)
-      .append(input_max)
-      .append($("<input type='submit' value='apply'>"))
-      .submit((e) =>
-        e.preventDefault()
-        this.test_numeric(e)
-      )
-
-
-  test_numeric: (e) =>
-    console.log(e.target[0].name)
-    console.log(e.target[0].value)
-    console.log(e.target[1].value)
-    this.add_nodes_by_filter_range(e.target[0].name, e.target[0].value, e.target[1].value)
-
-  add_categorical_filter: (k, v) =>
-    filter_id = "filter" + k
-    filter_group = $("<div class='filter-group-wrapper'><div class='filter-group-header'>"+k+"</div><div class='filter-group' id='"+filter_id+"'></div></div>")
-    $("#categorical-filters").append(filter_group)
-
-    that = this
-    d3.select("#"+filter_id).selectAll('div').data(v).enter()
-      .append("div")
-      .attr("class", (d) -> return "filter-value filter-" + d.id)
-      .text((d) -> return d.value)
-      .on("click", (d) ->
-        if $(this).hasClass("active")
-          that.remove_filter(d.id)
-        else
-          that.add_filter(d.id)
-          $(this).addClass("active")
-      )
+    reset_button = $("<button id='reset-button' class='disabled-button modifier-button'><span id='reset-icon'>&#8635;</span> Reset Selection</button>")
+    reset_button.on("click", (e) =>
+      this.add_all()
+    ).on("mouseover", (e) =>
+      this.update_position(e, "reset-tooltip")
+      reset_tooltip.show()
+    ).on("mouseout", (e) =>
+      reset_tooltip.hide()
+    )
+    $("#filter-select-buttons").append(reset_button)
 
   # add all data nodes to screen
   add_all: () =>
     if @nodes.length != @data.length
-
-      if @curr_filters.length > 0
-        # remove any currently selected filters
-        this.remove_all()
-
-      @curr_filters.push({id: 0})
-
-      filter_button = $("<button class='active filter-button filter-0'>All Data</button>")
-      filter_button.on "click", (e) =>
-        this.remove_all()
-      $("#filter-select-buttons").append(filter_button)
-
-      this.add_nodes_by_filter(null)
-
-  remove_all: () =>
-    $.each @curr_filters, (k, f) =>
-      this.remove_filter(f.id)
-
-  # add a filter by id
-  # this entails both adding the actual nodes as well as the subset button
-  add_filter: (id) =>
-    curr_filter = @filters[id]
-
-    # if the only filter is the all filter, remove the all filter
-    if @curr_filters.length == 1 && @curr_filters[0].id == 0
-      this.remove_all()
-
-    # this is the first filter
-    if @curr_filters.length == 0
-      $("#filter-select-buttons").text("Current subsets: ")
-
-    @curr_filters.push(curr_filter)
-
-    filter_button = $("<button class='active filter-button filter-"+id+"'>"+curr_filter.value+"</button>")
-    filter_button.on "click", (e) =>
-      this.remove_filter(id)
-    $("#filter-select-buttons").append(filter_button)
-
-    this.add_nodes_by_filter(id)
-
-  # remove a filter by id
-  # this entails both removing the actual nodes as well as removing the subset button
-  # and changing the active state in the subset_select modal
-  remove_filter: (id) =>
-    curr_filter = @filters[id]
-
-    this.remove_nodes(id)
-
-    # remove or turn off any necessary buttons / sub_selectors
-    $(".filter-"+id).each (k, v) ->
-      f_obj = $(v)
-      if f_obj.hasClass('filter-button')
-        f_obj.detach()
-      else
-        f_obj.removeClass("active")
-
-    # that was the last filter
-    if @curr_filters.length == 0
-      $("#filter-select-buttons").text("")
-
-  add_nodes_by_filter: (id) =>
-    if id
-      curr_filter = @filters[id]
-
-    @data.forEach (d) =>
-      if id == null || d[curr_filter.filter] == curr_filter.value
+      @data.forEach (d) =>
         if $.grep(@nodes, (e) => e.id == d.node_id).length == 0 # if it doesn't already exist in nodes
           this.add_node(d)
 
+    $("#reset-button").addClass('disabled-button')
     this.update()
 
-    # apply any existing splits
+    # apply any existing splits/colors/sizes
     split_id = $(".split-option.active").attr('id')
-    if split_id != undefined
-      this.split_by(split_id.split('-')[1])
-
-
-  add_nodes_by_filter_range: (id, min, max) =>
-
-    @data.forEach (d) =>
-      if parseFloat(d[id]) >= min and parseFloat(d[id]) <= max
-        if $.grep(@nodes, (e) => e.id == d.node_id).length == 0 # if it doesn't already exist in nodes
-          this.add_node(d)
-
-    this.update()
+    this.split_by(split_id.substr(split_id.indexOf("-") + 1)) if split_id != undefined
+    color_id = $(".color-option.active").attr('id')
+    this.color_by(color_id.substr(color_id.indexOf("-") + 1)) if color_id != undefined
+    size_id = $(".size-option.active").attr('id')
+    this.size_by(size_id.substr(size_id.indexOf("-") + 1)) if size_id != undefined
+    order_id = $(".order-option.active").attr('id')
+    this.order_by(order_id.substr(order_id.indexOf("-") + 1)) if order_id != undefined
 
   add_node: (d) =>
     vals = {} # create a hash with the appropriate filters
@@ -272,10 +218,9 @@ class window.Potato
     curr_class = ''
     curr_r = 5
 
-    # TODO temp hack for NFL dataset
-    if d['team']
-      curr_class = d.team
-      curr_r = 8
+    # this is set by params
+    if @node_class?
+      curr_class = d[@node_class]
 
     node = {
       id: d.node_id
@@ -290,55 +235,66 @@ class window.Potato
     }
     @nodes.push node
 
-  remove_nodes: (id) =>
-    if id == 0
-      while @nodes.length > 0 # we can't just set @nodes = [] because that creates a new object
-        @nodes.pop()
+  remove_nodes: (nodes_to_remove) =>
+    # this was the only array iterator + removal I could get to work
+    len = @nodes.length
+    while (len--)
+      if nodes_to_remove.indexOf(@nodes[len]['id']) >= 0 # node with offending value found
+        @nodes.splice(len, 1)
 
-      while @curr_filters.length > 0
-        @curr_filters.pop()
-    else
-      curr_filter = @filters[id]
+    $("#reset-button").removeClass('disabled-button')
 
-      # remove this filter from the @curr_filters
-      @curr_filters = $.grep @curr_filters, (e) =>
-        return e['filter'] != curr_filter.filter || e['value'] != curr_filter.value
-
-      # this was the only array iterator + removal I could get to work
-      len = @nodes.length
-      while (len--)
-        if @nodes[len]['values'][curr_filter.filter] == curr_filter.value # node with offending value found
-          # now check that it doesnt have other values that would allow it to stay
-          should_remove = true
-          @curr_filters.forEach (k) =>
-            if @nodes[len]['values'][k['filter']] == k['value']
-              should_remove = false
-          # we can now remove it
-          if should_remove == true
-            @nodes.splice(len, 1)
+    order_id = $(".order-option.active").attr('id')
+    this.order_by(order_id.substr(order_id.indexOf("-") + 1)) if order_id != undefined
 
     this.update()
 
-  split_buttons: () =>
-    $("#modifiers").append("<div id='split-wrapper' class='modifier-wrapper'><button id='split-button' class='modifier-button'>Split By<span class='button-arrow'>&#x25BC;</span><span id='split-hint' class='modifier-hint'></span></button><div id='split-menu' class='modifier-menu'></div></div>")
-    $("#split-button").hover () ->
-      $("#split-menu").slideDown(100)
+  create_buttons: (type) =>
+    type_upper = type[0].toUpperCase() + type.slice(1);
+    $("#modifiers").append("<div id='#{type}-wrapper' class='modifier-wrapper'><button id='#{type}-button' class='modifier-button'>#{type_upper}<span class='button-arrow'>&#x25BC;</span><span id='#{type}-hint' class='modifier-hint'></span></button><div id='#{type}-menu' class='modifier-menu'></div></div>")
+    $("##{type}-button").hover () ->
+      $("##{type}-menu").slideDown(100)
 
-    $("#split-wrapper").mouseleave () ->
-      $("#split-menu").slideUp(100)
+    $("##{type}-wrapper").mouseleave () ->
+      $("##{type}-menu").slideUp(100)
 
-    d3.select("#split-menu").selectAll('div').data(@categorical_filters).enter()
+    $("##{type}-button").on "click", () =>
+      this.reset_split() if type == "split"
+      this.reset_color() if type == "color"
+      this.reset_size() if type == "size"
+      this.reset_order() if type == "order"
+
+    button_filters = @categorical_filters if type == "split"
+    button_filters = @numeric_filters if type == "size" || type == "order"
+    button_filters = @categorical_filters.concat(@numeric_filters) if type == "color"
+
+    d3.select("##{type}-menu").selectAll('div').data(button_filters).enter()
       .append("div")
       .text((d) -> d.value)
-      .attr("class", 'modifier-option split-option')
-      .attr("id", (d) -> 'split-' + d.value)
+      .attr("class", "modifier-option #{type}-option")
+      .attr("id", (d) -> "#{type}-#{d.value}")
       .on("click", (d) =>
-        this.split_by(d.value)
+        this.split_by(d.value) if type == "split"
+        this.color_by(d.value) if type == "color"
+        this.size_by(d.value) if type == "size"
+        this.order_by(d.value) if type == "order"
       )
+
+  reset_split: () =>
+    $(".split-option").removeClass('active')
+    $("#split-hint").html("")
+    while @labels.length > 0
+      @labels.pop()
+    @circles.each (c) =>
+      c.tarx = @width/2.0
+      c.tary = @height/2.0
+    this.update()
 
   split_by: (split) =>
     if @circles == undefined || @circles.length == 0
       return
+
+    this.reset_order()
 
     $("#split-hint").html("<br>"+split)
 
@@ -371,7 +327,7 @@ class window.Potato
 
     # calculate positions for each filter group
     curr_vals.forEach (s, i) =>
-      curr_vals[i] = { split: s, tarx: (@width*0.08) + (0.5 + curr_col) * (width_2 / num_cols), tary: (@height*0.15) + (0.5 + curr_row) * (height_2 / num_rows)}
+      curr_vals[i] = { split: s, tarx: (@width*0.07) + (0.5 + curr_col) * (width_2 / num_cols), tary: (@height*0.18) + (0.5 + curr_row) * (height_2 / num_rows)}
 
       label = {
         val: s
@@ -399,49 +355,75 @@ class window.Potato
     # then update
     this.update()
 
-  color_buttons: () =>
-    $("#vis").append("<div id='color-legend'></div>")
-    $("#modifiers").append("<div id='color-wrapper' class='modifier-wrapper'><button id='color-button' class='modifier-button'>Color By<span class='button-arrow'>&#x25BC;</span><span id='color-hint' class='modifier-hint'></span></button><div id='color-menu' class='modifier-menu'></div></div>")
-    $("#color-button").hover () ->
-      $("#color-menu").slideDown(100)
-
-    $("#color-wrapper").mouseleave () ->
-      $("#color-menu").slideUp(100)
-
-    d3.select("#color-menu").selectAll('div').data(@categorical_filters).enter()
-      .append("div")
-      .text((d) -> d.value)
-      .attr("class", 'modifier-option color-option')
-      .attr("id", (d) -> 'color-' + d.value)
-      .on("click", (d) =>
-        this.color_by(d.value)
-      )
+  reset_color: () =>
+    # remove the current legend
+    d3.select("#color-legend").selectAll("*").remove()
+    $(".color-option").removeClass('active')
+    $("#color-hint").html("")
+    @circles.each (c) ->
+      c.color = "#777"
 
   color_by: (split) =>
     if @circles == undefined || @circles.length == 0
       return
 
-    $("#color-hint").html("<br>"+split)
+    this.reset_color()
+
+    $("#vis").append("<div id='color-legend'></div>") if $("#color-legend").length < 1
 
     $(".color-option").removeClass('active')
     $("#color-"+split).addClass('active')
 
-    curr_vals = []
+    curr_vals_with_count = {}
+
+    numeric = true
 
     # first get number of unique values in the filter
     @circles.each (c) =>
-      if curr_vals.indexOf(c['values'][split]) < 0
-        curr_vals.push c['values'][split]
+      val = c['values'][split]
+      if curr_vals_with_count.hasOwnProperty(val)
+        curr_vals_with_count[val] += 1
+      else
+        curr_vals_with_count[val] = 1
+        # if you find any non numerics, set numeric flag
+        if c['values'][split] != "" && $.isNumeric(c['values'][split]) == false
+          numeric = false
+
+    curr_vals_tuples = []
+    $.each curr_vals_with_count, (k, c) =>
+      curr_vals_tuples.push([k, c])
+
+    # descending order
+    curr_vals_tuples.sort((a,b) -> b[1] - a[1])
+
+    if !numeric && curr_vals_tuples.length > 18
+      curr_vals_tuples = curr_vals_tuples.slice(0, 18)
+      curr_vals_tuples.push(['other', 0])
+
+    curr_vals = []
+
+    $.each curr_vals_tuples, (c, arr) =>
+      curr_vals.push(arr[0])
 
     num_colors = curr_vals.length
 
-    colors = d3.scale.ordinal()
-      .domain(curr_vals)
-      .range(['#1f77b4','#ff7f0e','#2ca02c','#d62728','#9467bd','#8c564b','#e377c2','#7f7f7f','#bcbd22','#17becf',
-              '#aec7e8','#ffbb78','#98df8a','#ff9896','#c5b0d5','#c49c94','#f7b6d2','#c7c7c7','#dbdb8d','#9edae5'])
+    if numeric == true
+      curr_max = d3.max(curr_vals, (d) -> parseFloat(d))
+      non_zero_min = curr_max
 
-    # remove the current legend
-    d3.select("#color-legend").selectAll("*").remove()
+      $.each curr_vals, (k, c) =>
+        if c > 0 && c < non_zero_min
+          non_zero_min = c
+
+      colors = d3.scale.linear()
+        .domain([non_zero_min, curr_max])
+        .range(["#ccc", "#1f77b4"])
+    else
+      colors = d3.scale.ordinal()
+        .domain(curr_vals)
+        .range(['#1f77b4','#ff7f0e','#2ca02c','#d62728','#9467bd','#8c564b','#e377c2','#bcbd22','#17becf',
+                '#aec7e8','#ffbb78','#98df8a','#ff9896','#c5b0d5','#c49c94','#f7b6d2','#dbdb8d','#9edae5',
+                '#777777'])
 
     l_size = 30
 
@@ -476,22 +458,12 @@ class window.Potato
 
     @circles.attr("fill", (d) -> d.color)
 
-  size_buttons: () =>
-    $("#modifiers").append("<div id='size-wrapper' class='modifier-wrapper'><button id='size-button' class='modifier-button'>Size By<span class='button-arrow'>&#x25BC;</span><span id='size-hint' class='modifier-hint'></span></button><div id='size-menu' class='modifier-menu'></div></div>")
-    $("#size-button").hover () ->
-      $("#size-menu").slideDown(100)
-
-    $("#size-wrapper").mouseleave () ->
-      $("#size-menu").slideUp(100)
-
-    d3.select("#size-menu").selectAll('div').data(@numeric_filters).enter()
-      .append("div")
-      .text((d) -> d.value)
-      .attr("class", 'modifier-option size-option')
-      .attr("id", (d) -> 'size-' + d.value)
-      .on("click", (d) =>
-        this.size_by(d.value)
-      )
+  reset_size: () =>
+    $(".size-option").removeClass('active')
+    $("#size-hint").html("")
+    @circles.each (c) =>
+      c.radius = 5
+    this.update()
 
   size_by: (split) =>
     if @circles == undefined || @circles.length == 0
@@ -508,7 +480,7 @@ class window.Potato
     @circles.each (c) =>
       curr_vals.push parseFloat(c['values'][split])
 
-    curr_max = d3.max(curr_vals, (d) -> d)
+    curr_max = d3.max(curr_vals, (d) -> parseFloat(d))
     non_zero_min = curr_max
 
     $.each curr_vals, (k, c) =>
@@ -530,6 +502,73 @@ class window.Potato
 
     this.update()
 
+  reset_order: () =>
+    $(".order-option").removeClass('active')
+    $("#order-hint").html("")
+    while @axis.length > 0
+      @axis.pop()
+    while @labels.length > 0
+      @labels.pop()
+    @circles.each (c) =>
+      c.tarx = @width/2.0
+    this.update()
+
+  order_by: (split) =>
+    if @circles == undefined || @circles.length == 0
+      return
+
+    this.reset_split()
+
+    $("#order-hint").html("<br>"+split)
+
+    $(".order-option").removeClass('active')
+    $("#order-"+split).addClass('active')
+
+    while @labels.length > 0
+      @labels.pop()
+
+    curr_vals = []
+
+    # first get all the values for this filter
+    @circles.each (c) =>
+      curr_vals.push parseFloat(c['values'][split])
+
+    curr_max = d3.max(curr_vals, (d) -> d)
+    non_zero_min = curr_max
+
+    #TODO sort curr_vals and then take some segment, maybe 4? 5?
+    #and add those selected variables to labels....
+
+    $.each curr_vals, (k, c) =>
+      if c > 0 && c < non_zero_min
+        non_zero_min = c
+
+    orders = d3.scale.sqrt()
+      .domain([non_zero_min, curr_max])
+      .range([220, @width - 160])
+      .clamp(true) # allows us to handle null values
+
+    # then update all circle positions appropriately
+    @circles.each (c) =>
+      s_val = c['values'][split]
+      if !isNaN(s_val) and s_val != ""
+        c.tarx = orders(parseFloat(s_val))
+      else
+        c.tarx = -100
+
+    @labels.push {type: "order", val: non_zero_min, label_id: "head-label", split: split, x: 220, y: 0, tarx: 220, tary: 0}
+    @labels.push {type: "order", val: curr_max, label_id: "tail-label", split: split, x: @width - 160, y: 0, tarx: @width - 160, tary: 0}
+    @labels.push {type: "order", val: split, label_id: "text-label", x: @width / 2.0, y: 0, tarx: @width / 2.0, tary: 0}
+
+    @axis.push {
+      x1: 220
+      x2: @width - 160
+      y1: 0
+      y2: 0
+    }
+
+    this.update()
+
   update: () =>
     @circles = @vis.selectAll("circle")
       .data(@nodes, (d) -> d.id)
@@ -538,7 +577,7 @@ class window.Potato
     that = this
     @circles.enter().append("circle")
       .attr("r", 0)
-      .attr("stroke-width", 3)
+      .attr("stroke-width", 2)
       .attr("id", (d) -> "bubble_#{d.id}")
       .attr("fill", (d) -> d.color)
       .on("mouseover", (d,i) -> that.show_details(d,i,this))
@@ -549,6 +588,7 @@ class window.Potato
         else
           ''
       )
+#      .on("click", (d) => this.remove_node(d.id))
 
     # Fancy transition to make bubbles appear to 'grow in'
     @circles.transition().duration(2000).attr("r", (d) -> d.radius)
@@ -559,26 +599,49 @@ class window.Potato
     # remove any currently present split labels
     @vis.selectAll(".split-labels").remove()
 
-    @text = @vis.selectAll(".split-labels")
+    text = @vis.selectAll(".split-labels")
       .data(@labels)
 
     # now do the text labels
-    @text.enter().append("text")
+    text.enter().append("text")
       .attr("x", (d) -> d.x)
       .attr("y", (d) -> d.y)
       .attr("class", 'split-labels')
+      .attr("id", (d) -> d.label_id)
       .text((d) -> d.val)
 
-    @text.exit().remove()
+    text.exit().remove()
+
+    @vis.selectAll(".axis-label").remove()
+
+    axis = @vis.selectAll(".axis-label")
+      .data(@axis)
+
+    axis.enter().append("line")
+      .attr("x1", (d) -> d.x1)
+      .attr("x2", (d) -> d.x2)
+      .attr("y1", (d) -> d.y1)
+      .attr("y2", (d) -> d.y2)
+      .attr("stroke", "#999")
+      .attr("class", "axis-label")
 
     @force.on "tick", (e) =>
       @circles.each(this.move_towards_target(e.alpha))
         .attr("cx", (d) -> d.x)
         .attr("cy", (d) -> d.y)
-      @text.each(this.adjust_label_pos())
-      @text.each(this.move_towards_target(e.alpha))
+      text.each(this.adjust_label_pos())
+      text.each(this.move_towards_target(e.alpha))
         .attr("x", (d) -> d.x)
         .attr("y", (d) -> d.y)
+
+      head_label = @vis.select("#head-label")
+      tail_label = @vis.select("#tail-label")
+
+      if head_label[0][0]?
+        axis.attr("x1", parseInt(head_label.attr('x')) + 35)
+        axis.attr("y1", head_label.attr('y') - 7)
+        axis.attr("x2", tail_label.attr('x') - 40)
+        axis.attr("y2", tail_label.attr('y') - 7)
 
     @force.start()
 
@@ -587,17 +650,36 @@ class window.Potato
       min_y = 10000
       min_x = 10000
       max_x = 0
-      @circles.each (c) =>
-        if d.val == c['values'][d.split]
+
+      if d.type == "order" # an order by label, not a split
+        totx = 0
+        count = 0
+        @circles.each (c) =>
           if (c.y - c.radius) < min_y
             min_y = (c.y - c.radius)
-          if (c.x - c.radius) < min_x
-            min_x = (c.x - c.radius)
-          if (c.x + c.radius) > max_x
-            max_x = (c.x + c.radius)
 
-      d.tary = min_y - 10
-      d.tarx = (max_x - min_x) / 2.0 + min_x
+          if d.label_id != "text-label" && d.val == parseFloat(c['values'][d.split])
+            totx += c.x
+            count += 1
+
+        if d.label_id == "text-label"
+          d.tary = min_y - 40
+        else
+          d.tary = min_y - 20
+          d.tarx = totx / count
+
+      else
+        @circles.each (c) =>
+          if d.val == c['values'][d.split]
+            if (c.y - c.radius) < min_y
+              min_y = (c.y - c.radius)
+            if (c.x - c.radius) < min_x
+              min_x = (c.x - c.radius)
+            if (c.x + c.radius) > max_x
+              max_x = (c.x + c.radius)
+
+        d.tary = min_y - 10
+        d.tarx = (max_x - min_x) / 2.0 + min_x
 
   # move node towards the target defined in (tarx,tary)
   move_towards_target: (alpha) =>
@@ -610,23 +692,20 @@ class window.Potato
     $.each data.values, (k, v) ->
       content +="#{v}<br/>"
     $("#node-tooltip").html(content)
-    this.update_position(d3.event)
+    this.update_position(d3.event, "node-tooltip")
     $("#node-tooltip").show()
 
   hide_details: (data, i, element) =>
     $("#node-tooltip").hide()
 
-  update_position: (e) =>
+  update_position: (e, id) =>
     xOffset = 20
     yOffset = 10
     # move tooltip to fit on screen as needed
-    ttw = $("#node-tooltip").width()
-    tth = $("#node-tooltip").height()
+    ttw = $("##{id}").width()
+    tth = $("##{id}").height()
     ttleft = if ((e.pageX + xOffset*2 + ttw) > $(window).width()) then e.pageX - ttw - xOffset*2 else e.pageX + xOffset
     tttop = if ((e.pageY + yOffset*2 + tth) > $(window).height()) then e.pageY - tth - yOffset*2 else e.pageY + yOffset
-    $("#node-tooltip").css('top', tttop + 'px').css('left', ttleft + 'px')
-
-  safe_string: (input) =>
-    input.toLowerCase().replace(/\s/g, '_').replace('.','')
+    $("##{id}").css('top', tttop + 'px').css('left', ttleft + 'px')
 
 root = exports ? this

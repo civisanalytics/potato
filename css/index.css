@@ -1,0 +1,72 @@
+body {
+  margin: 0;
+  font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+  font-weight: 300;
+}
+
+a {
+  text-decoration: none;
+  color: #000;
+}
+
+#git {
+  position: absolute;
+  bottom: 7px;
+  left: 10px;
+}
+
+#sig {
+  position: absolute;
+  bottom: 7px;
+  right: 8px;
+}
+
+.load-screen {
+  position: fixed;
+  top: 40%;
+  left: 50%;
+  width: 500px;
+  margin: 0 0 0 -250px;
+  font-size: 2em;
+}
+
+.fileContainer {
+  position: absolute;
+  background: #CCC;
+  border-radius: .5em;
+  width: 100%;
+  padding: 70px 0;
+  text-align: center;
+  margin: -90px 0;
+}
+
+.fileContainer:hover {
+  background-color: #ddd;
+}
+
+.fileContainer [type=file] {
+  display: block;
+  font-size: 999px;
+  filter: alpha(opacity=0);
+  min-height: 100%;
+  min-width: 100%;
+  opacity: 0;
+  position: absolute;
+  right: 0;
+  text-align: right;
+  top: 0;
+  cursor: pointer;
+}
+
+#demo {
+  position: relative;
+  top: 125px;
+  text-align: center;
+}
+#demo-text {
+  font-size: 0.7em;
+}
+
+.demo-button {
+  padding: 14px;
+}

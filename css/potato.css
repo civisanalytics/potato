@@ -1,26 +1,12 @@
-body {
-  margin: 0;
-  font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
-  font-weight: 300;
-}
+/* styling specifically for the potato library */
 
-a {
-  text-decoration: none;
-  color: #000;
-}
-
-
-
-#git {
-  position: absolute;
-  bottom: 7px;
-  left: 10px;
-}
-
-#sig {
-  position: absolute;
-  bottom: 7px;
-  right: 8px;
+#vis {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 
 #toolbar {
@@ -30,6 +16,7 @@ a {
 }
 #vis-svg {
   position: absolute;
+  cursor: default;
 }
 
 .pull-left {
@@ -37,13 +24,6 @@ a {
 }
 .pull-right {
   float: right;
-}
-
-#title {
-  display: inline-block;
-  font-size: 2em;
-  float: left;
-  margin-right: 20px;
 }
 
 button {
@@ -64,63 +44,31 @@ button:hover {
   background-color: #eee;
 }
 
+#reset-button {
+  padding-right: 20px;
+}
+
+.disabled-button {
+  cursor: not-allowed;
+  background-color: #eee;
+}
+
+#reset-icon {
+  font-size: 1.5em;
+  position: absolute;
+  right: 18px;
+  top: 7px;
+}
+
 .color-button {
   font-variant: small-caps;
   margin-right: 5px;
 }
 
-.load-screen {
-  position: fixed;
-  top: 40%;
-  left: 50%;
-  width: 500px;
-  margin: 0 0 0 -250px;
-  font-size: 2em;
-}
-
-.fileContainer {
-  position: absolute;
-  background: #CCC;
-  border-radius: .5em;
-  width: 100%;
-  padding: 70px 0;
-  text-align: center;
-  margin: -90px 0;
-}
-
-.fileContainer:hover {
-  background-color: #ddd;
-}
-
-.fileContainer [type=file] {
-  display: block;
-  font-size: 999px;
-  filter: alpha(opacity=0);
-  min-height: 100%;
-  min-width: 100%;
-  opacity: 0;
-  position: absolute;
-  right: 0;
-  text-align: right;
-  top: 0;
-  cursor: pointer;
-}
-
-#demo {
-  position: relative;
-  top: 125px;
-  text-align: center;
-}
-#demo-text {
-  font-size: 0.7em;
-}
-
-.demo-button {
-  padding: 14px;
-}
-
 #filter-select-buttons {
   display: inline-block;
+  float: right;
+  margin-right: 20px;
 }
 
 #modifiers {
@@ -180,20 +128,20 @@ button:hover {
 
 .split-labels {
   fill: #999;
-  font-size: 1.5em;
+  font-size: 1.2em;
   z-index: -1;
   text-anchor: middle;
+}
+
+#text-label {
+  font-variant: small-caps;
 }
 
 .selector {
   width: 100%;
 }
 
-#school-select-wrapper {
-  margin: 20px 0 20px 0;
-}
-
-#node-tooltip {
+.tooltip {
   border-radius: 10px;
   padding: 10px;
   position: absolute;
@@ -281,132 +229,9 @@ button:hover {
   background-color: #0194D3;
 }
 
+.select-box {
+  stroke: gray;
+  fill: gray;
+  fill-opacity: 0.2;
+}
 
-.arizona_cardinals {
-  fill: #870619;
-  stroke: #000000;
-}
-.atlanta_falcons {
-  fill: #BD0D18;
-  stroke: #000000;
-}
-.baltimore_ravens {
-  fill: #280353;
-  stroke: #000000;
-}
-.buffalo_bills {
-  fill: #00338D;
-  stroke: #C60630;
-}
-.carolina_panthers {
-  fill: #000000;
-  stroke: #0088CE;
-}
-.chicago_bears {
-  fill: #03202F;
-  stroke: #DD4814;
-}
-.cincinnati_bengals {
-  fill: #FFFFFF;
-  stroke: #FB4F14;
-}
-.cleveland_browns {
-  fill: #26201E;
-  stroke: #E34912;
-}
-.dallas_cowboys {
-  fill: #002244;
-  stroke: #8C8B8A;
-}
-.denver_broncos {
-  fill: #FB4F14;
-  stroke: #002244;
-}
-.detroit_lions {
-  fill: #006D80;
-  stroke: #C5C7CF;
-}
-.green_bay_packers {
-  fill: #213D30;
-  stroke: #FFCC00;
-}
-.houston_texans {
-  fill: #02253A;
-  stroke: #B31B34;
-}
-.indianapolis_colts {
-  fill: #FFFFFF;
-  stroke: #003B7B;
-}
-.jacksonville_jaguars {
-  fill: #D0B239;
-  stroke: #007198;
-}
-.kansas_city_chiefs {
-  fill: #B20032;
-  stroke: #F2C800;
-}
-.miami_dolphins {
-  fill: #008D97;
-  stroke: #F5811F;
-}
-.minnesota_vikings {
-  fill: #4F2682;
-  stroke: #FFC52F;
-}
-.new_england_patriots {
-  fill: #0D254C;
-  stroke: #D6D6D6;
-}
-.new_orleans_saints {
-  fill: #000000;
-  stroke: #D2B887;
-}
-.new_york_giants {
-  fill: #CA001A;
-  stroke: #192F6B;
-}
-.new_york_jets {
-  fill: #FFFFFF;
-  stroke: #0C371D;
-}
-.oakland_raiders {
-  fill: #C4C8CB;
-  stroke: #000000;
-}
-.philadelphia_eagles {
-  fill: #003B48;
-  stroke: #708090;
-}
-.pittsburgh_steelers {
-  fill: #000000;
-  stroke: #F2C800;
-}
-.san_diego_chargers {
-  fill: #5B92E5;
-  stroke: #EEC607;
-}
-.san_francisco_49ers {
-  fill: #AF1E2C;
-  stroke: #E6BE8A;
-}
-.seattle_seahawks {
-  fill: #4EAE47;
-  stroke: #06192E;
-}
-.st_louis_rams {
-  fill: #C9AF74;
-  stroke: #13264B;
-}
-.tampa_bay_buccaneers {
-  fill: #D60A0B;
-  stroke: #FF7A00;
-}
-.tennessee_titans {
-  fill: #648FCC;
-  stroke: #000080;
-}
-.washington_redskins {
-  fill: #773141;
-  stroke: #FFB612;
-}
