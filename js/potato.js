@@ -229,7 +229,9 @@
       reset_button = $("<button id='reset-button' class='disabled-button modifier-button'><span id='reset-icon'>&#8635;</span> Reset Selection</button>");
       reset_button.on("click", (function(_this) {
         return function(e) {
-          return _this.add_all();
+          if (!reset_button.hasClass('disabled-button')) {
+            return _this.add_all();
+          }
         };
       })(this)).on("mouseover", (function(_this) {
         return function(e) {

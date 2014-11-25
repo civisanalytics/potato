@@ -179,7 +179,8 @@ class window.Potato
 
     reset_button = $("<button id='reset-button' class='disabled-button modifier-button'><span id='reset-icon'>&#8635;</span> Reset Selection</button>")
     reset_button.on("click", (e) =>
-      this.add_all()
+      if !reset_button.hasClass('disabled-button')
+        this.add_all()
     ).on("mouseover", (e) => reset_tooltip.show()
     ).on("mouseout", (e) => reset_tooltip.hide())
 
