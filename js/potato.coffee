@@ -344,54 +344,70 @@ class window.Potato
     d3.select("#color-legend").selectAll("*").remove()
     $(".color-option").removeClass('active')
     $("#color-hint").html("")
-    @circles.attr("fill", "#777")
+    @circles.each (c) ->
+      c.color = "#777"
 
   color_by: (split) =>
     if @circles == undefined || @circles.length == 0
       return
 
-    $("#vis").append("<div id='color-legend'></div>") if $("#color-legend").length < 1
+    this.reset_color()
 
-    $("#color-hint").html("<br>"+split)
+    $("#vis").append("<div id='color-legend'></div>") if $("#color-legend").length < 1
 
     $(".color-option").removeClass('active')
     $("#color-"+split).addClass('active')
 
-    curr_vals = []
+    curr_vals_with_count = {}
 
     numeric = true
 
     # first get number of unique values in the filter
     @circles.each (c) =>
-      if curr_vals.indexOf(c['values'][split]) < 0
-        curr_vals.push c['values'][split]
+      val = c['values'][split]
+      if curr_vals_with_count.hasOwnProperty(val)
+        curr_vals_with_count[val] += 1
+      else
+        curr_vals_with_count[val] = 1
         # if you find any non numerics, set numeric flag
         if c['values'][split] != "" && $.isNumeric(c['values'][split]) == false
           numeric = false
 
+    curr_vals_tuples = []
+    $.each curr_vals_with_count, (k, c) =>
+      curr_vals_tuples.push([k, c])
+
+    # descending order
+    curr_vals_tuples.sort((a,b) -> b[1] - a[1])
+
+    if !numeric && curr_vals_tuples.length > 18
+      curr_vals_tuples = curr_vals_tuples.slice(0, 18)
+      curr_vals_tuples.push(['other', 0])
+
+    curr_vals = []
+
+    $.each curr_vals_tuples, (c, arr) =>
+      curr_vals.push(arr[0])
+
     num_colors = curr_vals.length
 
-    curr_vals.sort()
-
-    curr_max = d3.max(curr_vals, (d) -> parseFloat(d))
-    non_zero_min = curr_max
-
-    $.each curr_vals, (k, c) =>
-      if c > 0 && c < non_zero_min
-        non_zero_min = c
-
     if numeric == true
+      curr_max = d3.max(curr_vals, (d) -> parseFloat(d))
+      non_zero_min = curr_max
+
+      $.each curr_vals, (k, c) =>
+        if c > 0 && c < non_zero_min
+          non_zero_min = c
+
       colors = d3.scale.linear()
         .domain([non_zero_min, curr_max])
         .range(["#ccc", "#1f77b4"])
     else
       colors = d3.scale.ordinal()
         .domain(curr_vals)
-        .range(['#1f77b4','#ff7f0e','#2ca02c','#d62728','#9467bd','#8c564b','#e377c2','#7f7f7f','#bcbd22','#17becf',
-                '#aec7e8','#ffbb78','#98df8a','#ff9896','#c5b0d5','#c49c94','#f7b6d2','#c7c7c7','#dbdb8d','#9edae5'])
-
-    # remove the current legend
-    d3.select("#color-legend").selectAll("*").remove()
+        .range(['#1f77b4','#ff7f0e','#2ca02c','#d62728','#9467bd','#8c564b','#e377c2','#bcbd22','#17becf',
+                '#aec7e8','#ffbb78','#98df8a','#ff9896','#c5b0d5','#c49c94','#f7b6d2','#dbdb8d','#9edae5',
+                '#777777'])
 
     l_size = 30
 
