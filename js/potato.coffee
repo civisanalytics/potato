@@ -176,18 +176,16 @@ class window.Potato
         return if a.value == b.value then 0 else (a.value > b.value) || -1
 
     reset_tooltip = $("<div class='tooltip' id='reset-tooltip'>Click and drag on the canvas to remove nodes.</div>")
-    $("#vis").append(reset_tooltip)
-    reset_tooltip.hide()
 
     reset_button = $("<button id='reset-button' class='disabled-button modifier-button'><span id='reset-icon'>&#8635;</span> Reset Selection</button>")
     reset_button.on("click", (e) =>
       this.add_all()
-    ).on("mouseover", (e) =>
-      this.update_position(e, "reset-tooltip")
-      reset_tooltip.show()
-    ).on("mouseout", (e) =>
-      reset_tooltip.hide()
-    )
+    ).on("mouseover", (e) => reset_tooltip.show()
+    ).on("mouseout", (e) => reset_tooltip.hide())
+
+    reset_button.append(reset_tooltip)
+    reset_tooltip.hide()
+
     $("#filter-select-buttons").append(reset_button)
 
   # add all data nodes to screen

@@ -226,8 +226,6 @@
         };
       })(this));
       reset_tooltip = $("<div class='tooltip' id='reset-tooltip'>Click and drag on the canvas to remove nodes.</div>");
-      $("#vis").append(reset_tooltip);
-      reset_tooltip.hide();
       reset_button = $("<button id='reset-button' class='disabled-button modifier-button'><span id='reset-icon'>&#8635;</span> Reset Selection</button>");
       reset_button.on("click", (function(_this) {
         return function(e) {
@@ -235,7 +233,6 @@
         };
       })(this)).on("mouseover", (function(_this) {
         return function(e) {
-          _this.update_position(e, "reset-tooltip");
           return reset_tooltip.show();
         };
       })(this)).on("mouseout", (function(_this) {
@@ -243,6 +240,8 @@
           return reset_tooltip.hide();
         };
       })(this));
+      reset_button.append(reset_tooltip);
+      reset_tooltip.hide();
       return $("#filter-select-buttons").append(reset_button);
     };
 

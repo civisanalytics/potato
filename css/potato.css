@@ -151,6 +151,11 @@ button:hover {
   z-index: 1;
 }
 
+#reset-tooltip {
+  top: 45px;
+  font-size: 1.2em;
+}
+
 #color-legend {
   position:absolute;
 }
