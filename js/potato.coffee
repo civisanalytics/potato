@@ -175,10 +175,20 @@ class window.Potato
       sorted_filters[v.value].sort (a, b) ->
         return if a.value == b.value then 0 else (a.value > b.value) || -1
 
-    filter_button = $("<button id='reset-button' class='modifier-button'><span id='reset-icon'>&#8635;</span> Reset Nodes</button>")
-    filter_button.on "click", (e) =>
+    reset_tooltip = $("<div class='tooltip' id='reset-tooltip'>Click and drag on the canvas to remove nodes.</div>")
+    $("#vis").append(reset_tooltip)
+    reset_tooltip.hide()
+
+    reset_button = $("<button id='reset-button' class='disabled-button modifier-button'><span id='reset-icon'>&#8635;</span> Reset Selection</button>")
+    reset_button.on("click", (e) =>
       this.add_all()
-    $("#filter-select-buttons").append(filter_button)
+    ).on("mouseover", (e) =>
+      this.update_position(e, "reset-tooltip")
+      reset_tooltip.show()
+    ).on("mouseout", (e) =>
+      reset_tooltip.hide()
+    )
+    $("#filter-select-buttons").append(reset_button)
 
   # add all data nodes to screen
   add_all: () =>
@@ -186,6 +196,8 @@ class window.Potato
       @data.forEach (d) =>
         if $.grep(@nodes, (e) => e.id == d.node_id).length == 0 # if it doesn't already exist in nodes
           this.add_node(d)
+
+    $("#reset-button").addClass('disabled-button')
     this.update()
 
     # apply any existing splits/colors/sizes
@@ -229,6 +241,8 @@ class window.Potato
     while (len--)
       if nodes_to_remove.indexOf(@nodes[len]['id']) >= 0 # node with offending value found
         @nodes.splice(len, 1)
+
+    $("#reset-button").removeClass('disabled-button')
 
     order_id = $(".order-option.active").attr('id')
     this.order_by(order_id.substr(order_id.indexOf("-") + 1)) if order_id != undefined
@@ -678,20 +692,20 @@ class window.Potato
     $.each data.values, (k, v) ->
       content +="#{v}<br/>"
     $("#node-tooltip").html(content)
-    this.update_position(d3.event)
+    this.update_position(d3.event, "node-tooltip")
     $("#node-tooltip").show()
 
   hide_details: (data, i, element) =>
     $("#node-tooltip").hide()
 
-  update_position: (e) =>
+  update_position: (e, id) =>
     xOffset = 20
     yOffset = 10
     # move tooltip to fit on screen as needed
-    ttw = $("#node-tooltip").width()
-    tth = $("#node-tooltip").height()
+    ttw = $("##{id}").width()
+    tth = $("##{id}").height()
     ttleft = if ((e.pageX + xOffset*2 + ttw) > $(window).width()) then e.pageX - ttw - xOffset*2 else e.pageX + xOffset
     tttop = if ((e.pageY + yOffset*2 + tth) > $(window).height()) then e.pageY - tth - yOffset*2 else e.pageY + yOffset
-    $("#node-tooltip").css('top', tttop + 'px').css('left', ttleft + 'px')
+    $("##{id}").css('top', tttop + 'px').css('left', ttleft + 'px')
 
 root = exports ? this

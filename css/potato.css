@@ -48,6 +48,11 @@ button:hover {
   padding-right: 20px;
 }
 
+.disabled-button {
+  cursor: not-allowed;
+  background-color: #eee;
+}
+
 #reset-icon {
   font-size: 1.5em;
   position: absolute;
@@ -136,7 +141,7 @@ button:hover {
   width: 100%;
 }
 
-#node-tooltip {
+.tooltip {
   border-radius: 10px;
   padding: 10px;
   position: absolute;

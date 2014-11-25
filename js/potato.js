@@ -166,7 +166,7 @@
     };
 
     Potato.prototype.create_filters = function() {
-      var filter_button, sorted_filters;
+      var reset_button, reset_tooltip, sorted_filters;
       sorted_filters = {};
       this.filter_names = [];
       $.each(this.data[0], (function(_this) {
@@ -225,13 +225,25 @@
           });
         };
       })(this));
-      filter_button = $("<button id='reset-button' class='modifier-button'><span id='reset-icon'>&#8635;</span> Reset Nodes</button>");
-      filter_button.on("click", (function(_this) {
+      reset_tooltip = $("<div class='tooltip' id='reset-tooltip'>Click and drag on the canvas to remove nodes.</div>");
+      $("#vis").append(reset_tooltip);
+      reset_tooltip.hide();
+      reset_button = $("<button id='reset-button' class='disabled-button modifier-button'><span id='reset-icon'>&#8635;</span> Reset Selection</button>");
+      reset_button.on("click", (function(_this) {
         return function(e) {
           return _this.add_all();
         };
+      })(this)).on("mouseover", (function(_this) {
+        return function(e) {
+          _this.update_position(e, "reset-tooltip");
+          return reset_tooltip.show();
+        };
+      })(this)).on("mouseout", (function(_this) {
+        return function(e) {
+          return reset_tooltip.hide();
+        };
       })(this));
-      return $("#filter-select-buttons").append(filter_button);
+      return $("#filter-select-buttons").append(reset_button);
     };
 
     Potato.prototype.add_all = function() {
@@ -247,6 +259,7 @@
           };
         })(this));
       }
+      $("#reset-button").addClass('disabled-button');
       this.update();
       split_id = $(".split-option.active").attr('id');
       if (split_id !== void 0) {
@@ -301,6 +314,7 @@
           this.nodes.splice(len, 1);
         }
       }
+      $("#reset-button").removeClass('disabled-button');
       order_id = $(".order-option.active").attr('id');
       if (order_id !== void 0) {
         this.order_by(order_id.substr(order_id.indexOf("-") + 1));
@@ -829,7 +843,7 @@
         return content += "" + v + "<br/>";
       });
       $("#node-tooltip").html(content);
-      this.update_position(d3.event);
+      this.update_position(d3.event, "node-tooltip");
       return $("#node-tooltip").show();
     };
 
@@ -837,15 +851,15 @@
       return $("#node-tooltip").hide();
     };
 
-    Potato.prototype.update_position = function(e) {
+    Potato.prototype.update_position = function(e, id) {
       var tth, ttleft, tttop, ttw, xOffset, yOffset;
       xOffset = 20;
       yOffset = 10;
-      ttw = $("#node-tooltip").width();
-      tth = $("#node-tooltip").height();
+      ttw = $("#" + id).width();
+      tth = $("#" + id).height();
       ttleft = (e.pageX + xOffset * 2 + ttw) > $(window).width() ? e.pageX - ttw - xOffset * 2 : e.pageX + xOffset;
       tttop = (e.pageY + yOffset * 2 + tth) > $(window).height() ? e.pageY - tth - yOffset * 2 : e.pageY + yOffset;
-      return $("#node-tooltip").css('top', tttop + 'px').css('left', ttleft + 'px');
+      return $("#" + id).css('top', tttop + 'px').css('left', ttleft + 'px');
     };
 
     return Potato;
