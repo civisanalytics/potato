@@ -382,6 +382,9 @@
         this.circles.attr("fill", function(d) {
           return d.color;
         });
+        this.circles.attr("stroke", function(d) {
+          return d3.rgb(d.color).darker();
+        });
       } else if (type === 'size') {
         this.circles.each((function(_this) {
           return function(c) {
@@ -552,8 +555,11 @@
           });
         };
       })(this));
-      return this.circles.attr("fill", function(d) {
+      this.circles.attr("fill", function(d) {
         return d.color;
+      });
+      return this.circles.attr("stroke", function(d) {
+        return d3.rgb(d.color).darker();
       });
     };
 
@@ -679,7 +685,9 @@
         return d.id;
       });
       that = this;
-      this.circles.enter().append("circle").attr("r", 0).attr("stroke-width", 2).attr("id", function(d) {
+      this.circles.enter().append("circle").attr("r", 0).attr("stroke-width", 0).attr("stroke", function(d) {
+        return d3.rgb(d.color).darker();
+      }).attr("id", function(d) {
         return "bubble_" + d.id;
       }).attr("fill", function(d) {
         return d.color;
@@ -805,7 +813,7 @@
     };
 
     Potato.prototype.show_details = function(data, i, element) {
-      var content;
+      var content, s_width;
       content = "";
       $.each(data.values, function(k, v) {
         return content += "" + v + "<br/>";
@@ -813,12 +821,19 @@
       $("#node-tooltip").html(content);
       this.update_position(d3.event, "node-tooltip");
       $("#node-tooltip").show();
-      return d3.select(element).attr("fill", d3.rgb(data.color).brighter());
+      s_width = d3.select(element).attr("r") * 0.3;
+      return d3.select(element).attr("r", (function(_this) {
+        return function(d) {
+          return d.radius + (s_width / 2.0);
+        };
+      })(this)).attr("stroke-width", s_width);
     };
 
     Potato.prototype.hide_details = function(data, i, element) {
       $("#node-tooltip").hide();
-      return d3.select(element).attr("fill", data.color);
+      return d3.select(element).attr("r", function(d) {
+        return d.radius;
+      }).attr("stroke-width", 0);
     };
 
     Potato.prototype.update_position = function(e, id) {

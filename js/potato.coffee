@@ -288,6 +288,7 @@ class window.Potato
       @circles.each (c) ->
         c.color = "#777"
       @circles.attr("fill", (d) -> d.color)
+      @circles.attr("stroke", (d) -> d3.rgb(d.color).darker())
 
     else if type == 'size'
       @circles.each (c) =>
@@ -456,6 +457,7 @@ class window.Potato
           c.color = String(colors(s))
 
     @circles.attr("fill", (d) -> d.color)
+    @circles.attr("stroke", (d) -> d3.rgb(d.color).darker())
 
   size_by: (split) =>
     if @circles == undefined || @circles.length == 0
@@ -554,7 +556,8 @@ class window.Potato
     that = this
     @circles.enter().append("circle")
       .attr("r", 0)
-      .attr("stroke-width", 2)
+      .attr("stroke-width", 0)
+      .attr("stroke", (d) -> d3.rgb(d.color).darker())
       .attr("id", (d) -> "bubble_#{d.id}")
       .attr("fill", (d) -> d.color)
       .on("mouseover", (d,i) -> that.show_details(d,i,this))
@@ -673,11 +676,16 @@ class window.Potato
     $("#node-tooltip").html(content)
     this.update_position(d3.event, "node-tooltip")
     $("#node-tooltip").show()
-    d3.select(element).attr("fill", d3.rgb(data.color).brighter())
+    s_width = d3.select(element).attr("r") * 0.3
+    d3.select(element)
+      .attr("r", (d) => d.radius + (s_width / 2.0))
+      .attr("stroke-width", s_width)
 
   hide_details: (data, i, element) =>
     $("#node-tooltip").hide()
-    d3.select(element).attr("fill", data.color)
+    d3.select(element)
+      .attr("r", (d) -> d.radius)
+      .attr("stroke-width", 0)
 
   update_position: (e, id) =>
     xOffset = 20
