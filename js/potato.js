@@ -695,7 +695,13 @@
         return d.id;
       });
       that = this;
-      this.circles.enter().append("circle").attr("r", 0).attr("stroke-width", 0).attr("stroke", function(d) {
+      this.circles.enter().append("circle").attr("r", 0).attr("stroke-width", function(d) {
+        if (d["class"].length > 0) {
+          return d.radius * 0.3;
+        } else {
+          return 0;
+        }
+      }).attr("stroke", function(d) {
         return d3.rgb(d.color).darker();
       }).attr("id", function(d) {
         return "bubble_" + d.id;
@@ -841,16 +847,18 @@
 
     Potato.prototype.highlight_node = function(element, highlight) {
       var s_width;
-      if (highlight) {
-        s_width = element.attr("r") * 0.3;
-      } else {
-        s_width = 0;
+      if (element.attr("class").length <= 0) {
+        if (highlight) {
+          s_width = element.attr("r") * 0.3;
+        } else {
+          s_width = 0;
+        }
+        return element.attr("r", (function(_this) {
+          return function(d) {
+            return d.radius + (s_width / 2.0);
+          };
+        })(this)).attr("stroke-width", s_width);
       }
-      return element.attr("r", (function(_this) {
-        return function(d) {
-          return d.radius + (s_width / 2.0);
-        };
-      })(this)).attr("stroke-width", s_width);
     };
 
     Potato.prototype.update_position = function(e, id) {

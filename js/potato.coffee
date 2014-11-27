@@ -46,6 +46,7 @@ class window.Potato
     zoomListener = d3.behavior.zoom()
       .scaleExtent([0, 1])
       .on("zoom", =>
+        # TODO change this to just see if the mouse is down?
         return if @dragging
 
         trans = "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")"
@@ -225,8 +226,7 @@ class window.Potato
     curr_r = 5
 
     # this is set by params
-    if @node_class?
-      curr_class = d[@node_class]
+    curr_class = d[@node_class] if @node_class?
 
     node = {
       id: d.node_id
@@ -567,7 +567,12 @@ class window.Potato
     that = this
     @circles.enter().append("circle")
       .attr("r", 0)
-      .attr("stroke-width", 0)
+      .attr("stroke-width", (d) ->
+        if d.class.length > 0
+          d.radius * 0.3
+        else
+          0
+      )
       .attr("stroke", (d) -> d3.rgb(d.color).darker())
       .attr("id", (d) -> "bubble_#{d.id}")
       .attr("fill", (d) -> d.color)
@@ -694,13 +699,14 @@ class window.Potato
     this.highlight_node(d3.select(element), false)
 
   highlight_node: (element, highlight) =>
-    if highlight
-      s_width = element.attr("r") * 0.3
-    else
-      s_width = 0
-    element
-      .attr("r", (d) => d.radius + (s_width / 2.0))
-      .attr("stroke-width", s_width)
+    if element.attr("class").length <= 0 #ignore custom colors?
+      if highlight
+        s_width = element.attr("r") * 0.3
+      else
+        s_width = 0
+      element
+        .attr("r", (d) => d.radius + (s_width / 2.0))
+        .attr("stroke-width", s_width)
 
   update_position: (e, id) =>
     xOffset = 20
