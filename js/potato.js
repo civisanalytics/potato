@@ -54,18 +54,13 @@
       this.drag_select();
       this.zoom();
       this.create_filters();
-      if (params.split) {
-        this.create_buttons('split');
-      }
-      if (params.color) {
-        this.create_buttons('color');
-      }
-      if (params.size) {
-        this.create_buttons('size');
-      }
-      if (params.order) {
-        this.create_buttons('order');
-      }
+      $.each(params, (function(_this) {
+        return function(k, v) {
+          if (k !== 'class' && v === true) {
+            return _this.create_buttons(k);
+          }
+        };
+      })(this));
       this.add_all();
     }
 
@@ -415,6 +410,7 @@
         return;
       }
       this.reset('order');
+      this.reset('split');
       $("#split-hint").html("<br>" + split);
       $("#split-" + split).addClass('active');
       curr_vals = [];
@@ -566,6 +562,7 @@
       if (this.circles === void 0 || this.circles.length === 0) {
         return;
       }
+      this.reset('size');
       $("#size-hint").html("<br>" + split);
       $("#size-" + split).addClass('active');
       curr_vals = [];
@@ -606,6 +603,7 @@
         return;
       }
       this.reset('split');
+      this.reset('order');
       $("#order-hint").html("<br>" + split);
       $("#order-" + split).addClass('active');
       curr_vals = [];
@@ -723,6 +721,7 @@
       }).attr("y2", function(d) {
         return d.y2;
       }).attr("stroke", "#999").attr("class", "axis-label");
+      axis.exit().remove();
       this.force.on("tick", (function(_this) {
         return function(e) {
           var head_label, tail_label;

@@ -24,7 +24,6 @@ class window.Potato
       .charge((d) -> -Math.pow(d.radius, 2.0) * 1.5)
       .size([@width, @height])
 
-
     # this is necessary so graph and model stay in sync
     # http://stackoverflow.com/questions/9539294/adding-new-nodes-to-force-directed-layout
     @nodes = @force.nodes()
@@ -38,10 +37,8 @@ class window.Potato
 
     this.create_filters()
 
-    this.create_buttons('split') if params.split
-    this.create_buttons('color') if params.color
-    this.create_buttons('size') if params.size
-    this.create_buttons('order') if params.order
+    $.each params, (k, v) =>
+      this.create_buttons(k) if k != 'class' && v == true
 
     this.add_all()
 
@@ -128,7 +125,6 @@ class window.Potato
 
       @circles.each (c) =>
         if c.x > sx && c.x < sx2 && c.y > sy && c.y < sy2
-          # TODO this is hugely inefficient
           nodes_to_remove.push(c.id)
 
       if nodes_to_remove.length > 0
@@ -312,6 +308,7 @@ class window.Potato
       return
 
     this.reset('order')
+    this.reset('split')
 
     $("#split-hint").html("<br>"+split)
     $("#split-"+split).addClass('active')
@@ -464,6 +461,8 @@ class window.Potato
     if @circles == undefined || @circles.length == 0
       return
 
+    this.reset('size')
+
     $("#size-hint").html("<br>"+split)
     $("#size-"+split).addClass('active')
 
@@ -500,6 +499,7 @@ class window.Potato
       return
 
     this.reset('split')
+    this.reset('order')
 
     $("#order-hint").html("<br>"+split)
     $("#order-"+split).addClass('active')
@@ -601,6 +601,8 @@ class window.Potato
       .attr("y2", (d) -> d.y2)
       .attr("stroke", "#999")
       .attr("class", "axis-label")
+
+    axis.exit().remove()
 
     @force.on "tick", (e) =>
       @circles.each(this.move_towards_target(e.alpha))
