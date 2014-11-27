@@ -100,6 +100,9 @@ class window.Potato
         }
         move = {x: p[0] - d.x, y : p[1] - d.y}
 
+        # this ensures that the top left corner is always (d.x, d.y)
+        # regardless of whether that is the initial point or the current
+        # mouse position
         if( move.x < 1 || (move.x*2 < d.width))
           d.x = p[0]
           d.width -= move.x
@@ -113,6 +116,14 @@ class window.Potato
           d.height = move.y
 
         s.attr(d)
+
+        #TODO there has got to be a more efficient way to do this...?
+        that.circles.each (c) =>
+          if c.x > d.x && c.x < d.x + d.width && c.y > d.y && c.y < d.y + d.height
+            that.highlight_node(d3.select("#bubble_#{c.id}"), true)
+          else
+            that.highlight_node(d3.select("#bubble_#{c.id}"), false)
+
     ).on("mouseup", =>
       s = @vis.select("rect.select-box")
 
@@ -676,16 +687,20 @@ class window.Potato
     $("#node-tooltip").html(content)
     this.update_position(d3.event, "node-tooltip")
     $("#node-tooltip").show()
-    s_width = d3.select(element).attr("r") * 0.3
-    d3.select(element)
-      .attr("r", (d) => d.radius + (s_width / 2.0))
-      .attr("stroke-width", s_width)
+    this.highlight_node(d3.select(element), true)
 
   hide_details: (data, i, element) =>
     $("#node-tooltip").hide()
-    d3.select(element)
-      .attr("r", (d) -> d.radius)
-      .attr("stroke-width", 0)
+    this.highlight_node(d3.select(element), false)
+
+  highlight_node: (element, highlight) =>
+    if highlight
+      s_width = element.attr("r") * 0.3
+    else
+      s_width = 0
+    element
+      .attr("r", (d) => d.radius + (s_width / 2.0))
+      .attr("stroke-width", s_width)
 
   update_position: (e, id) =>
     xOffset = 20

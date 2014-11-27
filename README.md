@@ -37,6 +37,4 @@ Wishlist:
 by gender)
 - [ ] Hint about zooming?...
 - [ ] simultaneous split + ordering?
-- [ ] interaction on hover over a node
-- [ ] hightlight nodes when selecting (with the click & drag select box)
 - [ ] Allow users to either keep or remove selection?

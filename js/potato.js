@@ -15,6 +15,7 @@
         };
       }
       this.update_position = __bind(this.update_position, this);
+      this.highlight_node = __bind(this.highlight_node, this);
       this.hide_details = __bind(this.hide_details, this);
       this.show_details = __bind(this.show_details, this);
       this.move_towards_target = __bind(this.move_towards_target, this);
@@ -132,7 +133,16 @@
           } else {
             d.height = move.y;
           }
-          return s.attr(d);
+          s.attr(d);
+          return that.circles.each((function(_this) {
+            return function(c) {
+              if (c.x > d.x && c.x < d.x + d.width && c.y > d.y && c.y < d.y + d.height) {
+                return that.highlight_node(d3.select("#bubble_" + c.id), true);
+              } else {
+                return that.highlight_node(d3.select("#bubble_" + c.id), false);
+              }
+            };
+          })(this));
         }
       }).on("mouseup", (function(_this) {
         return function() {
@@ -813,7 +823,7 @@
     };
 
     Potato.prototype.show_details = function(data, i, element) {
-      var content, s_width;
+      var content;
       content = "";
       $.each(data.values, function(k, v) {
         return content += "" + v + "<br/>";
@@ -821,19 +831,26 @@
       $("#node-tooltip").html(content);
       this.update_position(d3.event, "node-tooltip");
       $("#node-tooltip").show();
-      s_width = d3.select(element).attr("r") * 0.3;
-      return d3.select(element).attr("r", (function(_this) {
-        return function(d) {
-          return d.radius + (s_width / 2.0);
-        };
-      })(this)).attr("stroke-width", s_width);
+      return this.highlight_node(d3.select(element), true);
     };
 
     Potato.prototype.hide_details = function(data, i, element) {
       $("#node-tooltip").hide();
-      return d3.select(element).attr("r", function(d) {
-        return d.radius;
-      }).attr("stroke-width", 0);
+      return this.highlight_node(d3.select(element), false);
+    };
+
+    Potato.prototype.highlight_node = function(element, highlight) {
+      var s_width;
+      if (highlight) {
+        s_width = element.attr("r") * 0.3;
+      } else {
+        s_width = 0;
+      }
+      return element.attr("r", (function(_this) {
+        return function(d) {
+          return d.radius + (s_width / 2.0);
+        };
+      })(this)).attr("stroke-width", s_width);
     };
 
     Potato.prototype.update_position = function(e, id) {
