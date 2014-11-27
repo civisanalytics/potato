@@ -673,9 +673,11 @@ class window.Potato
     $("#node-tooltip").html(content)
     this.update_position(d3.event, "node-tooltip")
     $("#node-tooltip").show()
+    d3.select(element).attr("fill", d3.rgb(data.color).brighter())
 
   hide_details: (data, i, element) =>
     $("#node-tooltip").hide()
+    d3.select(element).attr("fill", data.color)
 
   update_position: (e, id) =>
     xOffset = 20

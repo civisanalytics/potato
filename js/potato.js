@@ -812,11 +812,13 @@
       });
       $("#node-tooltip").html(content);
       this.update_position(d3.event, "node-tooltip");
-      return $("#node-tooltip").show();
+      $("#node-tooltip").show();
+      return d3.select(element).attr("fill", d3.rgb(data.color).brighter());
     };
 
     Potato.prototype.hide_details = function(data, i, element) {
-      return $("#node-tooltip").hide();
+      $("#node-tooltip").hide();
+      return d3.select(element).attr("fill", data.color);
     };
 
     Potato.prototype.update_position = function(e, id) {
