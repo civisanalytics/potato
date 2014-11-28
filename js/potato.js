@@ -156,11 +156,12 @@
           sy2 = sy + parseInt(s.attr('height'), 10);
           nodes_to_remove = [];
           _this.circles.each(function(c) {
-            if (c.x > sx && c.x < sx2 && c.y > sy && c.y < sy2) {
+            that.highlight_node(d3.select("#bubble_" + c.id), false);
+            if (c.x < sx || c.x > sx2 || c.y < sy || c.y > sy2) {
               return nodes_to_remove.push(c.id);
             }
           });
-          if (nodes_to_remove.length > 0) {
+          if (nodes_to_remove.length > 0 && nodes_to_remove.length !== _this.nodes.length) {
             _this.remove_nodes(nodes_to_remove);
           }
           s.remove();
