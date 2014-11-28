@@ -104,34 +104,36 @@
           x: p[0],
           y: p[1],
           width: 0,
-          height: 0
+          height: 0,
+          x1: p[0],
+          y1: p[1]
         });
       }).on("mousemove", function() {
-        var d, move, p, s;
+        var d, p, s;
         s = d3.select(this).select("rect.select-box");
         if (!s.empty()) {
           p = d3.mouse(this);
           d = {
             x: parseInt(s.attr("x"), 10),
             y: parseInt(s.attr("y"), 10),
+            x1: parseInt(s.attr("x1"), 10),
+            y1: parseInt(s.attr("y1"), 10),
             width: parseInt(s.attr("width"), 10),
             height: parseInt(s.attr("height"), 10)
           };
-          move = {
-            x: p[0] - d.x,
-            y: p[1] - d.y
-          };
-          if (move.x < 1 || (move.x * 2 < d.width)) {
+          if (p[0] < d.x1) {
+            d.width = d.x1 - p[0];
             d.x = p[0];
-            d.width -= move.x;
           } else {
-            d.width = move.x;
+            d.width = p[0] - d.x;
+            d.x = d.x1;
           }
-          if (move.y < 1 || (move.y * 2 < d.height)) {
+          if (p[1] < d.y1) {
+            d.height = d.y1 - p[1];
             d.y = p[1];
-            d.height -= move.y;
           } else {
-            d.height = move.y;
+            d.height = p[1] - d.y;
+            d.y = d.y1;
           }
           s.attr(d);
           return that.circles.each((function(_this) {

@@ -56,7 +56,7 @@ class window.Potato
 
         radius_change = if dy > 0 then 0.95 else 1.05
 
-        # lower bound
+        # lower/upper bounds
         if (@nodes[0].radius < 2 and radius_change < 1) or (@nodes[0].radius > 75 and radius_change > 1)
           return
 
@@ -87,6 +87,8 @@ class window.Potato
           y: p[1]
           width: 0
           height: 0
+          x1: p[0]
+          y1: p[1]
         })
     ).on("mousemove", ->
       s = d3.select(this).select("rect.select-box")
@@ -96,25 +98,26 @@ class window.Potato
         d = {
           x: parseInt( s.attr( "x"), 10)
           y: parseInt( s.attr( "y"), 10)
+          x1: parseInt( s.attr( "x1"), 10)
+          y1: parseInt( s.attr( "y1"), 10)
           width: parseInt( s.attr( "width"), 10)
           height: parseInt( s.attr( "height"), 10)
         }
-        move = {x: p[0] - d.x, y : p[1] - d.y}
 
-        # this ensures that the top left corner is always (d.x, d.y)
-        # regardless of whether that is the initial point or the current
-        # mouse position
-        if( move.x < 1 || (move.x*2 < d.width))
+        # anchor at least one corner to the original click point (x1,y1)
+        if p[0] < d.x1
+          d.width = d.x1 - p[0]
           d.x = p[0]
-          d.width -= move.x
         else
-          d.width = move.x
+          d.width = p[0] - d.x
+          d.x = d.x1
 
-        if( move.y < 1 || (move.y*2 < d.height))
+        if p[1] < d.y1
+          d.height = d.y1 - p[1]
           d.y = p[1]
-          d.height -= move.y
         else
-          d.height = move.y
+          d.height = p[1] - d.y
+          d.y = d.y1
 
         s.attr(d)
 
@@ -584,7 +587,6 @@ class window.Potato
         else
           ''
       )
-#      .on("click", (d) => this.remove_node(d.id))
 
     # Fancy transition to make bubbles appear to 'grow in'
     @circles.transition().duration(2000).attr("r", (d) -> d.radius)
