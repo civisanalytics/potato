@@ -19,6 +19,8 @@ class window.Potato
        .attr("viewBox", "0 0 #{@width} #{@height}")
        .attr("id", "vis-svg")
 
+    #this.zoom()
+
     @force = d3.layout.force()
       .gravity(-0.01)
       .charge((d) -> -Math.pow(d.radius, 2.0) * 1.5)
@@ -31,9 +33,8 @@ class window.Potato
     @labels = []
     @axis = []
 
-    @dragging = false
+    @mousedown = false
     this.drag_select()
-    this.zoom()
 
     this.create_filters()
 
@@ -44,35 +45,32 @@ class window.Potato
 
   zoom: () =>
     zoomListener = d3.behavior.zoom()
-      .scaleExtent([0, 1])
+      .scaleExtent([.5, 10])
       .on("zoom", =>
         # TODO change this to just see if the mouse is down?
-        return if @dragging
+        return if @mousedown
 
         trans = "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")"
 
-        # positive is scroll up which on a map is zoom out
-        dy = d3.event.sourceEvent.deltaY
-
-        radius_change = if dy > 0 then 0.95 else 1.05
-
-        # lower/upper bounds
-        if (@nodes[0].radius < 2 and radius_change < 1) or (@nodes[0].radius > 75 and radius_change > 1)
-          return
-
-        $.each @nodes, (i, n) =>
-          n.radius *= radius_change
-
-        this.update()
+        @vis.attr("transform",trans)
       )
 
-    @vis.call(zoomListener)
+    svg = d3.select("#vis").select("svg")
+      .call(zoomListener)
+
+    rect = svg.append("rect")
+       .attr("width", @width)
+       .attr("height", @height)
+       .style("fill", "none")
+       .style("pointer-events", "all")
+
+    @vis = svg.append("g")
 
   # initialize drag select
   drag_select: () =>
     that = this
     @vis.on("mousedown", ->
-      that.dragging = true
+      that.mousedown = true
       s = d3.select(this).select("rect.select-box")
       s.remove()
 
@@ -147,7 +145,7 @@ class window.Potato
         this.remove_nodes(nodes_to_remove)
 
       s.remove()
-      @dragging = false
+      @mousedown = false
     )
 
   # the logic behind taking the csv and determining what the categorical data is
@@ -187,7 +185,7 @@ class window.Potato
       sorted_filters[v.value].sort (a, b) ->
         return if a.value == b.value then 0 else (a.value > b.value) || -1
 
-    reset_tooltip = $("<div class='tooltip' id='reset-tooltip'>Click and drag on the canvas to remove nodes.</div>")
+    reset_tooltip = $("<div class='tooltip' id='reset-tooltip'>Click and drag on the canvas to select nodes.</div>")
 
     reset_button = $("<button id='reset-button' class='disabled-button modifier-button'><span id='reset-icon'>&#8635;</span> Reset Selection</button>")
     reset_button.on("click", (e) =>

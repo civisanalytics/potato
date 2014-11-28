@@ -51,9 +51,8 @@
       this.nodes = this.force.nodes();
       this.labels = [];
       this.axis = [];
-      this.dragging = false;
+      this.mousedown = false;
       this.drag_select();
-      this.zoom();
       this.create_filters();
       $.each(params, (function(_this) {
         return function(k, v) {
@@ -66,26 +65,20 @@
     }
 
     Potato.prototype.zoom = function() {
-      var zoomListener;
-      zoomListener = d3.behavior.zoom().scaleExtent([0, 1]).on("zoom", (function(_this) {
+      var rect, svg, zoomListener;
+      zoomListener = d3.behavior.zoom().scaleExtent([.5, 10]).on("zoom", (function(_this) {
         return function() {
-          var dy, radius_change, trans;
-          if (_this.dragging) {
+          var trans;
+          if (_this.mousedown) {
             return;
           }
           trans = "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")";
-          dy = d3.event.sourceEvent.deltaY;
-          radius_change = dy > 0 ? 0.95 : 1.05;
-          if ((_this.nodes[0].radius < 2 && radius_change < 1) || (_this.nodes[0].radius > 75 && radius_change > 1)) {
-            return;
-          }
-          $.each(_this.nodes, function(i, n) {
-            return n.radius *= radius_change;
-          });
-          return _this.update();
+          return _this.vis.attr("transform", trans);
         };
       })(this));
-      return this.vis.call(zoomListener);
+      svg = d3.select("#vis").select("svg").call(zoomListener);
+      rect = svg.append("rect").attr("width", this.width).attr("height", this.height).style("fill", "none").style("pointer-events", "all");
+      return this.vis = svg.append("g");
     };
 
     Potato.prototype.drag_select = function() {
@@ -93,7 +86,7 @@
       that = this;
       return this.vis.on("mousedown", function() {
         var p, s;
-        that.dragging = true;
+        that.mousedown = true;
         s = d3.select(this).select("rect.select-box");
         s.remove();
         p = d3.mouse(this);
@@ -165,7 +158,7 @@
             _this.remove_nodes(nodes_to_remove);
           }
           s.remove();
-          return _this.dragging = false;
+          return _this.mousedown = false;
         };
       })(this));
     };
@@ -230,7 +223,7 @@
           });
         };
       })(this));
-      reset_tooltip = $("<div class='tooltip' id='reset-tooltip'>Click and drag on the canvas to remove nodes.</div>");
+      reset_tooltip = $("<div class='tooltip' id='reset-tooltip'>Click and drag on the canvas to select nodes.</div>");
       reset_button = $("<button id='reset-button' class='disabled-button modifier-button'><span id='reset-icon'>&#8635;</span> Reset Selection</button>");
       reset_button.on("click", (function(_this) {
         return function(e) {
