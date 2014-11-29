@@ -68,12 +68,9 @@
       var rect, svg, zoomListener;
       zoomListener = d3.behavior.zoom().scaleExtent([.5, 10]).on("zoom", (function(_this) {
         return function() {
-          var trans;
-          if (_this.mousedown) {
-            return;
+          if (!_this.mousedown) {
+            return _this.vis.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
           }
-          trans = "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")";
-          return _this.vis.attr("transform", trans);
         };
       })(this));
       svg = d3.select("#vis").select("svg").call(zoomListener);
@@ -85,10 +82,9 @@
       var that;
       that = this;
       return this.vis.on("mousedown", function() {
-        var p, s;
+        var p;
         that.mousedown = true;
-        s = d3.select(this).select("rect.select-box");
-        s.remove();
+        d3.select(this).select("rect.select-box").remove();
         p = d3.mouse(this);
         return d3.select(this).append("rect").attr({
           rx: 6,
@@ -98,35 +94,35 @@
           y: p[1],
           width: 0,
           height: 0,
-          x1: p[0],
-          y1: p[1]
+          x0: p[0],
+          y0: p[1]
         });
       }).on("mousemove", function() {
-        var d, p, s;
+        var d, p, s, x0, y0;
         s = d3.select(this).select("rect.select-box");
         if (!s.empty()) {
           p = d3.mouse(this);
           d = {
             x: parseInt(s.attr("x"), 10),
             y: parseInt(s.attr("y"), 10),
-            x1: parseInt(s.attr("x1"), 10),
-            y1: parseInt(s.attr("y1"), 10),
             width: parseInt(s.attr("width"), 10),
             height: parseInt(s.attr("height"), 10)
           };
-          if (p[0] < d.x1) {
-            d.width = d.x1 - p[0];
+          x0 = parseInt(s.attr("x0"), 10);
+          y0 = parseInt(s.attr("y0"), 10);
+          if (p[0] < x0) {
+            d.width = x0 - p[0];
             d.x = p[0];
           } else {
             d.width = p[0] - d.x;
-            d.x = d.x1;
+            d.x = x0;
           }
-          if (p[1] < d.y1) {
-            d.height = d.y1 - p[1];
+          if (p[1] < y0) {
+            d.height = y0 - p[1];
             d.y = p[1];
           } else {
             d.height = p[1] - d.y;
-            d.y = d.y1;
+            d.y = y0;
           }
           s.attr(d);
           return that.circles.each((function(_this) {
@@ -199,7 +195,7 @@
       this.numeric_filters = [];
       $.each(sorted_filters, (function(_this) {
         return function(f, v) {
-          if (isNaN(v[0].value)) {
+          if (isNaN(v[0].value.replace("%", ""))) {
             if (v.length !== _this.data.length && v.length < 500) {
               return _this.categorical_filters.push({
                 value: f
@@ -279,30 +275,24 @@
     };
 
     Potato.prototype.add_node = function(d) {
-      var curr_class, curr_r, node, vals;
+      var vals;
       vals = {};
       $.each(this.filter_names, (function(_this) {
         return function(k, f) {
           return vals[f.value] = d[f.value];
         };
       })(this));
-      curr_class = '';
-      curr_r = 5;
-      if (this.node_class != null) {
-        curr_class = d[this.node_class];
-      }
-      node = {
+      return this.nodes.push({
         id: d.node_id,
-        radius: curr_r,
+        radius: 5,
         values: vals,
         color: "#777",
-        "class": curr_class,
+        "class": this.node_class != null ? d[this.node_class] : '',
         x: Math.random() * 900,
         y: Math.random() * 800,
         tarx: this.width / 2.0,
         tary: this.height / 2.0
-      };
-      return this.nodes.push(node);
+      });
     };
 
     Potato.prototype.remove_nodes = function(nodes_to_remove) {
@@ -370,17 +360,7 @@
     Potato.prototype.reset = function(type) {
       $("." + type + "-option").removeClass('active');
       $("#" + type + "-hint").html("");
-      if (type === 'split') {
-        while (this.labels.length > 0) {
-          this.labels.pop();
-        }
-        this.circles.each((function(_this) {
-          return function(c) {
-            c.tarx = _this.width / 2.0;
-            return c.tary = _this.height / 2.0;
-          };
-        })(this));
-      } else if (type === 'color') {
+      if (type === 'color') {
         d3.select("#color-legend").selectAll("*").remove();
         this.circles.each(function(c) {
           return c.color = "#777";
@@ -397,7 +377,7 @@
             return c.radius = 5;
           };
         })(this));
-      } else if (type === 'order') {
+      } else if (type === 'split' || type === 'order') {
         while (this.axis.length > 0) {
           this.axis.pop();
         }
@@ -406,7 +386,8 @@
         }
         this.circles.each((function(_this) {
           return function(c) {
-            return c.tarx = _this.width / 2.0;
+            c.tarx = _this.width / 2.0;
+            return c.tary = _this.height / 2.0;
           };
         })(this));
       }
@@ -430,11 +411,11 @@
           }
         };
       })(this));
-      num_rows = Math.round(Math.sqrt(curr_vals.length)) + 1;
-      num_cols = curr_vals.length / (num_rows - 1);
+      num_cols = Math.ceil(Math.sqrt(curr_vals.length));
+      num_rows = Math.ceil(curr_vals.length / num_cols);
       curr_row = 0;
       curr_col = 0;
-      width_2 = this.width * 0.75;
+      width_2 = this.width * 0.8;
       height_2 = this.height * 0.8;
       curr_vals.sort();
       curr_vals.forEach((function(_this) {
@@ -442,8 +423,8 @@
           var label;
           curr_vals[i] = {
             split: s,
-            tarx: (_this.width * 0.07) + (0.5 + curr_col) * (width_2 / num_cols),
-            tary: (_this.height * 0.18) + (0.5 + curr_row) * (height_2 / num_rows)
+            tarx: (_this.width * 0.12) + (0.5 + curr_col) * (width_2 / num_cols),
+            tary: (_this.height * 0.14) + (0.5 + curr_row) * (height_2 / num_rows)
           };
           label = {
             val: s,

@@ -47,12 +47,8 @@ class window.Potato
     zoomListener = d3.behavior.zoom()
       .scaleExtent([.5, 10])
       .on("zoom", =>
-        # TODO change this to just see if the mouse is down?
-        return if @mousedown
-
-        trans = "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")"
-
-        @vis.attr("transform",trans)
+        if !@mousedown
+          @vis.attr("transform","translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")")
       )
 
     svg = d3.select("#vis").select("svg")
@@ -71,8 +67,7 @@ class window.Potato
     that = this
     @vis.on("mousedown", ->
       that.mousedown = true
-      s = d3.select(this).select("rect.select-box")
-      s.remove()
+      d3.select(this).select("rect.select-box").remove()
 
       p = d3.mouse(this)
 
@@ -85,8 +80,8 @@ class window.Potato
           y: p[1]
           width: 0
           height: 0
-          x1: p[0]
-          y1: p[1]
+          x0: p[0]
+          y0: p[1]
         })
     ).on("mousemove", ->
       s = d3.select(this).select("rect.select-box")
@@ -94,28 +89,29 @@ class window.Potato
       if !s.empty()
         p = d3.mouse(this)
         d = {
-          x: parseInt( s.attr( "x"), 10)
-          y: parseInt( s.attr( "y"), 10)
-          x1: parseInt( s.attr( "x1"), 10)
-          y1: parseInt( s.attr( "y1"), 10)
-          width: parseInt( s.attr( "width"), 10)
-          height: parseInt( s.attr( "height"), 10)
+          x: parseInt(s.attr("x"), 10)
+          y: parseInt(s.attr("y"), 10)
+          width: parseInt(s.attr("width"), 10)
+          height: parseInt(s.attr("height"), 10)
         }
 
+        x0 = parseInt(s.attr("x0"), 10)
+        y0 = parseInt(s.attr("y0"), 10)
+
         # anchor at least one corner to the original click point (x1,y1)
-        if p[0] < d.x1
-          d.width = d.x1 - p[0]
+        if p[0] < x0
+          d.width = x0 - p[0]
           d.x = p[0]
         else
           d.width = p[0] - d.x
-          d.x = d.x1
+          d.x = x0
 
-        if p[1] < d.y1
-          d.height = d.y1 - p[1]
+        if p[1] < y0
+          d.height = y0 - p[1]
           d.y = p[1]
         else
           d.height = p[1] - d.y
-          d.y = d.y1
+          d.y = y0
 
         s.attr(d)
 
@@ -174,7 +170,7 @@ class window.Potato
     @numeric_filters = []
 
     $.each sorted_filters, (f, v) =>
-      if isNaN(v[0].value)
+      if isNaN(v[0].value.replace("%",""))
         if v.length != @data.length && v.length < 500 # every filter value is not unique
           @categorical_filters.push({value: f})
       else
@@ -224,27 +220,19 @@ class window.Potato
     $.each @filter_names, (k, f) =>
       vals[f.value] = d[f.value]
 
-    curr_class = ''
-    curr_r = 5
-
-    # this is set by params
-    curr_class = d[@node_class] if @node_class?
-
-    node = {
+    @nodes.push {
       id: d.node_id
-      radius: curr_r
+      radius: 5
       values: vals
       color: "#777"
-      class: curr_class
+      class: if @node_class? then d[@node_class] else ''
       x: Math.random() * 900
       y: Math.random() * 800
       tarx: @width/2.0
       tary: @height/2.0
     }
-    @nodes.push node
 
   remove_nodes: (nodes_to_remove) =>
-    # this was the only array iterator + removal I could get to work
     len = @nodes.length
     while (len--)
       if nodes_to_remove.indexOf(@nodes[len]['id']) >= 0 # node with offending value found
@@ -252,6 +240,7 @@ class window.Potato
 
     $("#reset-button").removeClass('disabled-button')
 
+    # order by is the one effected by removal of nodes
     order_id = $(".order-option.active").attr('id')
     this.order_by(order_id.substr(order_id.indexOf("-") + 1)) if order_id != undefined
 
@@ -289,14 +278,7 @@ class window.Potato
     $(".#{type}-option").removeClass('active')
     $("##{type}-hint").html("")
 
-    if type == 'split'
-      while @labels.length > 0
-        @labels.pop()
-      @circles.each (c) =>
-        c.tarx = @width/2.0
-        c.tary = @height/2.0
-
-    else if type == 'color'
+    if type == 'color'
       d3.select("#color-legend").selectAll("*").remove()
       @circles.each (c) ->
         c.color = "#777"
@@ -307,13 +289,14 @@ class window.Potato
       @circles.each (c) =>
         c.radius = 5
 
-    else if type == 'order'
+    else if type == 'split' || type == 'order'
       while @axis.length > 0
         @axis.pop()
       while @labels.length > 0
         @labels.pop()
       @circles.each (c) =>
         c.tarx = @width/2.0
+        c.tary = @height/2.0
 
     this.update()
 
@@ -335,21 +318,21 @@ class window.Potato
         curr_vals.push c['values'][split]
 
     # then determine what spots all the values should go to
-    num_rows = Math.round(Math.sqrt(curr_vals.length)) + 1
-    num_cols = curr_vals.length / (num_rows - 1)
+    num_cols = Math.ceil(Math.sqrt(curr_vals.length))
+    num_rows = Math.ceil(curr_vals.length / (num_cols))
 
     curr_row = 0
     curr_col = 0
 
     # padding because the clumps tend to float off the screen
-    width_2 = @width * 0.75
+    width_2 = @width * 0.8
     height_2 = @height * 0.8
 
     curr_vals.sort()
 
     # calculate positions for each filter group
     curr_vals.forEach (s, i) =>
-      curr_vals[i] = { split: s, tarx: (@width*0.07) + (0.5 + curr_col) * (width_2 / num_cols), tary: (@height*0.18) + (0.5 + curr_row) * (height_2 / num_rows)}
+      curr_vals[i] = { split: s, tarx: (@width*0.12) + (0.5 + curr_col) * (width_2 / num_cols), tary: (@height*0.14) + (0.5 + curr_row) * (height_2 / num_rows)}
 
       label = {
         val: s
