@@ -184,7 +184,7 @@ class window.Potato
     @numeric_filters = []
 
     $.each sorted_filters, (f, v) =>
-      if isNaN(v[0].value.replace("%",""))
+      if isNaN(v[0].value.replace("%","").replace(",",""))
         if v.length != @data.length && v.length < 500 # every filter value is not unique
           @categorical_filters.push({value: f})
       else

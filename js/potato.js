@@ -204,7 +204,7 @@
       this.numeric_filters = [];
       $.each(sorted_filters, (function(_this) {
         return function(f, v) {
-          if (isNaN(v[0].value.replace("%", ""))) {
+          if (isNaN(v[0].value.replace("%", "").replace(",", ""))) {
             if (v.length !== _this.data.length && v.length < 500) {
               return _this.categorical_filters.push({
                 value: f
