@@ -9,11 +9,11 @@ $ ->
     file = e.target.files[0]
     console.log(file)
 
-    if file.type == 'text/csv'
-      fileReader = new FileReader()
-      fileReader.onload = (e) =>
-        render_vis(d3.csv.parse(fileReader.result))
-      fileReader.readAsText(file)
+#    if file.type == 'text/csv'
+    fileReader = new FileReader()
+    fileReader.onload = (e) =>
+      render_vis(d3.csv.parse(fileReader.result))
+    fileReader.readAsText(file)
 
   $("#basketball-dataset").on 'click', (e) =>
     d3.csv "data/basketball/basketball.csv", (csv) ->

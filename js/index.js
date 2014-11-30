@@ -15,13 +15,11 @@
         var file, fileReader;
         file = e.target.files[0];
         console.log(file);
-        if (file.type === 'text/csv') {
-          fileReader = new FileReader();
-          fileReader.onload = function(e) {
-            return render_vis(d3.csv.parse(fileReader.result));
-          };
-          return fileReader.readAsText(file);
-        }
+        fileReader = new FileReader();
+        fileReader.onload = function(e) {
+          return render_vis(d3.csv.parse(fileReader.result));
+        };
+        return fileReader.readAsText(file);
       };
     })(this));
     $("#basketball-dataset").on('click', (function(_this) {
