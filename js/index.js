@@ -14,6 +14,7 @@
       return function(e) {
         var file, fileReader;
         file = e.target.files[0];
+        console.log(file);
         if (file.type === 'text/csv') {
           fileReader = new FileReader();
           fileReader.onload = function(e) {

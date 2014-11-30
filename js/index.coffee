@@ -7,6 +7,7 @@ $ ->
 
   $("#file-uploader").on 'change', (e) =>
     file = e.target.files[0]
+    console.log(file)
 
     if file.type == 'text/csv'
       fileReader = new FileReader()
