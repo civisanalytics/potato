@@ -19,7 +19,7 @@ class window.Potato
        .attr("viewBox", "0 0 #{@width} #{@height}")
        .attr("id", "vis-svg")
 
-    #this.zoom()
+    this.zoom()
 
     @force = d3.layout.force()
       .gravity(-0.01)
@@ -48,21 +48,35 @@ class window.Potato
       .scaleExtent([.5, 10])
       .on("zoom", =>
         if !@mousedown
-          @vis.attr("transform","translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")")
+          #  @vis.attr("transform","translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")")
+
+          # positive is scroll up which on a map is zoom out
+          dy = d3.event.sourceEvent.deltaY
+
+          radius_change = if dy > 0 then 0.95 else 1.05
+
+          # lower/upper bounds
+          if (@nodes[0].radius < 2 and radius_change < 1) or (@nodes[0].radius > 75 and radius_change > 1)
+            return
+
+          $.each @nodes, (i, n) =>
+            n.radius *= radius_change
+
+          this.update()
       )
+    @vis.call(zoomListener)
 
-    svg = d3.select("#vis").select("svg")
-      .call(zoomListener)
+#    svg = d3.select("#vis").select("svg")
+#      .call(zoomListener)
 
-    rect = svg.append("rect")
-       .attr("width", @width)
-       .attr("height", @height)
-       .style("fill", "none")
-       .style("pointer-events", "all")
+#    rect = svg.append("rect")
+#       .attr("width", @width)
+#       .attr("height", @height)
+#       .style("fill", "none")
+#       .style("pointer-events", "all")
 
-    @vis = svg.append("g")
+#    @vis = svg.append("g")
 
-  # initialize drag select
   drag_select: () =>
     that = this
     @vis.on("mousedown", ->
@@ -204,7 +218,9 @@ class window.Potato
 
     $("#reset-button").addClass('disabled-button')
     this.update()
+    this.apply_filters()
 
+  apply_filters: ( )=>
     # apply any existing splits/colors/sizes
     split_id = $(".split-option.active").attr('id')
     this.split_by(split_id.substr(split_id.indexOf("-") + 1)) if split_id != undefined
@@ -240,11 +256,8 @@ class window.Potato
 
     $("#reset-button").removeClass('disabled-button')
 
-    # order by is the one effected by removal of nodes
-    order_id = $(".order-option.active").attr('id')
-    this.order_by(order_id.substr(order_id.indexOf("-") + 1)) if order_id != undefined
-
     this.update()
+    setTimeout(this.apply_filters, 200)
 
   create_buttons: (type) =>
     type_upper = type[0].toUpperCase() + type.slice(1);
@@ -332,7 +345,11 @@ class window.Potato
 
     # calculate positions for each filter group
     curr_vals.forEach (s, i) =>
-      curr_vals[i] = { split: s, tarx: (@width*0.12) + (0.5 + curr_col) * (width_2 / num_cols), tary: (@height*0.14) + (0.5 + curr_row) * (height_2 / num_rows)}
+      curr_vals[i] = {
+        split: s
+        tarx: (@width*0.12) + (0.5 + curr_col) * (width_2 / num_cols)
+        tary: (@height*0.14) + (0.5 + curr_row) * (height_2 / num_rows)
+      }
 
       label = {
         val: s
@@ -473,14 +490,13 @@ class window.Potato
     curr_max = d3.max(curr_vals, (d) -> parseFloat(d))
     non_zero_min = curr_max
 
-    $.each curr_vals, (k, c) =>
-      if c > 0 && c < non_zero_min
-        non_zero_min = c
+    $.each curr_vals, (k, v) =>
+      if v > 0 && v < non_zero_min
+        non_zero_min = v
 
     sizes = d3.scale.sqrt()
       .domain([non_zero_min, curr_max])
       .range([2,20])
-      .clamp(true) # allows us to handle null values
 
     # then update all circle sizes appropriately
     @circles.each (c) =>
@@ -511,9 +527,6 @@ class window.Potato
     curr_max = d3.max(curr_vals, (d) -> d)
     non_zero_min = curr_max
 
-    #TODO sort curr_vals and then take some segment, maybe 4? 5?
-    #and add those selected variables to labels....
-
     $.each curr_vals, (k, c) =>
       if c > 0 && c < non_zero_min
         non_zero_min = c
@@ -521,7 +534,6 @@ class window.Potato
     orders = d3.scale.sqrt()
       .domain([non_zero_min, curr_max])
       .range([220, @width - 160])
-      .clamp(true) # allows us to handle null values
 
     # then update all circle positions appropriately
     @circles.each (c) =>
@@ -646,7 +658,7 @@ class window.Potato
 
         if d.label_id == "text-label"
           d.tary = min_y - 40
-        else
+        else if count > 0
           d.tary = min_y - 20
           d.tarx = totx / count
 

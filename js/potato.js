@@ -29,6 +29,7 @@
       this.create_buttons = __bind(this.create_buttons, this);
       this.remove_nodes = __bind(this.remove_nodes, this);
       this.add_node = __bind(this.add_node, this);
+      this.apply_filters = __bind(this.apply_filters, this);
       this.add_all = __bind(this.add_all, this);
       this.create_filters = __bind(this.create_filters, this);
       this.drag_select = __bind(this.drag_select, this);
@@ -45,6 +46,7 @@
       $("#vis").append("<div class='tooltip' id='node-tooltip'></div>").append("<div id='toolbar'><div id='modifiers'></div><div id='filter-select-buttons'></div></div>");
       $("#node-tooltip").hide();
       this.vis = d3.select("#vis").append("svg").attr("viewBox", "0 0 " + this.width + " " + this.height).attr("id", "vis-svg");
+      this.zoom();
       this.force = d3.layout.force().gravity(-0.01).charge(function(d) {
         return -Math.pow(d.radius, 2.0) * 1.5;
       }).size([this.width, this.height]);
@@ -65,17 +67,24 @@
     }
 
     Potato.prototype.zoom = function() {
-      var rect, svg, zoomListener;
+      var zoomListener;
       zoomListener = d3.behavior.zoom().scaleExtent([.5, 10]).on("zoom", (function(_this) {
         return function() {
+          var dy, radius_change;
           if (!_this.mousedown) {
-            return _this.vis.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+            dy = d3.event.sourceEvent.deltaY;
+            radius_change = dy > 0 ? 0.95 : 1.05;
+            if ((_this.nodes[0].radius < 2 && radius_change < 1) || (_this.nodes[0].radius > 75 && radius_change > 1)) {
+              return;
+            }
+            $.each(_this.nodes, function(i, n) {
+              return n.radius *= radius_change;
+            });
+            return _this.update();
           }
         };
       })(this));
-      svg = d3.select("#vis").select("svg").call(zoomListener);
-      rect = svg.append("rect").attr("width", this.width).attr("height", this.height).style("fill", "none").style("pointer-events", "all");
-      return this.vis = svg.append("g");
+      return this.vis.call(zoomListener);
     };
 
     Potato.prototype.drag_select = function() {
@@ -242,7 +251,6 @@
     };
 
     Potato.prototype.add_all = function() {
-      var color_id, order_id, size_id, split_id;
       if (this.nodes.length !== this.data.length) {
         this.data.forEach((function(_this) {
           return function(d) {
@@ -256,6 +264,11 @@
       }
       $("#reset-button").addClass('disabled-button');
       this.update();
+      return this.apply_filters();
+    };
+
+    Potato.prototype.apply_filters = function() {
+      var color_id, order_id, size_id, split_id;
       split_id = $(".split-option.active").attr('id');
       if (split_id !== void 0) {
         this.split_by(split_id.substr(split_id.indexOf("-") + 1));
@@ -296,7 +309,7 @@
     };
 
     Potato.prototype.remove_nodes = function(nodes_to_remove) {
-      var len, order_id;
+      var len;
       len = this.nodes.length;
       while (len--) {
         if (nodes_to_remove.indexOf(this.nodes[len]['id']) >= 0) {
@@ -304,11 +317,8 @@
         }
       }
       $("#reset-button").removeClass('disabled-button');
-      order_id = $(".order-option.active").attr('id');
-      if (order_id !== void 0) {
-        this.order_by(order_id.substr(order_id.indexOf("-") + 1));
-      }
-      return this.update();
+      this.update();
+      return setTimeout(this.apply_filters, 200);
     };
 
     Potato.prototype.create_buttons = function(type) {
@@ -569,13 +579,13 @@
       });
       non_zero_min = curr_max;
       $.each(curr_vals, (function(_this) {
-        return function(k, c) {
-          if (c > 0 && c < non_zero_min) {
-            return non_zero_min = c;
+        return function(k, v) {
+          if (v > 0 && v < non_zero_min) {
+            return non_zero_min = v;
           }
         };
       })(this));
-      sizes = d3.scale.sqrt().domain([non_zero_min, curr_max]).range([2, 20]).clamp(true);
+      sizes = d3.scale.sqrt().domain([non_zero_min, curr_max]).range([2, 20]);
       this.circles.each((function(_this) {
         return function(c) {
           var s_val;
@@ -616,7 +626,7 @@
           }
         };
       })(this));
-      orders = d3.scale.sqrt().domain([non_zero_min, curr_max]).range([220, this.width - 160]).clamp(true);
+      orders = d3.scale.sqrt().domain([non_zero_min, curr_max]).range([220, this.width - 160]);
       this.circles.each((function(_this) {
         return function(c) {
           var s_val;
@@ -771,7 +781,7 @@
             });
             if (d.label_id === "text-label") {
               return d.tary = min_y - 40;
-            } else {
+            } else if (count > 0) {
               d.tary = min_y - 20;
               return d.tarx = totx / count;
             }
