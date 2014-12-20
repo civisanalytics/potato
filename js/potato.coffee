@@ -26,7 +26,7 @@ class window.Potato
 
     @force = d3.layout.force()
       .gravity(-0.01)
-      .charge((d) -> -Math.pow(d.radius, 2.0) * 1.5)
+      .charge((d) -> -Math.pow(d.radius, 2.0) * 1.4)
       .size([@width, @height])
 
     # this is necessary so graph and model stay in sync
@@ -359,7 +359,7 @@ class window.Potato
       curr_vals[i] = {
         split: s
         tarx: (@width*0.12) + (0.5 + curr_col) * (width_2 / num_cols)
-        tary: (@height*0.14) + (0.5 + curr_row) * (height_2 / num_rows)
+        tary: (@height*0.10) + (0.5 + curr_row) * (height_2 / num_rows)
       }
 
       label = {
@@ -689,8 +689,8 @@ class window.Potato
   # move node towards the target defined in (tarx,tary)
   move_towards_target: (alpha) =>
     (d) =>
-      d.x = d.x + (d.tarx - d.x) * (0.7) * alpha
-      d.y = d.y + (d.tary - d.y) * (0.7) * alpha
+      d.x = d.x + (d.tarx - d.x) * (0.5) * alpha
+      d.y = d.y + (d.tary - d.y) * (0.5) * alpha
 
   show_details: (data, i, element) =>
     content = ""

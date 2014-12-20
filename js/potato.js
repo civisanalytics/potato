@@ -53,7 +53,7 @@
       this.vis = d3.select("#vis").append("svg").attr("viewBox", "0 0 " + this.width + " " + this.height).attr("id", "vis-svg");
       this.zoom();
       this.force = d3.layout.force().gravity(-0.01).charge(function(d) {
-        return -Math.pow(d.radius, 2.0) * 1.5;
+        return -Math.pow(d.radius, 2.0) * 1.4;
       }).size([this.width, this.height]);
       this.nodes = this.force.nodes();
       this.labels = [];
@@ -446,7 +446,7 @@
           curr_vals[i] = {
             split: s,
             tarx: (_this.width * 0.12) + (0.5 + curr_col) * (width_2 / num_cols),
-            tary: (_this.height * 0.14) + (0.5 + curr_row) * (height_2 / num_rows)
+            tary: (_this.height * 0.10) + (0.5 + curr_row) * (height_2 / num_rows)
           };
           label = {
             val: s,
@@ -821,8 +821,8 @@
     Potato.prototype.move_towards_target = function(alpha) {
       return (function(_this) {
         return function(d) {
-          d.x = d.x + (d.tarx - d.x) * 0.7 * alpha;
-          return d.y = d.y + (d.tary - d.y) * 0.7 * alpha;
+          d.x = d.x + (d.tarx - d.x) * 0.5 * alpha;
+          return d.y = d.y + (d.tary - d.y) * 0.5 * alpha;
         };
       })(this);
     };
