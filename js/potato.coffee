@@ -1,8 +1,11 @@
 class window.Potato
-  constructor: (data, params = {split: true, color: true, size: true, order: true, class: null}) ->
-    @data = data
+  default_params = {split: true, color: true, size: true, order: true, class: null}
+
+  constructor: (@data, params = default_params) ->
     @width = $(window).width()
-    @height = $(window).height() - 105
+    # 55 is the height of the toolbar, which I unfortunately can't grab programatically
+    # as the toolbar doesn't gain a height until this.create_filters is called
+    @height = $(window).height() - 55
 
     @node_class = params.class
 
@@ -216,22 +219,27 @@ class window.Potato
     if @nodes.length != @data.length
       @data.forEach (d) =>
         if $.grep(@nodes, (e) => e.id == d.node_id).length == 0 # if it doesn't already exist in nodes
-          this.add_node(d)
+          temp_obj = {}
+          $.each d, (k, v) =>
+            k_mod = k.replace(/\(|\)/g," ")
+            temp_obj[k_mod] = v
+          this.add_node(temp_obj)
 
     $("#reset-button").addClass('disabled-button')
     this.update()
     this.apply_filters()
 
-  apply_filters: ( )=>
-    # apply any existing splits/colors/sizes
-    split_id = $(".split-option.active").attr('id')
-    this.split_by(split_id.substr(split_id.indexOf("-") + 1)) if split_id != undefined
-    color_id = $(".color-option.active").attr('id')
-    this.color_by(color_id.substr(color_id.indexOf("-") + 1)) if color_id != undefined
-    size_id = $(".size-option.active").attr('id')
-    this.size_by(size_id.substr(size_id.indexOf("-") + 1)) if size_id != undefined
-    order_id = $(".order-option.active").attr('id')
-    this.order_by(order_id.substr(order_id.indexOf("-") + 1)) if order_id != undefined
+  # apply any existing splits/colors/sizes
+  apply_filters: () =>
+    $(".active-split").each((i, splitObj) =>
+      split_id = $(splitObj).attr('id')
+      dash_loc = split_id.indexOf('-')
+
+      type = split_id.substr(0, dash_loc)
+      val = split_id.substr(dash_loc + 1)
+
+      this.apply_split(type, val)
+    )
 
   add_node: (d) =>
     vals = {} # create a hash with the appropriate filters
@@ -282,15 +290,10 @@ class window.Potato
       .text((d) -> d.value)
       .attr("class", "modifier-option #{type}-option")
       .attr("id", (d) -> "#{type}-#{d.value}")
-      .on("click", (d) =>
-        this.split_by(d.value) if type == "split"
-        this.color_by(d.value) if type == "color"
-        this.size_by(d.value) if type == "size"
-        this.order_by(d.value) if type == "order"
-      )
+      .on("click", (d) => this.apply_split(type, d.value))
 
   reset: (type) =>
-    $(".#{type}-option").removeClass('active')
+    $(".#{type}-option").removeClass('active-split')
     $("##{type}-hint").html("")
 
     if type == 'color'
@@ -315,6 +318,12 @@ class window.Potato
 
     this.update()
 
+  apply_split: (type, split) =>
+    this.split_by(split) if type == "split"
+    this.color_by(split) if type == "color"
+    this.size_by(split) if type == "size"
+    this.order_by(split) if type == "order"
+
   split_by: (split) =>
     if @circles == undefined || @circles.length == 0
       return
@@ -323,7 +332,7 @@ class window.Potato
     this.reset('split')
 
     $("#split-hint").html("<br>"+split)
-    $("#split-"+split).addClass('active')
+    $("#split-"+split).addClass('active-split')
 
     curr_vals = []
 
@@ -387,7 +396,7 @@ class window.Potato
 
     $("#vis").append("<div id='color-legend'></div>") if $("#color-legend").length < 1
     $("#color-hint").html("<br>"+split)
-    $("#color-"+split).addClass('active')
+    $("#color-"+split).addClass('active-split')
 
     curr_vals_with_count = {}
 
@@ -481,7 +490,7 @@ class window.Potato
     this.reset('size')
 
     $("#size-hint").html("<br>"+split)
-    $("#size-"+split).addClass('active')
+    $("#size-"+split).addClass('active-split')
 
     curr_vals = []
 
@@ -518,7 +527,7 @@ class window.Potato
     this.reset('order')
 
     $("#order-hint").html("<br>"+split)
-    $("#order-"+split).addClass('active')
+    $("#order-"+split).addClass('active-split')
 
     curr_vals = []
 

@@ -4,15 +4,20 @@
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
   window.Potato = (function() {
+    var default_params;
+
+    default_params = {
+      split: true,
+      color: true,
+      size: true,
+      order: true,
+      "class": null
+    };
+
     function Potato(data, params) {
+      this.data = data;
       if (params == null) {
-        params = {
-          split: true,
-          color: true,
-          size: true,
-          order: true,
-          "class": null
-        };
+        params = default_params;
       }
       this.update_position = __bind(this.update_position, this);
       this.highlight_node = __bind(this.highlight_node, this);
@@ -25,6 +30,7 @@
       this.size_by = __bind(this.size_by, this);
       this.color_by = __bind(this.color_by, this);
       this.split_by = __bind(this.split_by, this);
+      this.apply_split = __bind(this.apply_split, this);
       this.reset = __bind(this.reset, this);
       this.create_buttons = __bind(this.create_buttons, this);
       this.remove_nodes = __bind(this.remove_nodes, this);
@@ -34,9 +40,8 @@
       this.create_filters = __bind(this.create_filters, this);
       this.drag_select = __bind(this.drag_select, this);
       this.zoom = __bind(this.zoom, this);
-      this.data = data;
       this.width = $(window).width();
-      this.height = $(window).height() - 105;
+      this.height = $(window).height() - 55;
       this.node_class = params["class"];
       $.each(this.data, (function(_this) {
         return function(i, d) {
@@ -278,23 +283,16 @@
     };
 
     Potato.prototype.apply_filters = function() {
-      var color_id, order_id, size_id, split_id;
-      split_id = $(".split-option.active").attr('id');
-      if (split_id !== void 0) {
-        this.split_by(split_id.substr(split_id.indexOf("-") + 1));
-      }
-      color_id = $(".color-option.active").attr('id');
-      if (color_id !== void 0) {
-        this.color_by(color_id.substr(color_id.indexOf("-") + 1));
-      }
-      size_id = $(".size-option.active").attr('id');
-      if (size_id !== void 0) {
-        this.size_by(size_id.substr(size_id.indexOf("-") + 1));
-      }
-      order_id = $(".order-option.active").attr('id');
-      if (order_id !== void 0) {
-        return this.order_by(order_id.substr(order_id.indexOf("-") + 1));
-      }
+      return $(".active-split").each((function(_this) {
+        return function(i, splitObj) {
+          var dash_loc, split_id, type, val;
+          split_id = $(splitObj).attr('id');
+          dash_loc = split_id.indexOf('-');
+          type = split_id.substr(0, dash_loc);
+          val = split_id.substr(dash_loc + 1);
+          return _this.apply_split(type, val);
+        };
+      })(this));
     };
 
     Potato.prototype.add_node = function(d) {
@@ -361,24 +359,13 @@
         return "" + type + "-" + d.value;
       }).on("click", (function(_this) {
         return function(d) {
-          if (type === "split") {
-            _this.split_by(d.value);
-          }
-          if (type === "color") {
-            _this.color_by(d.value);
-          }
-          if (type === "size") {
-            _this.size_by(d.value);
-          }
-          if (type === "order") {
-            return _this.order_by(d.value);
-          }
+          return _this.apply_split(type, d.value);
         };
       })(this));
     };
 
     Potato.prototype.reset = function(type) {
-      $("." + type + "-option").removeClass('active');
+      $("." + type + "-option").removeClass('active-split');
       $("#" + type + "-hint").html("");
       if (type === 'color') {
         d3.select("#color-legend").selectAll("*").remove();
@@ -414,6 +401,21 @@
       return this.update();
     };
 
+    Potato.prototype.apply_split = function(type, split) {
+      if (type === "split") {
+        this.split_by(split);
+      }
+      if (type === "color") {
+        this.color_by(split);
+      }
+      if (type === "size") {
+        this.size_by(split);
+      }
+      if (type === "order") {
+        return this.order_by(split);
+      }
+    };
+
     Potato.prototype.split_by = function(split) {
       var curr_col, curr_row, curr_vals, height_2, num_cols, num_rows, width_2;
       if (this.circles === void 0 || this.circles.length === 0) {
@@ -422,7 +424,7 @@
       this.reset('order');
       this.reset('split');
       $("#split-hint").html("<br>" + split);
-      $("#split-" + split).addClass('active');
+      $("#split-" + split).addClass('active-split');
       curr_vals = [];
       this.circles.each((function(_this) {
         return function(c) {
@@ -485,7 +487,7 @@
         $("#vis").append("<div id='color-legend'></div>");
       }
       $("#color-hint").html("<br>" + split);
-      $("#color-" + split).addClass('active');
+      $("#color-" + split).addClass('active-split');
       curr_vals_with_count = {};
       numeric = true;
       this.circles.each((function(_this) {
@@ -577,7 +579,7 @@
       }
       this.reset('size');
       $("#size-hint").html("<br>" + split);
-      $("#size-" + split).addClass('active');
+      $("#size-" + split).addClass('active-split');
       curr_vals = [];
       this.circles.each((function(_this) {
         return function(c) {
@@ -618,7 +620,7 @@
       this.reset('split');
       this.reset('order');
       $("#order-hint").html("<br>" + split);
-      $("#order-" + split).addClass('active');
+      $("#order-" + split).addClass('active-split');
       curr_vals = [];
       this.circles.each((function(_this) {
         return function(c) {
