@@ -174,25 +174,28 @@
       this.filter_names = [];
       $.each(this.data[0], (function(_this) {
         return function(d) {
+          var d_mod;
           if (d !== 'node_id') {
+            d_mod = d.replace(/\(|\)/g, " ");
             _this.filter_names.push({
-              value: d
+              value: d_mod
             });
-            return sorted_filters[d] = [];
+            return sorted_filters[d_mod] = [];
           }
         };
       })(this));
       this.data.forEach((function(_this) {
         return function(d) {
           return $.each(d, function(k, v) {
-            var filter_exists;
-            if (k !== 'node_id') {
-              filter_exists = $.grep(sorted_filters[k], function(e) {
-                return e.filter === k && e.value === v;
+            var filter_exists, k_mod;
+            k_mod = k.replace(/\(|\)/g, " ");
+            if (k_mod !== 'node_id') {
+              filter_exists = $.grep(sorted_filters[k_mod], function(e) {
+                return e.filter === k_mod && e.value === v;
               });
               if (filter_exists.length === 0) {
-                return sorted_filters[k].push({
-                  filter: k,
+                return sorted_filters[k_mod].push({
+                  filter: k_mod,
                   value: v
                 });
               }
@@ -254,10 +257,17 @@
       if (this.nodes.length !== this.data.length) {
         this.data.forEach((function(_this) {
           return function(d) {
+            var temp_obj;
             if ($.grep(_this.nodes, function(e) {
               return e.id === d.node_id;
             }).length === 0) {
-              return _this.add_node(d);
+              temp_obj = {};
+              $.each(d, function(k, v) {
+                var k_mod;
+                k_mod = k.replace(/\(|\)/g, " ");
+                return temp_obj[k_mod] = v;
+              });
+              return _this.add_node(temp_obj);
             }
           };
         })(this));

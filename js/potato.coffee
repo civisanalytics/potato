@@ -168,17 +168,19 @@ class window.Potato
     @filter_names = []
     $.each @data[0], (d) =>
       if d != 'node_id'
-        @filter_names.push {value: d}
-        sorted_filters[d] = []
+        d_mod = d.replace(/\(|\)/g," ")
+        @filter_names.push {value: d_mod}
+        sorted_filters[d_mod] = []
 
     # populate the filters from the dataset
     @data.forEach (d) =>
       $.each d, (k, v) =>
-        if k != 'node_id'
-          filter_exists = $.grep sorted_filters[k], (e) =>
-            return e.filter == k && e.value == v
+        k_mod = k.replace(/\(|\)/g," ")
+        if k_mod != 'node_id'
+          filter_exists = $.grep sorted_filters[k_mod], (e) =>
+            return e.filter == k_mod && e.value == v
           if filter_exists.length == 0
-            sorted_filters[k].push({filter: k, value: v})
+            sorted_filters[k_mod].push({filter: k_mod, value: v})
 
     @categorical_filters = []
     @numeric_filters = []
