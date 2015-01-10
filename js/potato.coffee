@@ -511,7 +511,7 @@ class window.Potato
 
     sizes = d3.scale.sqrt()
       .domain([non_zero_min, curr_max])
-      .range([2,20])
+      .range([3,12])
 
     # then update all circle sizes appropriately
     @circles.each (c) =>

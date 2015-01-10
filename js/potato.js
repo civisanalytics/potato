@@ -601,7 +601,7 @@
           }
         };
       })(this));
-      sizes = d3.scale.sqrt().domain([non_zero_min, curr_max]).range([2, 20]);
+      sizes = d3.scale.sqrt().domain([non_zero_min, curr_max]).range([3, 12]);
       this.circles.each((function(_this) {
         return function(c) {
           var s_val;
