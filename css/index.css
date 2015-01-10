@@ -70,3 +70,33 @@ a {
 .demo-button {
   padding: 14px;
 }
+
+.menu-button-wrapper {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  display: none;
+}
+.menu-button {
+  width: 120px;
+  height: 40px;
+}
+.menu-items {
+  position:absolute;
+  font-variant: small-caps;
+  width: 120px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  z-index: 10;
+  background-color: rgba(255,255,255,0.9);
+  display: none;
+}
+.menu-option {
+  text-align: center;
+  height: 35px;
+  line-height: 35px;
+}
+.menu-option:hover {
+  background-color: #ddd;
+  cursor: pointer;
+}

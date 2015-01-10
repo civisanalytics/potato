@@ -1,9 +1,21 @@
 $ ->
   chart = null
 
-  render_vis = (csv, params = null) ->
+  # menu button interaction js
+  $(".menu-button").hover () ->
+    $(".menu-items").slideDown(100)
+  $(".menu-button-wrapper").mouseleave () ->
+    $(".menu-items").slideUp(100)
+
+  $("#new-option").on "click", () =>
+    # not really sure how to properly garbage collect chart...
+    # so the hack workaround is just reload the page?
+    location.reload()
+
+  render_vis = (csv, params = null) =>
     $(".load-screen").hide()
     chart = new Potato csv, params
+    $(".menu-button-wrapper").show()
 
   $("#file-uploader").on 'change', (e) =>
     file = e.target.files[0]

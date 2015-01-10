@@ -53,6 +53,7 @@ button:hover {
 .disabled-button {
   cursor: not-allowed;
   background-color: #eee;
+  color: #777;
 }
 
 #reset-icon {

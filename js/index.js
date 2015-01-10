@@ -3,13 +3,27 @@
   $(function() {
     var chart, render_vis;
     chart = null;
-    render_vis = function(csv, params) {
-      if (params == null) {
-        params = null;
-      }
-      $(".load-screen").hide();
-      return chart = new Potato(csv, params);
-    };
+    $(".menu-button").hover(function() {
+      return $(".menu-items").slideDown(100);
+    });
+    $(".menu-button-wrapper").mouseleave(function() {
+      return $(".menu-items").slideUp(100);
+    });
+    $("#new-option").on("click", (function(_this) {
+      return function() {
+        return location.reload();
+      };
+    })(this));
+    render_vis = (function(_this) {
+      return function(csv, params) {
+        if (params == null) {
+          params = null;
+        }
+        $(".load-screen").hide();
+        chart = new Potato(csv, params);
+        return $(".menu-button-wrapper").show();
+      };
+    })(this);
     $("#file-uploader").on('change', (function(_this) {
       return function(e) {
         var file, fileReader;
