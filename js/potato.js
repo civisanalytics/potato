@@ -10,7 +10,6 @@
       split: true,
       color: true,
       size: true,
-      order: true,
       "class": null
     };
 
@@ -215,12 +214,14 @@
           if (isNaN(v[0].value.replace("%", "").replace(",", ""))) {
             if (v.length !== _this.data.length && v.length < 500) {
               return _this.categorical_filters.push({
-                value: f
+                value: f,
+                type: 'cat'
               });
             }
           } else {
             return _this.numeric_filters.push({
-              value: f
+              value: f,
+              type: 'num'
             });
           }
         };
@@ -290,7 +291,7 @@
           dash_loc = split_id.indexOf('-');
           type = split_id.substr(0, dash_loc);
           val = split_id.substr(dash_loc + 1);
-          return _this.apply_split(type, val);
+          return _this.apply_split(type, val, $(splitObj).attr('data-type'));
         };
       })(this));
     };
@@ -344,22 +345,21 @@
           return _this.reset(type);
         };
       })(this));
-      if (type === "split") {
-        button_filters = this.categorical_filters;
-      }
-      if (type === "size" || type === "order") {
+      if (type === "size") {
         button_filters = this.numeric_filters;
       }
-      if (type === "color") {
+      if (type === "color" || type === "split") {
         button_filters = this.categorical_filters.concat(this.numeric_filters);
       }
       return d3.select("#" + type + "-menu").selectAll('div').data(button_filters).enter().append("div").text(function(d) {
         return d.value;
-      }).attr("class", "modifier-option " + type + "-option").attr("id", function(d) {
+      }).attr("class", "modifier-option " + type + "-option").attr("split-type", function(d) {
+        return "" + d.type;
+      }).attr("id", function(d) {
         return "" + type + "-" + d.value;
       }).on("click", (function(_this) {
         return function(d) {
-          return _this.apply_split(type, d.value);
+          return _this.apply_split(type, d.value, d.type);
         };
       })(this));
     };
@@ -401,83 +401,83 @@
       return this.update();
     };
 
-    Potato.prototype.apply_split = function(type, split) {
+    Potato.prototype.apply_split = function(type, split, data_type) {
       if (type === "split") {
-        this.split_by(split);
+        this.split_by(split, data_type);
       }
       if (type === "color") {
-        this.color_by(split);
+        this.color_by(split, data_type);
       }
       if (type === "size") {
-        this.size_by(split);
-      }
-      if (type === "order") {
-        return this.order_by(split);
+        return this.size_by(split);
       }
     };
 
-    Potato.prototype.split_by = function(split) {
+    Potato.prototype.split_by = function(split, data_type) {
       var curr_col, curr_row, curr_vals, height_2, num_cols, num_rows, width_2;
       if (this.circles === void 0 || this.circles.length === 0) {
         return;
       }
-      this.reset('order');
       this.reset('split');
       $("#split-hint").html("<br>" + split);
       $("#split-" + split).addClass('active-split');
-      curr_vals = [];
-      this.circles.each((function(_this) {
-        return function(c) {
-          if (curr_vals.indexOf(c['values'][split]) < 0) {
-            return curr_vals.push(c['values'][split]);
-          }
-        };
-      })(this));
-      num_cols = Math.ceil(Math.sqrt(curr_vals.length));
-      num_rows = Math.ceil(curr_vals.length / num_cols);
-      curr_row = 0;
-      curr_col = 0;
-      width_2 = this.width * 0.8;
-      height_2 = this.height * 0.8;
-      curr_vals.sort();
-      curr_vals.forEach((function(_this) {
-        return function(s, i) {
-          var label;
-          curr_vals[i] = {
-            split: s,
-            tarx: (_this.width * 0.12) + (0.5 + curr_col) * (width_2 / num_cols),
-            tary: (_this.height * 0.10) + (0.5 + curr_row) * (height_2 / num_rows)
-          };
-          label = {
-            val: s,
-            split: split,
-            x: curr_vals[i].tarx,
-            y: curr_vals[i].tary,
-            tarx: curr_vals[i].tarx,
-            tary: curr_vals[i].tary
-          };
-          _this.labels.push(label);
-          curr_col++;
-          if (curr_col >= num_cols) {
-            curr_col = 0;
-            return curr_row++;
-          }
-        };
-      })(this));
-      this.circles.each((function(_this) {
-        return function(c) {
-          return curr_vals.forEach(function(s) {
-            if (s.split === c['values'][split]) {
-              c.tarx = s.tarx;
-              return c.tary = s.tary;
+      if (data_type === "num") {
+        return this.order_by(split);
+      } else {
+        curr_vals = [];
+        this.circles.each((function(_this) {
+          return function(c) {
+            if (curr_vals.indexOf(c['values'][split]) < 0) {
+              return curr_vals.push(c['values'][split]);
             }
-          });
-        };
-      })(this));
-      return this.update();
+          };
+        })(this));
+        num_cols = Math.ceil(Math.sqrt(curr_vals.length));
+        num_rows = Math.ceil(curr_vals.length / num_cols);
+        curr_row = 0;
+        curr_col = 0;
+        width_2 = this.width * 0.8;
+        height_2 = this.height * 0.8;
+        curr_vals.sort();
+        curr_vals.forEach((function(_this) {
+          return function(s, i) {
+            var label;
+            curr_vals[i] = {
+              split: s,
+              tarx: (_this.width * 0.12) + (0.5 + curr_col) * (width_2 / num_cols),
+              tary: (_this.height * 0.10) + (0.5 + curr_row) * (height_2 / num_rows)
+            };
+            label = {
+              val: s,
+              split: split,
+              x: curr_vals[i].tarx,
+              y: curr_vals[i].tary,
+              tarx: curr_vals[i].tarx,
+              tary: curr_vals[i].tary
+            };
+            _this.labels.push(label);
+            curr_col++;
+            if (curr_col >= num_cols) {
+              curr_col = 0;
+              return curr_row++;
+            }
+          };
+        })(this));
+        this.circles.each((function(_this) {
+          return function(c) {
+            return curr_vals.forEach(function(s) {
+              if (s.split === c['values'][split]) {
+                c.tarx = s.tarx;
+                return c.tary = s.tary;
+              }
+            });
+          };
+        })(this));
+        return this.update();
+      }
     };
 
-    Potato.prototype.color_by = function(split) {
+    Potato.prototype.color_by = function(split, data_type) {
       var colors, curr_max, curr_vals, curr_vals_tuples, curr_vals_with_count, g, l_size, legend, non_zero_min, num_colors, numeric;
       if (this.circles === void 0 || this.circles.length === 0) {
         return;
@@ -489,7 +489,7 @@
       $("#color-hint").html("<br>" + split);
       $("#color-" + split).addClass('active-split');
       curr_vals_with_count = {};
-      numeric = true;
+      numeric = data_type === 'num';
       this.circles.each((function(_this) {
         return function(c) {
           var val;
@@ -497,10 +497,7 @@
           if (curr_vals_with_count.hasOwnProperty(val)) {
             return curr_vals_with_count[val] += 1;
           } else {
-            curr_vals_with_count[val] = 1;
-            if (c['values'][split] !== "" && $.isNumeric(c['values'][split]) === false) {
-              return numeric = false;
-            }
+            return curr_vals_with_count[val] = 1;
           }
         };
       })(this));
@@ -614,13 +611,6 @@
 
     Potato.prototype.order_by = function(split) {
       var curr_max, curr_vals, non_zero_min, orders;
-      if (this.circles === void 0 || this.circles.length === 0) {
-        return;
-      }
-      this.reset('split');
-      this.reset('order');
-      $("#order-hint").html("<br>" + split);
-      $("#order-" + split).addClass('active-split');
       curr_vals = [];
       this.circles.each((function(_this) {
         return function(c) {

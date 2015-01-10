@@ -17,7 +17,7 @@ $ ->
 
   $("#basketball-dataset").on 'click', (e) =>
     d3.csv "data/basketball/basketball.csv", (csv) ->
-      render_vis(csv, {split: true, size: true, order: true, class: 'team'})
+      render_vis(csv, {split: true, size: true, class: 'team'})
   $("#billionaire-dataset").on 'click', (e) =>
     d3.csv "data/billion/billionaire.csv", (csv) ->
       render_vis(csv)

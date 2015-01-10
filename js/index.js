@@ -28,7 +28,6 @@
           return render_vis(csv, {
             split: true,
             size: true,
-            order: true,
             "class": 'team'
           });
         });

@@ -1,5 +1,5 @@
 class window.Potato
-  default_params = {split: true, color: true, size: true, order: true, class: null}
+  default_params = {split: true, color: true, size: true, class: null}
 
   constructor: (@data, params = default_params) ->
     @width = $(window).width()
@@ -191,9 +191,9 @@ class window.Potato
     $.each sorted_filters, (f, v) =>
       if isNaN(v[0].value.replace("%","").replace(",",""))
         if v.length != @data.length && v.length < 500 # every filter value is not unique
-          @categorical_filters.push({value: f})
+          @categorical_filters.push({value: f, type: 'cat'})
       else
-        @numeric_filters.push({value: f})
+        @numeric_filters.push({value: f, type: 'num'})
 
     # for the categoricals, put them in sorted alpha order
     $.each @categorical_filters, (k, v) =>
@@ -238,7 +238,7 @@ class window.Potato
       type = split_id.substr(0, dash_loc)
       val = split_id.substr(dash_loc + 1)
 
-      this.apply_split(type, val)
+      this.apply_split(type, val, $(splitObj).attr('data-type'))
     )
 
   add_node: (d) =>
@@ -281,16 +281,16 @@ class window.Potato
     $("##{type}-button").on "click", () =>
       this.reset(type)
 
-    button_filters = @categorical_filters if type == "split"
-    button_filters = @numeric_filters if type == "size" || type == "order"
-    button_filters = @categorical_filters.concat(@numeric_filters) if type == "color"
+    button_filters = @numeric_filters if type == "size"
+    button_filters = @categorical_filters.concat(@numeric_filters) if type == "color" || type == "split"
 
     d3.select("##{type}-menu").selectAll('div').data(button_filters).enter()
       .append("div")
       .text((d) -> d.value)
       .attr("class", "modifier-option #{type}-option")
+      .attr("split-type", (d) -> "#{d.type}")
       .attr("id", (d) -> "#{type}-#{d.value}")
-      .on("click", (d) => this.apply_split(type, d.value))
+      .on("click", (d) => this.apply_split(type, d.value, d.type))
 
   reset: (type) =>
     $(".#{type}-option").removeClass('active-split')
@@ -318,77 +318,79 @@ class window.Potato
 
     this.update()
 
-  apply_split: (type, split) =>
-    this.split_by(split) if type == "split"
-    this.color_by(split) if type == "color"
+  apply_split: (type, split, data_type) =>
+    this.split_by(split, data_type) if type == "split"
+    this.color_by(split, data_type) if type == "color"
     this.size_by(split) if type == "size"
-    this.order_by(split) if type == "order"
 
-  split_by: (split) =>
+  split_by: (split, data_type) =>
     if @circles == undefined || @circles.length == 0
       return
 
-    this.reset('order')
     this.reset('split')
 
     $("#split-hint").html("<br>"+split)
     $("#split-"+split).addClass('active-split')
 
-    curr_vals = []
+    if data_type == "num"
+      this.order_by(split)
+    else
 
-    # first get number of unique values in the filter
-    @circles.each (c) =>
-      if curr_vals.indexOf(c['values'][split]) < 0
-        curr_vals.push c['values'][split]
+      curr_vals = []
 
-    # then determine what spots all the values should go to
-    num_cols = Math.ceil(Math.sqrt(curr_vals.length))
-    num_rows = Math.ceil(curr_vals.length / (num_cols))
+      # first get number of unique values in the filter
+      @circles.each (c) =>
+        if curr_vals.indexOf(c['values'][split]) < 0
+          curr_vals.push c['values'][split]
 
-    curr_row = 0
-    curr_col = 0
+      # then determine what spots all the values should go to
+      num_cols = Math.ceil(Math.sqrt(curr_vals.length))
+      num_rows = Math.ceil(curr_vals.length / (num_cols))
 
-    # padding because the clumps tend to float off the screen
-    width_2 = @width * 0.8
-    height_2 = @height * 0.8
+      curr_row = 0
+      curr_col = 0
 
-    curr_vals.sort()
+      # padding because the clumps tend to float off the screen
+      width_2 = @width * 0.8
+      height_2 = @height * 0.8
 
-    # calculate positions for each filter group
-    curr_vals.forEach (s, i) =>
-      curr_vals[i] = {
-        split: s
-        tarx: (@width*0.12) + (0.5 + curr_col) * (width_2 / num_cols)
-        tary: (@height*0.10) + (0.5 + curr_row) * (height_2 / num_rows)
-      }
+      curr_vals.sort()
 
-      label = {
-        val: s
-        split: split
-        x: curr_vals[i].tarx
-        y: curr_vals[i].tary
-        tarx: curr_vals[i].tarx
-        tary: curr_vals[i].tary
-      }
+      # calculate positions for each filter group
+      curr_vals.forEach (s, i) =>
+        curr_vals[i] = {
+          split: s
+          tarx: (@width*0.12) + (0.5 + curr_col) * (width_2 / num_cols)
+          tary: (@height*0.10) + (0.5 + curr_row) * (height_2 / num_rows)
+        }
 
-      @labels.push label
+        label = {
+          val: s
+          split: split
+          x: curr_vals[i].tarx
+          y: curr_vals[i].tary
+          tarx: curr_vals[i].tarx
+          tary: curr_vals[i].tary
+        }
 
-      curr_col++
-      if curr_col >= num_cols
-        curr_col = 0
-        curr_row++
+        @labels.push label
 
-    # then update all circles tarx and tary appropriately
-    @circles.each (c) =>
-      curr_vals.forEach (s) =>
-        if s.split == c['values'][split]
-          c.tarx = s.tarx
-          c.tary = s.tary
+        curr_col++
+        if curr_col >= num_cols
+          curr_col = 0
+          curr_row++
 
-    # then update
-    this.update()
+      # then update all circles tarx and tary appropriately
+      @circles.each (c) =>
+        curr_vals.forEach (s) =>
+          if s.split == c['values'][split]
+            c.tarx = s.tarx
+            c.tary = s.tary
 
-  color_by: (split) =>
+      # then update
+      this.update()
+
+  color_by: (split, data_type) =>
     if @circles == undefined || @circles.length == 0
       return
 
@@ -400,7 +402,7 @@ class window.Potato
 
     curr_vals_with_count = {}
 
-    numeric = true
+    numeric = (data_type == 'num')
 
     # first get number of unique values in the filter
     @circles.each (c) =>
@@ -409,9 +411,6 @@ class window.Potato
         curr_vals_with_count[val] += 1
       else
         curr_vals_with_count[val] = 1
-        # if you find any non numerics, set numeric flag
-        if c['values'][split] != "" && $.isNumeric(c['values'][split]) == false
-          numeric = false
 
     curr_vals_tuples = []
     $.each curr_vals_with_count, (k, c) =>
@@ -520,15 +519,6 @@ class window.Potato
     this.update()
 
   order_by: (split) =>
-    if @circles == undefined || @circles.length == 0
-      return
-
-    this.reset('split')
-    this.reset('order')
-
-    $("#order-hint").html("<br>"+split)
-    $("#order-"+split).addClass('active-split')
-
     curr_vals = []
 
     # first get all the values for this filter
