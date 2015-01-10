@@ -281,13 +281,18 @@ class window.Potato
     $("##{type}-button").on "click", () =>
       this.reset(type)
 
-    button_filters = @numeric_filters if type == "size"
-    button_filters = @categorical_filters.concat(@numeric_filters) if type == "color" || type == "split"
+    button_filters = @numeric_filters
+    button_filters = button_filters.concat({value: '', type: 'divider'}).concat(@categorical_filters) if type == "color" || type == "split"
 
     d3.select("##{type}-menu").selectAll('div').data(button_filters).enter()
       .append("div")
       .text((d) -> d.value)
-      .attr("class", "modifier-option #{type}-option")
+      .attr("class", (d) ->
+        if d.type == 'divider'
+          'divider-option'
+        else
+          "modifier-option #{type}-option"
+      )
       .attr("data-type", (d) -> "#{d.type}")
       .attr("id", (d) -> "#{type}-#{d.value}")
       .on("click", (d) => this.apply_filter(type, d.value, d.type))

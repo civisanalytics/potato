@@ -345,15 +345,22 @@
           return _this.reset(type);
         };
       })(this));
-      if (type === "size") {
-        button_filters = this.numeric_filters;
-      }
+      button_filters = this.numeric_filters;
       if (type === "color" || type === "split") {
-        button_filters = this.categorical_filters.concat(this.numeric_filters);
+        button_filters = button_filters.concat({
+          value: '',
+          type: 'divider'
+        }).concat(this.categorical_filters);
       }
       return d3.select("#" + type + "-menu").selectAll('div').data(button_filters).enter().append("div").text(function(d) {
         return d.value;
-      }).attr("class", "modifier-option " + type + "-option").attr("data-type", function(d) {
+      }).attr("class", function(d) {
+        if (d.type === 'divider') {
+          return 'divider-option';
+        } else {
+          return "modifier-option " + type + "-option";
+        }
+      }).attr("data-type", function(d) {
         return "" + d.type;
       }).attr("id", function(d) {
         return "" + type + "-" + d.value;

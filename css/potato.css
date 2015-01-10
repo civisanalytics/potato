@@ -109,19 +109,24 @@ button:hover {
 }
 .modifier-option {
   text-align: center;
-  height: 30px;
+  height: 35px;
+  line-height: 35px;
   transition: background 0.2s ease-in-out;
   -webkit-transition: background 0.2s ease-in-out;
   -moz-transition: background 0.2s ease-easein-out;
   -ms-transition: background 0.2s ease-in-out;
   -o-transition: background 0.2s ease-in-out;
 }
-.modifier-option:first-child {
-  padding-top:5px;
-}
 .modifier-option:hover {
   background-color: #ddd;
   cursor: pointer;
+}
+
+/* used to divide numeric from categorical values */
+.divider-option {
+  height: 10px;
+  background-color: #aaa;
+  pointer-events: none;
 }
 
 .marker {
