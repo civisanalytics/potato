@@ -542,7 +542,7 @@ class window.Potato
       if !isNaN(s_val) and s_val != ""
         c.tarx = orders(parseFloat(s_val))
       else
-        c.tarx = -100
+        c.tarx = -1000
 
     @labels.push {type: "order", val: non_zero_min, label_id: "head-label", split: filter, x: 220, y: 0, tarx: 220, tary: 0}
     @labels.push {type: "order", val: curr_max, label_id: "tail-label", split: filter, x: @width - 160, y: 0, tarx: @width - 160, tary: 0}

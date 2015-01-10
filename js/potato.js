@@ -636,7 +636,7 @@
           if (!isNaN(s_val) && s_val !== "") {
             return c.tarx = orders(parseFloat(s_val));
           } else {
-            return c.tarx = -100;
+            return c.tarx = -1000;
           }
         };
       })(this));

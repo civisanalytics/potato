@@ -36,5 +36,4 @@ Wishlist:
   exploration.  (ie. billionaire: Try splitting by source and coloring
 by gender)
 - [ ] Hint about zooming?...
-- [ ] simultaneous split + ordering?
 - [ ] Allow users to either keep or remove selection?
