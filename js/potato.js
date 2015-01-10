@@ -29,7 +29,7 @@
       this.size_by = __bind(this.size_by, this);
       this.color_by = __bind(this.color_by, this);
       this.split_by = __bind(this.split_by, this);
-      this.apply_split = __bind(this.apply_split, this);
+      this.apply_filter = __bind(this.apply_filter, this);
       this.reset = __bind(this.reset, this);
       this.create_buttons = __bind(this.create_buttons, this);
       this.remove_nodes = __bind(this.remove_nodes, this);
@@ -284,14 +284,14 @@
     };
 
     Potato.prototype.apply_filters = function() {
-      return $(".active-split").each((function(_this) {
-        return function(i, splitObj) {
-          var dash_loc, split_id, type, val;
-          split_id = $(splitObj).attr('id');
-          dash_loc = split_id.indexOf('-');
-          type = split_id.substr(0, dash_loc);
-          val = split_id.substr(dash_loc + 1);
-          return _this.apply_split(type, val, $(splitObj).attr('data-type'));
+      return $(".active-filter").each((function(_this) {
+        return function(i, filterObj) {
+          var dash_loc, filter_id, type, val;
+          filter_id = $(filterObj).attr('id');
+          dash_loc = filter_id.indexOf('-');
+          type = filter_id.substr(0, dash_loc);
+          val = filter_id.substr(dash_loc + 1);
+          return _this.apply_filter(type, val, $(filterObj).attr('data-type'));
         };
       })(this));
     };
@@ -353,19 +353,19 @@
       }
       return d3.select("#" + type + "-menu").selectAll('div').data(button_filters).enter().append("div").text(function(d) {
         return d.value;
-      }).attr("class", "modifier-option " + type + "-option").attr("split-type", function(d) {
+      }).attr("class", "modifier-option " + type + "-option").attr("data-type", function(d) {
         return "" + d.type;
       }).attr("id", function(d) {
         return "" + type + "-" + d.value;
       }).on("click", (function(_this) {
         return function(d) {
-          return _this.apply_split(type, d.value, d.type);
+          return _this.apply_filter(type, d.value, d.type);
         };
       })(this));
     };
 
     Potato.prototype.reset = function(type) {
-      $("." + type + "-option").removeClass('active-split');
+      $("." + type + "-option").removeClass('active-filter');
       $("#" + type + "-hint").html("");
       if (type === 'color') {
         d3.select("#color-legend").selectAll("*").remove();
@@ -401,34 +401,34 @@
       return this.update();
     };
 
-    Potato.prototype.apply_split = function(type, split, data_type) {
+    Potato.prototype.apply_filter = function(type, filter, data_type) {
       if (type === "split") {
-        this.split_by(split, data_type);
+        this.split_by(filter, data_type);
       }
       if (type === "color") {
-        this.color_by(split, data_type);
+        this.color_by(filter, data_type);
       }
       if (type === "size") {
-        return this.size_by(split);
+        return this.size_by(filter);
       }
     };
 
-    Potato.prototype.split_by = function(split, data_type) {
+    Potato.prototype.split_by = function(filter, data_type) {
       var curr_col, curr_row, curr_vals, height_2, num_cols, num_rows, width_2;
       if (this.circles === void 0 || this.circles.length === 0) {
         return;
       }
       this.reset('split');
-      $("#split-hint").html("<br>" + split);
-      $("#split-" + split).addClass('active-split');
+      $("#split-hint").html("<br>" + filter);
+      $("#split-" + filter).addClass('active-filter');
       if (data_type === "num") {
-        return this.order_by(split);
+        return this.order_by(filter);
       } else {
         curr_vals = [];
         this.circles.each((function(_this) {
           return function(c) {
-            if (curr_vals.indexOf(c['values'][split]) < 0) {
-              return curr_vals.push(c['values'][split]);
+            if (curr_vals.indexOf(c['values'][filter]) < 0) {
+              return curr_vals.push(c['values'][filter]);
             }
           };
         })(this));
@@ -449,7 +449,7 @@
             };
             label = {
               val: s,
-              split: split,
+              split: filter,
               x: curr_vals[i].tarx,
               y: curr_vals[i].tary,
               tarx: curr_vals[i].tarx,
@@ -466,7 +466,7 @@
         this.circles.each((function(_this) {
           return function(c) {
             return curr_vals.forEach(function(s) {
-              if (s.split === c['values'][split]) {
+              if (s.split === c['values'][filter]) {
                 c.tarx = s.tarx;
                 return c.tary = s.tary;
               }
@@ -477,7 +477,7 @@
       }
     };
 
-    Potato.prototype.color_by = function(split, data_type) {
+    Potato.prototype.color_by = function(filter, data_type) {
       var colors, curr_max, curr_vals, curr_vals_tuples, curr_vals_with_count, g, l_size, legend, non_zero_min, num_colors, numeric;
       if (this.circles === void 0 || this.circles.length === 0) {
         return;
@@ -486,14 +486,14 @@
       if ($("#color-legend").length < 1) {
         $("#vis").append("<div id='color-legend'></div>");
       }
-      $("#color-hint").html("<br>" + split);
-      $("#color-" + split).addClass('active-split');
+      $("#color-hint").html("<br>" + filter);
+      $("#color-" + filter).addClass('active-filter');
       curr_vals_with_count = {};
       numeric = data_type === 'num';
       this.circles.each((function(_this) {
         return function(c) {
           var val;
-          val = c['values'][split];
+          val = c['values'][filter];
           if (curr_vals_with_count.hasOwnProperty(val)) {
             return curr_vals_with_count[val] += 1;
           } else {
@@ -555,7 +555,7 @@
       this.circles.each((function(_this) {
         return function(c) {
           return curr_vals.forEach(function(s) {
-            if (s === c['values'][split]) {
+            if (s === c['values'][filter]) {
               return c.color = String(colors(s));
             }
           });
@@ -569,18 +569,18 @@
       });
     };
 
-    Potato.prototype.size_by = function(split) {
+    Potato.prototype.size_by = function(filter) {
       var curr_max, curr_vals, non_zero_min, sizes;
       if (this.circles === void 0 || this.circles.length === 0) {
         return;
       }
       this.reset('size');
-      $("#size-hint").html("<br>" + split);
-      $("#size-" + split).addClass('active-split');
+      $("#size-hint").html("<br>" + filter);
+      $("#size-" + filter).addClass('active-filter');
       curr_vals = [];
       this.circles.each((function(_this) {
         return function(c) {
-          return curr_vals.push(parseFloat(c['values'][split]));
+          return curr_vals.push(parseFloat(c['values'][filter]));
         };
       })(this));
       curr_max = d3.max(curr_vals, function(d) {
@@ -598,7 +598,7 @@
       this.circles.each((function(_this) {
         return function(c) {
           var s_val;
-          s_val = c['values'][split];
+          s_val = c['values'][filter];
           if (!isNaN(s_val) && s_val !== "") {
             return c.radius = sizes(parseFloat(s_val));
           } else {
@@ -609,12 +609,12 @@
       return this.update();
     };
 
-    Potato.prototype.order_by = function(split) {
+    Potato.prototype.order_by = function(filter) {
       var curr_max, curr_vals, non_zero_min, orders;
       curr_vals = [];
       this.circles.each((function(_this) {
         return function(c) {
-          return curr_vals.push(parseFloat(c['values'][split]));
+          return curr_vals.push(parseFloat(c['values'][filter]));
         };
       })(this));
       curr_max = d3.max(curr_vals, function(d) {
@@ -632,7 +632,7 @@
       this.circles.each((function(_this) {
         return function(c) {
           var s_val;
-          s_val = c['values'][split];
+          s_val = c['values'][filter];
           if (!isNaN(s_val) && s_val !== "") {
             return c.tarx = orders(parseFloat(s_val));
           } else {
@@ -644,7 +644,7 @@
         type: "order",
         val: non_zero_min,
         label_id: "head-label",
-        split: split,
+        split: filter,
         x: 220,
         y: 0,
         tarx: 220,
@@ -654,7 +654,7 @@
         type: "order",
         val: curr_max,
         label_id: "tail-label",
-        split: split,
+        split: filter,
         x: this.width - 160,
         y: 0,
         tarx: this.width - 160,
@@ -662,7 +662,7 @@
       });
       this.labels.push({
         type: "order",
-        val: split,
+        val: filter,
         label_id: "text-label",
         x: this.width / 2.0,
         y: 0,

@@ -231,14 +231,14 @@ class window.Potato
 
   # apply any existing splits/colors/sizes
   apply_filters: () =>
-    $(".active-split").each((i, splitObj) =>
-      split_id = $(splitObj).attr('id')
-      dash_loc = split_id.indexOf('-')
+    $(".active-filter").each((i, filterObj) =>
+      filter_id = $(filterObj).attr('id')
+      dash_loc = filter_id.indexOf('-')
 
-      type = split_id.substr(0, dash_loc)
-      val = split_id.substr(dash_loc + 1)
+      type = filter_id.substr(0, dash_loc)
+      val = filter_id.substr(dash_loc + 1)
 
-      this.apply_split(type, val, $(splitObj).attr('data-type'))
+      this.apply_filter(type, val, $(filterObj).attr('data-type'))
     )
 
   add_node: (d) =>
@@ -288,12 +288,12 @@ class window.Potato
       .append("div")
       .text((d) -> d.value)
       .attr("class", "modifier-option #{type}-option")
-      .attr("split-type", (d) -> "#{d.type}")
+      .attr("data-type", (d) -> "#{d.type}")
       .attr("id", (d) -> "#{type}-#{d.value}")
-      .on("click", (d) => this.apply_split(type, d.value, d.type))
+      .on("click", (d) => this.apply_filter(type, d.value, d.type))
 
   reset: (type) =>
-    $(".#{type}-option").removeClass('active-split')
+    $(".#{type}-option").removeClass('active-filter')
     $("##{type}-hint").html("")
 
     if type == 'color'
@@ -318,30 +318,30 @@ class window.Potato
 
     this.update()
 
-  apply_split: (type, split, data_type) =>
-    this.split_by(split, data_type) if type == "split"
-    this.color_by(split, data_type) if type == "color"
-    this.size_by(split) if type == "size"
+  apply_filter: (type, filter, data_type) =>
+    this.split_by(filter, data_type) if type == "split"
+    this.color_by(filter, data_type) if type == "color"
+    this.size_by(filter) if type == "size"
 
-  split_by: (split, data_type) =>
+  split_by: (filter, data_type) =>
     if @circles == undefined || @circles.length == 0
       return
 
     this.reset('split')
 
-    $("#split-hint").html("<br>"+split)
-    $("#split-"+split).addClass('active-split')
+    $("#split-hint").html("<br>#{filter}")
+    $("#split-#{filter}").addClass('active-filter')
 
     if data_type == "num"
-      this.order_by(split)
+      this.order_by(filter)
     else
 
       curr_vals = []
 
       # first get number of unique values in the filter
       @circles.each (c) =>
-        if curr_vals.indexOf(c['values'][split]) < 0
-          curr_vals.push c['values'][split]
+        if curr_vals.indexOf(c['values'][filter]) < 0
+          curr_vals.push c['values'][filter]
 
       # then determine what spots all the values should go to
       num_cols = Math.ceil(Math.sqrt(curr_vals.length))
@@ -366,7 +366,7 @@ class window.Potato
 
         label = {
           val: s
-          split: split
+          split: filter
           x: curr_vals[i].tarx
           y: curr_vals[i].tary
           tarx: curr_vals[i].tarx
@@ -383,22 +383,22 @@ class window.Potato
       # then update all circles tarx and tary appropriately
       @circles.each (c) =>
         curr_vals.forEach (s) =>
-          if s.split == c['values'][split]
+          if s.split == c['values'][filter]
             c.tarx = s.tarx
             c.tary = s.tary
 
       # then update
       this.update()
 
-  color_by: (split, data_type) =>
+  color_by: (filter, data_type) =>
     if @circles == undefined || @circles.length == 0
       return
 
     this.reset('color')
 
     $("#vis").append("<div id='color-legend'></div>") if $("#color-legend").length < 1
-    $("#color-hint").html("<br>"+split)
-    $("#color-"+split).addClass('active-split')
+    $("#color-hint").html("<br>#{filter}")
+    $("#color-#{filter}").addClass('active-filter')
 
     curr_vals_with_count = {}
 
@@ -406,7 +406,7 @@ class window.Potato
 
     # first get number of unique values in the filter
     @circles.each (c) =>
-      val = c['values'][split]
+      val = c['values'][filter]
       if curr_vals_with_count.hasOwnProperty(val)
         curr_vals_with_count[val] += 1
       else
@@ -476,26 +476,26 @@ class window.Potato
     # then update all circle colors appropriately
     @circles.each (c) =>
       curr_vals.forEach (s) =>
-        if s == c['values'][split]
+        if s == c['values'][filter]
           c.color = String(colors(s))
 
     @circles.attr("fill", (d) -> d.color)
     @circles.attr("stroke", (d) -> d3.rgb(d.color).darker())
 
-  size_by: (split) =>
+  size_by: (filter) =>
     if @circles == undefined || @circles.length == 0
       return
 
     this.reset('size')
 
-    $("#size-hint").html("<br>"+split)
-    $("#size-"+split).addClass('active-split')
+    $("#size-hint").html("<br>#{filter}")
+    $("#size-#{filter}").addClass('active-filter')
 
     curr_vals = []
 
     # first get all the values for this filter
     @circles.each (c) =>
-      curr_vals.push parseFloat(c['values'][split])
+      curr_vals.push parseFloat(c['values'][filter])
 
     curr_max = d3.max(curr_vals, (d) -> parseFloat(d))
     non_zero_min = curr_max
@@ -510,7 +510,7 @@ class window.Potato
 
     # then update all circle sizes appropriately
     @circles.each (c) =>
-      s_val = c['values'][split]
+      s_val = c['values'][filter]
       if !isNaN(s_val) and s_val != ""
         c.radius = sizes(parseFloat(s_val))
       else
@@ -518,12 +518,12 @@ class window.Potato
 
     this.update()
 
-  order_by: (split) =>
+  order_by: (filter) =>
     curr_vals = []
 
     # first get all the values for this filter
     @circles.each (c) =>
-      curr_vals.push parseFloat(c['values'][split])
+      curr_vals.push parseFloat(c['values'][filter])
 
     curr_max = d3.max(curr_vals, (d) -> d)
     non_zero_min = curr_max
@@ -538,15 +538,15 @@ class window.Potato
 
     # then update all circle positions appropriately
     @circles.each (c) =>
-      s_val = c['values'][split]
+      s_val = c['values'][filter]
       if !isNaN(s_val) and s_val != ""
         c.tarx = orders(parseFloat(s_val))
       else
         c.tarx = -100
 
-    @labels.push {type: "order", val: non_zero_min, label_id: "head-label", split: split, x: 220, y: 0, tarx: 220, tary: 0}
-    @labels.push {type: "order", val: curr_max, label_id: "tail-label", split: split, x: @width - 160, y: 0, tarx: @width - 160, tary: 0}
-    @labels.push {type: "order", val: split, label_id: "text-label", x: @width / 2.0, y: 0, tarx: @width / 2.0, tary: 0}
+    @labels.push {type: "order", val: non_zero_min, label_id: "head-label", split: filter, x: 220, y: 0, tarx: 220, tary: 0}
+    @labels.push {type: "order", val: curr_max, label_id: "tail-label", split: filter, x: @width - 160, y: 0, tarx: @width - 160, tary: 0}
+    @labels.push {type: "order", val: filter, label_id: "text-label", x: @width / 2.0, y: 0, tarx: @width / 2.0, tary: 0}
 
     @axis.push {
       x1: 220
