@@ -607,7 +607,10 @@
           var s_val;
           s_val = c['values'][filter];
           if (!isNaN(s_val) && s_val !== "") {
-            return c.radius = sizes(parseFloat(s_val));
+            c.radius = sizes(parseFloat(s_val));
+            if (c.radius < 0) {
+              return c.radius = 0;
+            }
           } else {
             return c.radius = 0;
           }

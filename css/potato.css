@@ -47,7 +47,7 @@ button:hover {
 }
 
 #reset-button {
-  padding-right: 20px;
+  padding-right: 10px;
 }
 
 .disabled-button {
@@ -58,7 +58,7 @@ button:hover {
 #reset-icon {
   font-size: 1.5em;
   position: absolute;
-  right: 18px;
+  right: 10px;
   top: 7px;
 }
 
@@ -69,8 +69,6 @@ button:hover {
 
 #filter-select-buttons {
   display: inline-block;
-  float: right;
-  margin-right: 20px;
 }
 
 #modifiers {

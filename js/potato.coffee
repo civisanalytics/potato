@@ -518,6 +518,7 @@ class window.Potato
       s_val = c['values'][filter]
       if !isNaN(s_val) and s_val != ""
         c.radius = sizes(parseFloat(s_val))
+        c.radius = 0 if c.radius < 0 # bound negatives to 0
       else
         c.radius = 0
 
