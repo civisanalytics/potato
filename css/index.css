@@ -21,6 +21,34 @@ a {
   right: 8px;
 }
 
+.help-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+  z-index: 1;
+  display: none;
+}
+
+.help-screen {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: 500px;
+  height: 400px;
+  margin: -250px 0 0 -300px;
+  background-color: rgba(255,255,255,0.9);
+  border: solid 1px #ccc;
+  border-radius: 20px;
+  padding: 50px;
+}
+
+.dataset-info {
+  margin-top: 15px;
+}
+
 .load-screen {
   position: fixed;
   top: 40%;
