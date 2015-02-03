@@ -8,7 +8,7 @@ $ ->
     chart = new Potato data, params
     $(".menu-button-wrapper").show()
     $(".help-wrapper").show()
-    set_help_text(dataset_name)
+    #set_help_text(dataset_name)
 
   $("#file-uploader").on 'change', (e) =>
     file = e.target.files[0]
@@ -34,7 +34,8 @@ $ ->
 # can't do this in the 'on click' because the functions returned dont' have
 # access to the DOM
 set_help_text = (name) ->
-  $(".dataset-name").html(name)
+  #$(".dataset-name").html(name)
+  $("#toolbar").append("<div class='dataset-info'></div>")
 
   if name == "basketball"
     $(".dataset-info").html("

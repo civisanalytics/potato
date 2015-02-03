@@ -14,8 +14,7 @@
         $(".load-screen").hide();
         chart = new Potato(data, params);
         $(".menu-button-wrapper").show();
-        $(".help-wrapper").show();
-        return set_help_text(dataset_name);
+        return $(".help-wrapper").show();
       };
     })(this);
     $("#file-uploader").on('change', (function(_this) {
@@ -58,7 +57,7 @@
   });
 
   set_help_text = function(name) {
-    $(".dataset-name").html(name);
+    $("#toolbar").append("<div class='dataset-info'></div>");
     if (name === "basketball") {
       return $(".dataset-info").html("<b>Fun things to try:</b> <ul> <li>split by 'position' and size by 'height' </li> <li>split by 'age' and size by 'salary'</li> <li>split by 'team', click-n-drag to select your favorite team, and explore from there</li> </ul>");
     } else if (name === "billionaire") {
