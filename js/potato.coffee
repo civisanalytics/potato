@@ -542,6 +542,10 @@ class window.Potato
       .domain([non_zero_min, curr_max])
       .range([220, @width - 160])
 
+    # there's only one value, so just put it in the middle of the screen
+    if non_zero_min == curr_max
+      orders.range([@width / 2.0, @width / 2.0])
+
     # then update all circle positions appropriately
     @circles.each (c) =>
       s_val = c['values'][filter]
@@ -550,16 +554,21 @@ class window.Potato
       else
         c.tarx = -1000
 
-    @labels.push {type: "order", val: non_zero_min, label_id: "head-label", split: filter, x: 220, y: 0, tarx: 220, tary: 0}
-    @labels.push {type: "order", val: curr_max, label_id: "tail-label", split: filter, x: @width - 160, y: 0, tarx: @width - 160, tary: 0}
+    @labels.push {type: "order", val: non_zero_min, label_id: "head-label", split: filter, x: @width / 2.0, y: 0, tarx: @width / 2.0, tary: 0}
     @labels.push {type: "order", val: filter, label_id: "text-label", x: @width / 2.0, y: 0, tarx: @width / 2.0, tary: 0}
 
-    @axis.push {
-      x1: 220
-      x2: @width - 160
-      y1: 0
-      y2: 0
-    }
+    # if there's more than one value we need a tail label and an axis,
+    # we also want to move the head to 220 instead of @width / 2.0
+    if non_zero_min != curr_max
+      @labels[0]['x'] = 220
+      @labels[0]['tarx'] = 220
+      @labels.push {type: "order", val: curr_max, label_id: "tail-label", split: filter, x: @width - 160, y: 0, tarx: @width - 160, tary: 0}
+      @axis.push {
+        x1: 220
+        x2: @width - 160
+        y1: 0
+        y2: 0
+      }
 
     this.update()
 
@@ -638,7 +647,7 @@ class window.Potato
       head_label = @vis.select("#head-label")
       tail_label = @vis.select("#tail-label")
 
-      if head_label[0][0]?
+      if head_label[0][0]? && axis[0][0]?
         axis.attr("x1", parseInt(head_label.attr('x')) + 35)
         axis.attr("y1", head_label.attr('y') - 7)
         axis.attr("x2", tail_label.attr('x') - 40)

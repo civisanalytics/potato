@@ -639,6 +639,9 @@
         };
       })(this));
       orders = d3.scale.sqrt().domain([non_zero_min, curr_max]).range([220, this.width - 160]);
+      if (non_zero_min === curr_max) {
+        orders.range([this.width / 2.0, this.width / 2.0]);
+      }
       this.circles.each((function(_this) {
         return function(c) {
           var s_val;
@@ -655,19 +658,9 @@
         val: non_zero_min,
         label_id: "head-label",
         split: filter,
-        x: 220,
+        x: this.width / 2.0,
         y: 0,
-        tarx: 220,
-        tary: 0
-      });
-      this.labels.push({
-        type: "order",
-        val: curr_max,
-        label_id: "tail-label",
-        split: filter,
-        x: this.width - 160,
-        y: 0,
-        tarx: this.width - 160,
+        tarx: this.width / 2.0,
         tary: 0
       });
       this.labels.push({
@@ -679,12 +672,26 @@
         tarx: this.width / 2.0,
         tary: 0
       });
-      this.axis.push({
-        x1: 220,
-        x2: this.width - 160,
-        y1: 0,
-        y2: 0
-      });
+      if (non_zero_min !== curr_max) {
+        this.labels[0]['x'] = 220;
+        this.labels[0]['tarx'] = 220;
+        this.labels.push({
+          type: "order",
+          val: curr_max,
+          label_id: "tail-label",
+          split: filter,
+          x: this.width - 160,
+          y: 0,
+          tarx: this.width - 160,
+          tary: 0
+        });
+        this.axis.push({
+          x1: 220,
+          x2: this.width - 160,
+          y1: 0,
+          y2: 0
+        });
+      }
       return this.update();
     };
 
@@ -761,7 +768,7 @@
           });
           head_label = _this.vis.select("#head-label");
           tail_label = _this.vis.select("#tail-label");
-          if (head_label[0][0] != null) {
+          if ((head_label[0][0] != null) && (axis[0][0] != null)) {
             axis.attr("x1", parseInt(head_label.attr('x')) + 35);
             axis.attr("y1", head_label.attr('y') - 7);
             axis.attr("x2", tail_label.attr('x') - 40);
