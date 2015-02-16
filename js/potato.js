@@ -18,6 +18,7 @@
       if (params == null) {
         params = default_params;
       }
+      this.parse_numeric_string = __bind(this.parse_numeric_string, this);
       this.update_position = __bind(this.update_position, this);
       this.highlight_node = __bind(this.highlight_node, this);
       this.hide_details = __bind(this.hide_details, this);
@@ -211,7 +212,7 @@
       this.numeric_filters = [];
       $.each(sorted_filters, (function(_this) {
         return function(f, v) {
-          if (isNaN(v[0].value.replace("%", "").replace(",", ""))) {
+          if (isNaN(v[0].value.replace(/%/, "").replace(/,/g, ""))) {
             if (v.length !== _this.data.length && v.length < 500) {
               return _this.categorical_filters.push({
                 value: f,
@@ -524,13 +525,18 @@
       curr_vals = [];
       $.each(curr_vals_tuples, (function(_this) {
         return function(c, arr) {
-          return curr_vals.push(arr[0]);
+          var temp_val;
+          temp_val = arr[0];
+          if (numeric === true) {
+            temp_val = _this.parse_numeric_string(temp_val);
+          }
+          return curr_vals.push(temp_val);
         };
       })(this));
       num_colors = curr_vals.length;
       if (numeric === true) {
         curr_max = d3.max(curr_vals, function(d) {
-          return parseFloat(d);
+          return d;
         });
         non_zero_min = curr_max;
         $.each(curr_vals, (function(_this) {
@@ -562,7 +568,12 @@
       this.circles.each((function(_this) {
         return function(c) {
           return curr_vals.forEach(function(s) {
-            if (s === c['values'][filter]) {
+            var c_temp;
+            c_temp = c['values'][filter];
+            if (numeric === true) {
+              c_temp = _this.parse_numeric_string(c_temp);
+            }
+            if (s === c_temp) {
               return c.color = String(colors(s));
             }
           });
@@ -587,11 +598,11 @@
       curr_vals = [];
       this.circles.each((function(_this) {
         return function(c) {
-          return curr_vals.push(parseFloat(c['values'][filter]));
+          return curr_vals.push(_this.parse_numeric_string(c['values'][filter]));
         };
       })(this));
       curr_max = d3.max(curr_vals, function(d) {
-        return parseFloat(d);
+        return d;
       });
       non_zero_min = curr_max;
       $.each(curr_vals, (function(_this) {
@@ -605,9 +616,9 @@
       this.circles.each((function(_this) {
         return function(c) {
           var s_val;
-          s_val = c['values'][filter];
+          s_val = _this.parse_numeric_string(c['values'][filter]);
           if (!isNaN(s_val) && s_val !== "") {
-            c.radius = sizes(parseFloat(s_val));
+            c.radius = sizes(s_val);
             if (c.radius < 0) {
               return c.radius = 0;
             }
@@ -624,7 +635,7 @@
       curr_vals = [];
       this.circles.each((function(_this) {
         return function(c) {
-          return curr_vals.push(parseFloat(c['values'][filter]));
+          return curr_vals.push(_this.parse_numeric_string(c['values'][filter]));
         };
       })(this));
       curr_max = d3.max(curr_vals, function(d) {
@@ -645,7 +656,7 @@
       this.circles.each((function(_this) {
         return function(c) {
           var s_val;
-          s_val = c['values'][filter];
+          s_val = _this.parse_numeric_string(c['values'][filter]);
           if (!isNaN(s_val) && s_val !== "") {
             return c.tarx = orders(parseFloat(s_val));
           } else {
@@ -876,6 +887,10 @@
       ttleft = (e.pageX + xOffset * 2 + ttw) > $(window).width() ? e.pageX - ttw - xOffset * 2 : e.pageX + xOffset;
       tttop = (e.pageY + yOffset * 2 + tth) > $(window).height() ? e.pageY - tth - yOffset * 2 : e.pageY + yOffset;
       return $("#" + id).css('top', tttop + 'px').css('left', ttleft + 'px');
+    };
+
+    Potato.prototype.parse_numeric_string = function(str) {
+      return parseFloat(str.replace(/%/, "").replace(/,/g, ""));
     };
 
     return Potato;

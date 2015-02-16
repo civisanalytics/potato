@@ -189,7 +189,7 @@ class window.Potato
     @numeric_filters = []
 
     $.each sorted_filters, (f, v) =>
-      if isNaN(v[0].value.replace("%","").replace(",",""))
+      if isNaN(v[0].value.replace(/%/,"").replace(/,/g,""))
         if v.length != @data.length && v.length < 500 # every filter value is not unique
           @categorical_filters.push({value: f, type: 'cat'})
       else
@@ -340,7 +340,6 @@ class window.Potato
     if data_type == "num"
       this.order_by(filter)
     else
-
       curr_vals = []
 
       # first get number of unique values in the filter
@@ -431,12 +430,14 @@ class window.Potato
     curr_vals = []
 
     $.each curr_vals_tuples, (c, arr) =>
-      curr_vals.push(arr[0])
+      temp_val = arr[0]
+      temp_val = this.parse_numeric_string(temp_val) if numeric == true
+      curr_vals.push(temp_val)
 
     num_colors = curr_vals.length
 
     if numeric == true
-      curr_max = d3.max(curr_vals, (d) -> parseFloat(d))
+      curr_max = d3.max(curr_vals, (d) -> (d))
       non_zero_min = curr_max
 
       $.each curr_vals, (k, c) =>
@@ -481,7 +482,9 @@ class window.Potato
     # then update all circle colors appropriately
     @circles.each (c) =>
       curr_vals.forEach (s) =>
-        if s == c['values'][filter]
+        c_temp = c['values'][filter]
+        c_temp = this.parse_numeric_string(c_temp) if numeric == true
+        if s == c_temp
           c.color = String(colors(s))
 
     @circles.attr("fill", (d) -> d.color)
@@ -500,9 +503,9 @@ class window.Potato
 
     # first get all the values for this filter
     @circles.each (c) =>
-      curr_vals.push parseFloat(c['values'][filter])
+      curr_vals.push this.parse_numeric_string((c['values'][filter]))
 
-    curr_max = d3.max(curr_vals, (d) -> parseFloat(d))
+    curr_max = d3.max(curr_vals, (d) -> (d))
     non_zero_min = curr_max
 
     $.each curr_vals, (k, v) =>
@@ -515,9 +518,9 @@ class window.Potato
 
     # then update all circle sizes appropriately
     @circles.each (c) =>
-      s_val = c['values'][filter]
+      s_val = this.parse_numeric_string(c['values'][filter])
       if !isNaN(s_val) and s_val != ""
-        c.radius = sizes(parseFloat(s_val))
+        c.radius = sizes(s_val)
         c.radius = 0 if c.radius < 0 # bound negatives to 0
       else
         c.radius = 0
@@ -529,7 +532,7 @@ class window.Potato
 
     # first get all the values for this filter
     @circles.each (c) =>
-      curr_vals.push parseFloat(c['values'][filter])
+      curr_vals.push this.parse_numeric_string(c['values'][filter])
 
     curr_max = d3.max(curr_vals, (d) -> d)
     non_zero_min = curr_max
@@ -548,7 +551,7 @@ class window.Potato
 
     # then update all circle positions appropriately
     @circles.each (c) =>
-      s_val = c['values'][filter]
+      s_val = this.parse_numeric_string(c['values'][filter])
       if !isNaN(s_val) and s_val != ""
         c.tarx = orders(parseFloat(s_val))
       else
@@ -729,5 +732,10 @@ class window.Potato
     ttleft = if ((e.pageX + xOffset*2 + ttw) > $(window).width()) then e.pageX - ttw - xOffset*2 else e.pageX + xOffset
     tttop = if ((e.pageY + yOffset*2 + tth) > $(window).height()) then e.pageY - tth - yOffset*2 else e.pageY + yOffset
     $("##{id}").css('top', tttop + 'px').css('left', ttleft + 'px')
+
+  # parse string representations of numerics to floats
+  # ignore any % and commas along the way
+  parse_numeric_string: (str) =>
+    return parseFloat(str.replace(/%/,"").replace(/,/g,""))
 
 root = exports ? this
