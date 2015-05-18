@@ -15,14 +15,7 @@ The file uploader uses the HTML5 file API.  As a result, uploaded files
 stay in your browser and do **not** travel the tubes.
 In other words, any uploaded data is relatively secure.
 
-All demo datasets are derived from publically available data.
-- Basketball: stats.nba.com + http://www.basketball-reference.com/contracts/players.html
-- Billionaire: bloomberg.com + forbes.com
-- Automobile: [UCI Machine Learning Repository](https://archive.ics.uci.edu/ml/datasets/Automobile)
-All datasets and the contents/names/rights are owned by their respective owners.
-
-
-Wishlist:
+### Wishlist:
 - [ ] Limit number of filters/categories for a given column/category
 - [ ] Catch massive datasets to prevent browser from crashing
 - [ ] Size scale when size filter is set (aka size legend?)
@@ -36,5 +29,11 @@ by gender)
 - [ ] Hint about zooming?...
 - [ ] Allow users to either keep or remove selection?
 
-###
+### License
 Potato is released under the [MIT License](http://www.opensource.org/licenses/MIT)
+
+All demo datasets are derived from publically available data.
+- Basketball: stats.nba.com + http://www.basketball-reference.com/contracts/players.html
+- Billionaire: bloomberg.com + forbes.com
+- Automobile: [UCI Machine Learning Repository](https://archive.ics.uci.edu/ml/datasets/Automobile)
+All datasets and the contents/names/rights are owned by their respective owners.
