@@ -380,12 +380,6 @@
         this.circles.each(function(c) {
           return c.color = "#777";
         });
-        this.circles.attr("fill", function(d) {
-          return d.color;
-        });
-        this.circles.attr("stroke", function(d) {
-          return d3.rgb(d.color).darker();
-        });
       } else if (type === 'size') {
         this.circles.each((function(_this) {
           return function(c) {
@@ -565,7 +559,7 @@
       }).text(function(d) {
         return d;
       });
-      this.circles.each((function(_this) {
+      this.nodes.forEach((function(_this) {
         return function(c) {
           return curr_vals.forEach(function(s) {
             var c_temp;
@@ -579,12 +573,7 @@
           });
         };
       })(this));
-      this.circles.attr("fill", function(d) {
-        return d.color;
-      });
-      return this.circles.attr("stroke", function(d) {
-        return d3.rgb(d.color).darker();
-      });
+      return this.update();
     };
 
     Potato.prototype.size_by = function(filter) {
@@ -718,12 +707,8 @@
         } else {
           return 0;
         }
-      }).attr("stroke", function(d) {
-        return d3.rgb(d.color).darker();
       }).attr("id", function(d) {
         return "bubble_" + d.id;
-      }).attr("fill", function(d) {
-        return d.color;
       }).on("mouseover", function(d, i) {
         return that.show_details(d, i, this);
       }).on("mouseout", function(d, i) {
@@ -737,6 +722,10 @@
       });
       this.circles.transition().duration(2000).attr("r", function(d) {
         return d.radius;
+      }).duration(500).attr("fill", function(d) {
+        return d.color;
+      }).attr("stroke", function(d) {
+        return d3.rgb(d.color).darker();
       });
       this.circles.exit().remove();
       this.vis.selectAll(".split-labels").remove();

@@ -305,8 +305,6 @@ class window.Potato
       d3.select("#color-legend").selectAll("*").remove()
       @circles.each (c) ->
         c.color = "#777"
-      @circles.attr("fill", (d) -> d.color)
-      @circles.attr("stroke", (d) -> d3.rgb(d.color).darker())
 
     else if type == 'size'
       @circles.each (c) =>
@@ -480,15 +478,14 @@ class window.Potato
       .text((d) -> d)
 
     # then update all circle colors appropriately
-    @circles.each (c) =>
+    @nodes.forEach (c) =>
       curr_vals.forEach (s) =>
         c_temp = c['values'][filter]
         c_temp = this.parse_numeric_string(c_temp) if numeric == true
         if s == c_temp
           c.color = String(colors(s))
 
-    @circles.attr("fill", (d) -> d.color)
-    @circles.attr("stroke", (d) -> d3.rgb(d.color).darker())
+    this.update()
 
   size_by: (filter) =>
     if @circles == undefined || @circles.length == 0
@@ -589,9 +586,7 @@ class window.Potato
         else
           0
       )
-      .attr("stroke", (d) -> d3.rgb(d.color).darker())
       .attr("id", (d) -> "bubble_#{d.id}")
-      .attr("fill", (d) -> d.color)
       .on("mouseover", (d,i) -> that.show_details(d,i,this))
       .on("mouseout", (d,i) -> that.hide_details(d,i,this))
       .attr("class", (d) ->
@@ -602,7 +597,11 @@ class window.Potato
       )
 
     # Fancy transition to make bubbles appear to 'grow in'
-    @circles.transition().duration(2000).attr("r", (d) -> d.radius)
+    @circles.transition().duration(2000)
+      .attr("r", (d) -> d.radius)
+    .duration(500)
+      .attr("fill", (d) -> d.color)
+      .attr("stroke", (d) -> d3.rgb(d.color).darker())
 
     # this is IMPORTANT otherwise removing nodes won't work
     @circles.exit().remove()
