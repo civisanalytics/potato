@@ -303,11 +303,11 @@ class window.Potato
 
     if type == 'color'
       d3.select("#color-legend").selectAll("*").remove()
-      @circles.each (c) ->
+      @nodes.forEach (c) ->
         c.color = "#777"
 
     else if type == 'size'
-      @circles.each (c) =>
+      @nodes.forEach (c) =>
         c.radius = 5
 
     else if type == 'split' || type == 'order'
@@ -315,7 +315,7 @@ class window.Potato
         @axis.pop()
       while @labels.length > 0
         @labels.pop()
-      @circles.each (c) =>
+      @nodes.forEach (c) =>
         c.tarx = @width/2.0
         c.tary = @height/2.0
 
@@ -327,7 +327,7 @@ class window.Potato
     this.size_by(filter) if type == "size"
 
   split_by: (filter, data_type) =>
-    if @circles == undefined || @circles.length == 0
+    if @nodes == undefined || @nodes.length == 0
       return
 
     this.reset('split')
@@ -341,7 +341,7 @@ class window.Potato
       curr_vals = []
 
       # first get number of unique values in the filter
-      @circles.each (c) =>
+      @nodes.forEach (c) =>
         if curr_vals.indexOf(c['values'][filter]) < 0
           curr_vals.push c['values'][filter]
 
@@ -383,7 +383,7 @@ class window.Potato
           curr_row++
 
       # then update all circles tarx and tary appropriately
-      @circles.each (c) =>
+      @nodes.forEach (c) =>
         curr_vals.forEach (s) =>
           if s.split == c['values'][filter]
             c.tarx = s.tarx
@@ -393,7 +393,7 @@ class window.Potato
       this.update()
 
   color_by: (filter, data_type) =>
-    if @circles == undefined || @circles.length == 0
+    if @nodes == undefined || @nodes.length == 0
       return
 
     this.reset('color')
@@ -407,7 +407,7 @@ class window.Potato
     numeric = (data_type == 'num')
 
     # first get number of unique values in the filter
-    @circles.each (c) =>
+    @nodes.forEach (c) =>
       val = c['values'][filter]
       if curr_vals_with_count.hasOwnProperty(val)
         curr_vals_with_count[val] += 1
@@ -488,7 +488,7 @@ class window.Potato
     this.update()
 
   size_by: (filter) =>
-    if @circles == undefined || @circles.length == 0
+    if @nodes == undefined || @nodes.length == 0
       return
 
     this.reset('size')
@@ -499,7 +499,7 @@ class window.Potato
     curr_vals = []
 
     # first get all the values for this filter
-    @circles.each (c) =>
+    @nodes.forEach (c) =>
       curr_vals.push this.parse_numeric_string((c['values'][filter]))
 
     curr_max = d3.max(curr_vals, (d) -> (d))
@@ -514,11 +514,11 @@ class window.Potato
       .range([3,12])
 
     # then update all circle sizes appropriately
-    @circles.each (c) =>
+    @nodes.forEach (c) =>
       s_val = this.parse_numeric_string(c['values'][filter])
       if !isNaN(s_val) and s_val != ""
-        c.radius = sizes(s_val)
-        c.radius = 0 if c.radius < 0 # bound negatives to 0
+        # bound negatives to 0
+        c.radius = Math.max(0, sizes(s_val))
       else
         c.radius = 0
 
@@ -528,7 +528,7 @@ class window.Potato
     curr_vals = []
 
     # first get all the values for this filter
-    @circles.each (c) =>
+    @nodes.forEach (c) =>
       curr_vals.push this.parse_numeric_string(c['values'][filter])
 
     curr_max = d3.max(curr_vals, (d) -> d)
@@ -547,7 +547,7 @@ class window.Potato
       orders.range([@width / 2.0, @width / 2.0])
 
     # then update all circle positions appropriately
-    @circles.each (c) =>
+    @nodes.forEach (c) =>
       s_val = this.parse_numeric_string(c['values'][filter])
       if !isNaN(s_val) and s_val != ""
         c.tarx = orders(parseFloat(s_val))
@@ -597,9 +597,8 @@ class window.Potato
       )
 
     # Fancy transition to make bubbles appear to 'grow in'
-    @circles.transition().duration(2000)
+    @circles.transition().duration(1000)
       .attr("r", (d) -> d.radius)
-    .duration(500)
       .attr("fill", (d) -> d.color)
       .attr("stroke", (d) -> d3.rgb(d.color).darker())
 

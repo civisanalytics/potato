@@ -377,11 +377,11 @@
       $("#" + type + "-hint").html("");
       if (type === 'color') {
         d3.select("#color-legend").selectAll("*").remove();
-        this.circles.each(function(c) {
+        this.nodes.forEach(function(c) {
           return c.color = "#777";
         });
       } else if (type === 'size') {
-        this.circles.each((function(_this) {
+        this.nodes.forEach((function(_this) {
           return function(c) {
             return c.radius = 5;
           };
@@ -393,7 +393,7 @@
         while (this.labels.length > 0) {
           this.labels.pop();
         }
-        this.circles.each((function(_this) {
+        this.nodes.forEach((function(_this) {
           return function(c) {
             c.tarx = _this.width / 2.0;
             return c.tary = _this.height / 2.0;
@@ -417,7 +417,7 @@
 
     Potato.prototype.split_by = function(filter, data_type) {
       var curr_col, curr_row, curr_vals, height_2, num_cols, num_rows, width_2;
-      if (this.circles === void 0 || this.circles.length === 0) {
+      if (this.nodes === void 0 || this.nodes.length === 0) {
         return;
       }
       this.reset('split');
@@ -427,7 +427,7 @@
         return this.order_by(filter);
       } else {
         curr_vals = [];
-        this.circles.each((function(_this) {
+        this.nodes.forEach((function(_this) {
           return function(c) {
             if (curr_vals.indexOf(c['values'][filter]) < 0) {
               return curr_vals.push(c['values'][filter]);
@@ -465,7 +465,7 @@
             }
           };
         })(this));
-        this.circles.each((function(_this) {
+        this.nodes.forEach((function(_this) {
           return function(c) {
             return curr_vals.forEach(function(s) {
               if (s.split === c['values'][filter]) {
@@ -481,7 +481,7 @@
 
     Potato.prototype.color_by = function(filter, data_type) {
       var colors, curr_max, curr_vals, curr_vals_tuples, curr_vals_with_count, g, l_size, legend, non_zero_min, num_colors, numeric;
-      if (this.circles === void 0 || this.circles.length === 0) {
+      if (this.nodes === void 0 || this.nodes.length === 0) {
         return;
       }
       this.reset('color');
@@ -492,7 +492,7 @@
       $("#color-" + filter).addClass('active-filter');
       curr_vals_with_count = {};
       numeric = data_type === 'num';
-      this.circles.each((function(_this) {
+      this.nodes.forEach((function(_this) {
         return function(c) {
           var val;
           val = c['values'][filter];
@@ -578,14 +578,14 @@
 
     Potato.prototype.size_by = function(filter) {
       var curr_max, curr_vals, non_zero_min, sizes;
-      if (this.circles === void 0 || this.circles.length === 0) {
+      if (this.nodes === void 0 || this.nodes.length === 0) {
         return;
       }
       this.reset('size');
       $("#size-hint").html("<br>" + filter);
       $("#size-" + filter).addClass('active-filter');
       curr_vals = [];
-      this.circles.each((function(_this) {
+      this.nodes.forEach((function(_this) {
         return function(c) {
           return curr_vals.push(_this.parse_numeric_string(c['values'][filter]));
         };
@@ -602,15 +602,12 @@
         };
       })(this));
       sizes = d3.scale.sqrt().domain([non_zero_min, curr_max]).range([3, 12]);
-      this.circles.each((function(_this) {
+      this.nodes.forEach((function(_this) {
         return function(c) {
           var s_val;
           s_val = _this.parse_numeric_string(c['values'][filter]);
           if (!isNaN(s_val) && s_val !== "") {
-            c.radius = sizes(s_val);
-            if (c.radius < 0) {
-              return c.radius = 0;
-            }
+            return c.radius = Math.max(0, sizes(s_val));
           } else {
             return c.radius = 0;
           }
@@ -622,7 +619,7 @@
     Potato.prototype.order_by = function(filter) {
       var curr_max, curr_vals, non_zero_min, orders;
       curr_vals = [];
-      this.circles.each((function(_this) {
+      this.nodes.forEach((function(_this) {
         return function(c) {
           return curr_vals.push(_this.parse_numeric_string(c['values'][filter]));
         };
@@ -642,7 +639,7 @@
       if (non_zero_min === curr_max) {
         orders.range([this.width / 2.0, this.width / 2.0]);
       }
-      this.circles.each((function(_this) {
+      this.nodes.forEach((function(_this) {
         return function(c) {
           var s_val;
           s_val = _this.parse_numeric_string(c['values'][filter]);
@@ -720,9 +717,9 @@
           return '';
         }
       });
-      this.circles.transition().duration(2000).attr("r", function(d) {
+      this.circles.transition().duration(1000).attr("r", function(d) {
         return d.radius;
-      }).duration(500).attr("fill", function(d) {
+      }).attr("fill", function(d) {
         return d.color;
       }).attr("stroke", function(d) {
         return d3.rgb(d.color).darker();
