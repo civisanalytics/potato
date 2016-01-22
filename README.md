@@ -30,7 +30,8 @@ by gender)
 - [ ] Allow users to either keep or remove selection?
 
 ### License
-Potato is released under the [MIT License](http://www.opensource.org/licenses/MIT)
+Potato is released under the [BSD 3-Clause
+License](https://github.com/civisanalytics/potato/blob/master/LICENSE.txt).
 
 All demo datasets are derived from publically available data.
 - Basketball: stats.nba.com + http://www.basketball-reference.com/contracts/players.html
