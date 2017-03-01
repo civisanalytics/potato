@@ -20,10 +20,8 @@
       this.data = data;
       this.create_filters();
 
-
       $("#vis").append("<div class='tooltip' id='node-tooltip'></div>").append("<div id='toolbar'><div id='modifiers'></div><div id='filter-select-buttons'></div></div>");
       $("#node-tooltip").hide();
-
 
       this.width = $(window).width();
       this.height = $(window).height() - 55;
@@ -78,6 +76,46 @@
     }
 
     Potato.prototype.doSomething = function() {
+    };
+
+    Potato.prototype.order_by = function(filter) {
+      // TODO: this is all super inefficient to calculate max/min
+      var curr_vals = [];
+      for(var i = 0; i < this.data.length; i++) {
+        curr_vals.push(this.parse_numeric_string(this.data[i][filter]));
+      }
+
+      var curr_max = d3.max(curr_vals, function(d) {
+        return d;
+      });
+      var non_zero_min = curr_max;
+      $.each(curr_vals, (function(_this) {
+        return function(k, c) {
+          if (c > 0 && c < non_zero_min) {
+            return non_zero_min = c;
+          }
+        };
+      })(this));
+
+      var orders = d3.scaleSqrt()
+          .domain([non_zero_min, curr_max])
+          .range([220, this.width - 160]);
+
+      var xForceFn = d3.forceX(function(d) {
+        return orders(parseFloat(d[filter]));
+      });
+
+      var yForceFn = d3.forceY(this.height / 2.0);
+      this.simulation.force("x", xForceFn);
+      this.simulation.force("y", yForceFn);
+
+      this.simulation.alpha(1).restart();
+
+      //TODO: Handle edge case with only one value
+      /*if (non_zero_min === curr_max) {
+        orders.range([this.width / 2.0, this.width / 2.0]);
+      }*/
+      // TODO: labels
     };
 
     Potato.prototype.split_by = function(filter, data_type) {
@@ -135,7 +173,6 @@
           };
         })(this));
 
-        // TODO: dont forget the labels
 
         var xForceFn = d3.forceX(function(d) {
           return keysToLocation[d[filter]].x;
@@ -148,17 +185,18 @@
         this.simulation.force("y", yForceFn);
 
         this.simulation.alpha(1).restart();
+
+        // TODO: dont forget the labels
       }
     };
 
     Potato.prototype.apply_filters = function() {
       return $(".active-filter").each((function(_this) {
         return function(i, filterObj) {
-          var dash_loc, filter_id, type, val;
-          filter_id = $(filterObj).attr('id');
-          dash_loc = filter_id.indexOf('-');
-          type = filter_id.substr(0, dash_loc);
-          val = filter_id.substr(dash_loc + 1);
+          var filter_id = $(filterObj).attr('id');
+          var dash_loc = filter_id.indexOf('-');
+          var type = filter_id.substr(0, dash_loc);
+          var val = filter_id.substr(dash_loc + 1);
           return _this.apply_filter(type, val, $(filterObj).attr('data-type'));
         };
       })(this));
@@ -221,7 +259,6 @@
       var reset_button, reset_tooltip, sorted_filters;
       sorted_filters = {};
 
-      console.log("creating filters", this.data);
       this.filter_names = [];
       $.each(this.data[0], (function(_this) {
         return function(d) {
@@ -304,6 +341,10 @@
       reset_button.append(reset_tooltip);
       reset_tooltip.hide();
       return $("#filter-select-buttons").append(reset_button);
+    };
+
+    Potato.prototype.parse_numeric_string = function(str) {
+      return parseFloat(str.replace(/%/, "").replace(/,/g, ""));
     };
 
     return Potato;
