@@ -20,12 +20,14 @@
       this.data = data;
       this.create_filters();
 
+      this.labels = [];
+
       $("#vis").append("<div class='tooltip' id='node-tooltip'></div>").append("<div id='toolbar'><div id='modifiers'></div><div id='filter-select-buttons'></div></div>");
       $("#node-tooltip").hide();
 
       this.width = $(window).width();
       this.height = $(window).height() - 55;
-      svg = d3.select("#vis").append("svg").attr("viewBox", "0 0 " + this.width + " " + this.height).attr("id", "vis-svg");
+      this.svg = d3.select("#vis").append("svg").attr("viewBox", "0 0 " + this.width + " " + this.height).attr("id", "vis-svg");
 
       $.each(params, (function(_this) {
         return function(k, v) {
@@ -56,7 +58,7 @@
           .force("x", centerXForce)
           .force("y", centerYForce);
 
-      var node = svg.selectAll("circle")
+      var node = this.svg.selectAll("circle")
           .data(data)
           .enter().append("circle")
           .attr("r", function(d) {
@@ -72,11 +74,11 @@
             // It is up to us to translate these coordinates to the screen.
             node.attr("cx", function(d) { return d.x; })
                 .attr("cy", function(d) { return d.y; });
+
+            // TODO: hmmmm so one option is to update labels here, and not actually attach them to the physics simulation
+
           });
     }
-
-    Potato.prototype.doSomething = function() {
-    };
 
     Potato.prototype.order_by = function(filter) {
 
@@ -141,8 +143,6 @@
         // TODO: implement order_by
         return this.order_by(filter);
       } else {
-        ////////////////////////////
-        // TODO:
         // first determine the unique values for this category in the dataset, also sort
         var uniqueKeys = d3.map(this.data, function(d) {
           return d[filter];
@@ -160,6 +160,9 @@
 
         var keysToLocation = {};
 
+        // TODO: this should probably move to the reset function
+        this.labels = [];
+
         // then for each category value, increment to give the "row/col" coordinate
         // maybe save this in an object where key == category and value = {row: X, col: Y}
         uniqueKeys.forEach((function(_this) {
@@ -176,9 +179,34 @@
             }
 
             keysToLocation[d] = finalObj;
+
+            // also add a filter label
+            _this.labels.push({
+              val: d,
+              split: filter,
+              tarx: finalObj.x,
+              tary: finalObj.y - 50 // TODO: either make this relative to the number of nodes, or do the fancy thing in the old version
+            });
           };
         })(this));
 
+        /////////////////
+        // Add the labels to the svg
+        var text = this.svg.selectAll(".split-labels")
+            .data(this.labels)
+
+        text.enter().append("text")
+            .attr("class", "split-labels")
+            .text(function(d) { return d.val; })
+            .attr("x", function(d) { return d.tarx; })
+            .attr("y", function(d) { return d.tary; });
+
+        text.transition().text(function(d) { return d.val; })
+            .attr("x", function(d) { return d.tarx; })
+            .attr("y", function(d) { return d.tary; });
+
+        text.exit().remove();
+        ///////////////////////
 
         var xForceFn = d3.forceX(function(d) {
           return keysToLocation[d[filter]].x;
@@ -191,8 +219,6 @@
         this.simulation.force("y", yForceFn);
 
         this.simulation.alpha(1).restart();
-
-        // TODO: dont forget the labels
       }
     };
 
