@@ -5,6 +5,7 @@
   window.Potato = (function() {
     var default_params;
 
+    // if true, then interactive, if false, button is hidden
     default_params = {
       split: true,
       color: true,
@@ -22,20 +23,20 @@
 
       this.labels = [];
 
-      $("#vis").append("<div class='tooltip' id='node-tooltip'></div>").append("<div id='toolbar'><div id='modifiers'></div><div id='filter-select-buttons'></div></div>");
+      $("#vis").append("<div class='tooltip' id='node-tooltip'></div>")
+               .append("<div id='toolbar'><div id='modifiers'></div><div id='filter-select-buttons'></div></div>");
       $("#node-tooltip").hide();
 
       this.width = $(window).width();
       this.height = $(window).height() - 55;
       this.svg = d3.select("#vis").append("svg").attr("viewBox", "0 0 " + this.width + " " + this.height).attr("id", "vis-svg");
 
-      $.each(params, (function(_this) {
-        return function(k, v) {
-          if (k !== 'class' && v === true) {
-            return _this.create_buttons(k);
-          }
-        };
-      })(this));
+      // Only create buttons if param is set to True
+      for(var key in params) {
+        if(key !== 'class' && params[key] === true) {
+          this.create_buttons(key);
+        }
+      }
 
       // for now arbitrarily start all nodes at radius of 5
       data.forEach(function(d) {
@@ -429,45 +430,49 @@
       })(this));
     };
 
-    Potato.prototype.create_filters = function() {
-      var reset_button, reset_tooltip, sorted_filters;
-      sorted_filters = {};
+    // return an object containing all the filters and all the unique values in this dataset
+    // - key is the filter type and the value is an array of filters
+    Potato.prototype.uniqueDataValues = function() {
+      var sortedFilters = {};
 
-      this.filter_names = [];
-      $.each(this.data[0], (function(_this) {
-        return function(d) {
-          var d_mod;
-          if (d !== 'node_id') {
-            d_mod = d.replace(/\(|\)/g, " ");
-            _this.filter_names.push({
-              value: d_mod
-            });
-            return sorted_filters[d_mod] = [];
-          }
-        };
-      })(this));
-      this.data.forEach((function(_this) {
-        return function(d) {
-          return $.each(d, function(k, v) {
-            var filter_exists, k_mod;
-            k_mod = k.replace(/\(|\)/g, " ");
-            if (k_mod !== 'node_id') {
-              filter_exists = $.grep(sorted_filters[k_mod], function(e) {
-                return e.filter === k_mod && e.value === v;
-              });
-              if (filter_exists.length === 0) {
-                return sorted_filters[k_mod].push({
-                  filter: k_mod,
-                  value: v
-                });
-              }
+      for(var i=0; i<this.data.length; i++) {
+        for(var key in this.data[i]) {
+          var val = this.data[i][key];
+
+          // TODO: Do we even need the node_id anymore? (might need it for subselection?)
+          // ignore the id
+          if (key !== 'node_id') {
+            var key_mod = key.replace(/\(|\)/g, " ");
+
+            // this is a new filter we haven't seen before, so add
+            if(!sortedFilters.hasOwnProperty(key_mod)) {
+              sortedFilters[key_mod] = [];
             }
-          });
-        };
-      })(this));
+
+            var indexOfCurrVal = sortedFilters[key_mod].map(function(obj) {
+              return obj.value
+            }).indexOf(val);
+
+            // if < 0, then this is a new value that we should add
+            if(indexOfCurrVal < 0) {
+              sortedFilters[key_mod].push({
+                filter: key_mod,
+                value: val
+              });
+            }
+          }
+        }
+      }
+      return sortedFilters;
+    };
+
+    // the logic behind taking the csv and determining what the categorical data is
+    Potato.prototype.create_filters = function() {
+      var sortedFilters = this.uniqueDataValues();
+
       this.categorical_filters = [];
       this.numeric_filters = [];
-      $.each(sorted_filters, (function(_this) {
+      $.each(sortedFilters, (function(_this) {
         return function(f, v) {
           if (isNaN(v[0].value.replace(/%/, "").replace(/,/g, ""))) {
             if (v.length !== _this.data.length && v.length < 500) {
@@ -486,7 +491,7 @@
       })(this));
       $.each(this.categorical_filters, (function(_this) {
         return function(k, v) {
-          return sorted_filters[v.value].sort(function(a, b) {
+          return sortedFilters[v.value].sort(function(a, b) {
             if (a.value === b.value) {
               return 0;
             } else {
@@ -495,8 +500,8 @@
           });
         };
       })(this));
-      reset_tooltip = $("<div class='tooltip' id='reset-tooltip'>Click and drag on the canvas to select nodes.</div>");
-      reset_button = $("<button id='reset-button' class='disabled-button modifier-button'><span id='reset-icon'>&#8635;</span> Reset Selection</button>");
+      var reset_tooltip = $("<div class='tooltip' id='reset-tooltip'>Click and drag on the canvas to select nodes.</div>");
+      var reset_button = $("<button id='reset-button' class='disabled-button modifier-button'><span id='reset-icon'>&#8635;</span> Reset Selection</button>");
       reset_button.on("click", (function(_this) {
         return function(e) {
           if (!reset_button.hasClass('disabled-button')) {
