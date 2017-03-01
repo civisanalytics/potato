@@ -251,6 +251,66 @@
       }
     };
 
+    Potato.prototype.size_by = function(filter) {
+      /*
+      if (this.nodes === void 0 || this.nodes.length === 0) {
+        return;
+      }*/
+      //this.reset('size');
+      $("#size-hint").html("<br>" + filter);
+      $("#size-" + filter).addClass('active-filter');
+
+      // calculate the max and min value
+      var filterMax = 0;
+      var filterMin = null;
+      for(var i = 0; i < this.data.length; i++) {
+        var currVal = this.parse_numeric_string(this.data[i][filter]);
+
+        // ignore emptys (NaN)
+        if(!isNaN(currVal)) {
+          if(currVal > filterMax) {
+            filterMax = currVal;
+          }
+          if(filterMin === null || currVal < filterMin) {
+            filterMin = currVal;
+          }
+        }
+      }
+
+      var sizeScale = d3.scaleSqrt()
+          .domain([filterMin, filterMax])
+          .range([3, 12]);
+
+      // handle missing values gracefully by setting circle size to zero
+      this.data.forEach(function(d) {
+        var currSize = sizeScale(d[filter]);
+        if (!isNaN(currSize) && currSize !== "" && currSize > 0) {
+          d.radius = currSize;
+        } else {
+          d.radius = 0;
+        }
+      });
+
+      // update the actual circle svg sizes
+      this.svg.selectAll("circle")
+          .data(this.data)
+          .transition()
+          .attr("r", function(d) {
+            return d.radius;
+          });
+
+      // but also update the simulation
+
+      var chargeForce = d3.forceManyBody().strength(function(d) {
+        // base it on the radius of the node
+        return -Math.pow(d.radius, 2.0) * 0.2;
+      });
+
+      // change chargeForce to take into account new node sizes
+      this.simulation.force("charge", chargeForce)
+      this.simulation.alpha(1).restart();
+    };
+
     Potato.prototype.color_by = function(filter, data_type) {
       var curr_vals;
       /*if (this.nodes === void 0 || this.nodes.length === 0) {
