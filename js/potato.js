@@ -85,13 +85,14 @@
       var text = this.svg.selectAll(".split-labels")
           .data(this.labels)
 
-      text.enter().append("text")
+      var enter = text.enter().append("text");
+
+      // .merge() is a new thing from d3v4 if you want the updates to apply to
+      // new/appended elements
+      // http://stackoverflow.com/questions/38297872/d3-js-v4-0-0-alpha-35-transitions-not-working
+      text.merge(enter).transition()
           .attr("class", "split-labels")
           .text(function(d) { return d.val; })
-          .attr("x", function(d) { return d.tarx; })
-          .attr("y", function(d) { return d.tary; });
-
-      text.transition().text(function(d) { return d.val; })
           .attr("x", function(d) { return d.tarx; })
           .attr("y", function(d) { return d.tary; });
 
@@ -251,15 +252,17 @@
     };
 
     Potato.prototype.color_by = function(filter, data_type) {
-      var colors, curr_max, curr_vals, g, l_size, legend, non_zero_min, num_colors;
+      var curr_vals;
       /*if (this.nodes === void 0 || this.nodes.length === 0) {
         return;
       }*/
       //this.reset('color');
-      /*
+
+      // hmmmm we should probably just do this at init?
       if ($("#color-legend").length < 1) {
-        $("#vis").append("<div id='color-legend'></div>");
-      }*/
+        $("#vis").append("<div id='color-legend'></div>")
+        $("#color-legend").append("<svg></svg>");
+      }
       $("#color-hint").html("<br>" + filter);
       $("#color-" + filter).addClass('active-filter');
 
@@ -272,9 +275,9 @@
 
       var numeric = data_type === 'num';
 
+      var colorScale;
       // if numeric do gradient, else do categorical
       if(numeric === true) {
-
         // calculate the max and min value
         var filterMax = 0;
         var filterMin = null;
@@ -292,11 +295,11 @@
           }
         }
 
-        colors = d3.scaleLinear()
+        colorScale = d3.scaleLinear()
             .domain([filterMin, filterMax])
             .range(["#ccc", "#1f77b4"]);
       } else {
-        colors = d3.scaleOrdinal()
+        colorScale = d3.scaleOrdinal()
             .domain(uniqueKeys)
             .range(['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#bcbd22', '#17becf', '#aec7e8', '#ffbb78', '#98df8a', '#ff9896', '#c5b0d5', '#c49c94', '#f7b6d2', '#dbdb8d', '#9edae5', '#777777']);
       }
@@ -304,8 +307,46 @@
       this.svg.selectAll("circle")
           .data(this.data)
           .transition()
-          .attr("fill", function(d) { return colors(d[filter]); } );
+          .attr("fill", function(d) { return colorScale(d[filter]); } );
 
+      // TODO: there used to be code to limit to 18 total colors, and then group the rest in "other"
+
+      // Setup legend
+      var legendDotSize = 30;
+      var legendWrapper = d3.select("#color-legend").select("svg")
+          .attr("width", 150)
+          .attr("height", colorScale.domain().length * legendDotSize)
+          .style("padding", "20px 0 0 20px");
+
+      // The text of the legend
+      var legendText = legendWrapper.selectAll("text")
+          .data(colorScale.domain());
+
+      var textEnter = legendText.enter().append("text")
+          .attr("y", function(d, i) { return i * legendDotSize + 12; })
+          .attr("x", 20);
+
+      legendText.merge(textEnter).transition()
+          .text(function(d) { return d; });
+
+      legendText.exit().remove();
+
+      // The dots of the legend
+      var legendDot = legendWrapper.selectAll("rect")
+          .data(colorScale.domain());
+
+      var dotEnter = legendDot.enter().append("rect")
+          .attr("y", function(d, i) { return i * legendDotSize; })
+          .attr("rx", legendDotSize * 0.5)
+          .attr("ry", legendDotSize * 0.5)
+          .attr("width", legendDotSize * 0.5)
+          .attr("height", legendDotSize * 0.5)
+          .style("fill", function(d) { return colorScale(d); }); // we repeat this so it doesnt flash in from black
+
+      legendDot.merge(dotEnter).transition()
+          .style("fill", function(d) { return colorScale(d); });
+
+      legendDot.exit().remove();
     };
 
     Potato.prototype.apply_filters = function() {
