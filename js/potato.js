@@ -250,6 +250,64 @@
       }
     };
 
+    Potato.prototype.color_by = function(filter, data_type) {
+      var colors, curr_max, curr_vals, g, l_size, legend, non_zero_min, num_colors;
+      /*if (this.nodes === void 0 || this.nodes.length === 0) {
+        return;
+      }*/
+      //this.reset('color');
+      /*
+      if ($("#color-legend").length < 1) {
+        $("#vis").append("<div id='color-legend'></div>");
+      }*/
+      $("#color-hint").html("<br>" + filter);
+      $("#color-" + filter).addClass('active-filter');
+
+      // first determine the unique values for this category in the dataset, also sort alpha
+      // historically it was ranked by number, but I think alpha may actually be better?
+      // to keep female/asian/Argentina as one color no matter what the other splits are?
+      var uniqueKeys = d3.map(this.data, function(d) {
+        return d[filter];
+      }).keys().sort();
+
+      var numeric = data_type === 'num';
+
+      // if numeric do gradient, else do categorical
+      if(numeric === true) {
+
+        // calculate the max and min value
+        var filterMax = 0;
+        var filterMin = null;
+        for(var i = 0; i < this.data.length; i++) {
+          var currVal = this.parse_numeric_string(this.data[i][filter]);
+
+          // ignore emptys (NaN)
+          if(!isNaN(currVal)) {
+            if(currVal > filterMax) {
+              filterMax = currVal;
+            }
+            if(filterMin === null || currVal < filterMin) {
+              filterMin = currVal;
+            }
+          }
+        }
+
+        colors = d3.scaleLinear()
+            .domain([filterMin, filterMax])
+            .range(["#ccc", "#1f77b4"]);
+      } else {
+        colors = d3.scaleOrdinal()
+            .domain(uniqueKeys)
+            .range(['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#bcbd22', '#17becf', '#aec7e8', '#ffbb78', '#98df8a', '#ff9896', '#c5b0d5', '#c49c94', '#f7b6d2', '#dbdb8d', '#9edae5', '#777777']);
+      }
+
+      this.svg.selectAll("circle")
+          .data(this.data)
+          .transition()
+          .attr("fill", function(d) { return colors(d[filter]); } );
+
+    };
+
     Potato.prototype.apply_filters = function() {
       return $(".active-filter").each((function(_this) {
         return function(i, filterObj) {
