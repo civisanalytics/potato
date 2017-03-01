@@ -101,28 +101,13 @@
 
     Potato.prototype.order_by = function(filter) {
 
-      // calculate the max and min value
-      var filterMax = 0;
-      var filterMin = null;
-      for(var i = 0; i < this.data.length; i++) {
-        var currVal = this.parse_numeric_string(this.data[i][filter]);
-
-        // ignore emptys (NaN)
-        if(!isNaN(currVal)) {
-          if(currVal > filterMax) {
-            filterMax = currVal;
-          }
-          if(filterMin === null || currVal < filterMin) {
-            filterMin = currVal;
-          }
-        }
-      }
+      var extent = this.getNumericExtent(filter);
 
       var orderPadding = 160;
 
       // TODO: should we allow switching between linear and sqrt scale?
       var orders = d3.scaleLinear()
-          .domain([filterMin, filterMax])
+          .domain([extent.min, extent.max])
           .range([orderPadding, this.width - orderPadding]);
 
       // TODO: this should probably move to the reset function
@@ -130,14 +115,14 @@
 
       // Tail
       this.labels.push({
-        val: filterMin,
+        val: extent.min,
         split: filter,
         tarx: orders.range()[0],
         tary: this.height / 2.0 - 50 // TODO: either make this relative to the number of nodes, or do the fancy thing in the old version
       });
       // Head
       this.labels.push({
-        val: filterMax,
+        val: extent.max,
         split: filter,
         tarx: orders.range()[1],
         tary: this.height / 2.0 - 50 // TODO: either make this relative to the number of nodes, or do the fancy thing in the old version
@@ -260,25 +245,10 @@
       $("#size-hint").html("<br>" + filter);
       $("#size-" + filter).addClass('active-filter');
 
-      // calculate the max and min value
-      var filterMax = 0;
-      var filterMin = null;
-      for(var i = 0; i < this.data.length; i++) {
-        var currVal = this.parse_numeric_string(this.data[i][filter]);
-
-        // ignore emptys (NaN)
-        if(!isNaN(currVal)) {
-          if(currVal > filterMax) {
-            filterMax = currVal;
-          }
-          if(filterMin === null || currVal < filterMin) {
-            filterMin = currVal;
-          }
-        }
-      }
+      var extent = this.getNumericExtent(filter);
 
       var sizeScale = d3.scaleSqrt()
-          .domain([filterMin, filterMax])
+          .domain([extent.min, extent.max])
           .range([3, 12]);
 
       // handle missing values gracefully by setting circle size to zero
@@ -338,25 +308,10 @@
       var colorScale;
       // if numeric do gradient, else do categorical
       if(numeric === true) {
-        // calculate the max and min value
-        var filterMax = 0;
-        var filterMin = null;
-        for(var i = 0; i < this.data.length; i++) {
-          var currVal = this.parse_numeric_string(this.data[i][filter]);
-
-          // ignore emptys (NaN)
-          if(!isNaN(currVal)) {
-            if(currVal > filterMax) {
-              filterMax = currVal;
-            }
-            if(filterMin === null || currVal < filterMin) {
-              filterMin = currVal;
-            }
-          }
-        }
+        var extent = this.getNumericExtent(filter);
 
         colorScale = d3.scaleLinear()
-            .domain([filterMin, filterMax])
+            .domain([extent.min, extent.max])
             .range(["#ccc", "#1f77b4"]);
       } else {
         colorScale = d3.scaleOrdinal()
@@ -562,8 +517,29 @@
       return $("#filter-select-buttons").append(reset_button);
     };
 
-    Potato.prototype.parse_numeric_string = function(str) {
+    Potato.prototype.parseNumericString = function(str) {
       return parseFloat(str.replace(/%/, "").replace(/,/g, ""));
+    };
+
+    // for a given filter, get the extent (min and max)
+    Potato.prototype.getNumericExtent = function(filter) {
+      var filterMax = 0;
+      var filterMin = null;
+      for(var i = 0; i < this.data.length; i++) {
+        var currVal = this.parseNumericString(this.data[i][filter]);
+
+        // ignore emptys (NaN)
+        if(!isNaN(currVal)) {
+          if(currVal > filterMax) {
+            filterMax = currVal;
+          }
+          if(filterMin === null || currVal < filterMin) {
+            filterMin = currVal;
+          }
+        }
+      }
+
+      return { min: filterMin, max: filterMax };
     };
 
     return Potato;
