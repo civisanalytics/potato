@@ -80,51 +80,8 @@
           });
     }
 
-    Potato.prototype.order_by = function(filter) {
-
-      // calculate the max and min value
-      var curr_max = 0;
-      var non_zero_min = null;
-      for(var i = 0; i < this.data.length; i++) {
-        var new_val = this.parse_numeric_string(this.data[i][filter]);
-        if(new_val > curr_max) {
-          curr_max = new_val;
-        }
-
-        // TODO: I wonder if this first conditional can actually just be (new_val > 0)??
-        // For that matter.... why do we want to hide zeros?....
-        // I wonder if this was leftover from coffeescript that was auto parsing nulls to 0?
-        if((!isNaN(new_val) && new_val !== 0) && (non_zero_min === null || new_val < non_zero_min)) {
-          non_zero_min = new_val;
-        }
-      }
-
-      // TODO: should we allow switching between linear and sqrt scale?
-      var orders = d3.scaleSqrt()
-          .domain([non_zero_min, curr_max])
-          .range([220, this.width - 160]);
-
-
-      // TODO: this should probably move to the reset function
-      this.labels = [];
-
-      // Tail
-      this.labels.push({
-        val: non_zero_min,
-        split: filter,
-        tarx: 220,
-        tary: this.height / 2.0 - 50 // TODO: either make this relative to the number of nodes, or do the fancy thing in the old version
-      });
-      // Head
-      this.labels.push({
-        val: curr_max,
-        split: filter,
-        tarx: this.width - 160,
-        tary: this.height / 2.0 - 50 // TODO: either make this relative to the number of nodes, or do the fancy thing in the old version
-      });
-
-      /////////////////
-      // Add the labels to the svg
+    // Update any labels on the screen as needed, called by orderBy and splitBy
+    Potato.prototype.updateLabels = function() {
       var text = this.svg.selectAll(".split-labels")
           .data(this.labels)
 
@@ -139,7 +96,54 @@
           .attr("y", function(d) { return d.tary; });
 
       text.exit().remove();
-      ///////////////////////
+    }
+
+    Potato.prototype.order_by = function(filter) {
+
+      // calculate the max and min value
+      var filterMax = 0;
+      var filterMin = null;
+      for(var i = 0; i < this.data.length; i++) {
+        var currVal = this.parse_numeric_string(this.data[i][filter]);
+
+        // ignore emptys (NaN)
+        if(!isNaN(currVal)) {
+          if(currVal > filterMax) {
+            filterMax = currVal;
+          }
+          if(filterMin === null || currVal < filterMin) {
+            filterMin = currVal;
+          }
+        }
+      }
+
+      var orderPadding = 160;
+
+      // TODO: should we allow switching between linear and sqrt scale?
+      var orders = d3.scaleLinear()
+          .domain([filterMin, filterMax])
+          .range([orderPadding, this.width - orderPadding]);
+
+      // TODO: this should probably move to the reset function
+      this.labels = [];
+
+      // Tail
+      this.labels.push({
+        val: filterMin,
+        split: filter,
+        tarx: orders.range()[0],
+        tary: this.height / 2.0 - 50 // TODO: either make this relative to the number of nodes, or do the fancy thing in the old version
+      });
+      // Head
+      this.labels.push({
+        val: filterMax,
+        split: filter,
+        tarx: orders.range()[1],
+        tary: this.height / 2.0 - 50 // TODO: either make this relative to the number of nodes, or do the fancy thing in the old version
+      });
+
+      // TODO: add the line thing between the labels?
+      this.updateLabels();
 
       var xForceFn = d3.forceX(function(d) {
         var new_x = orders(parseFloat(d[filter]))
@@ -157,7 +161,7 @@
       this.simulation.alpha(1).restart();
 
       //TODO: Handle edge case with only one value
-      /*if (non_zero_min === curr_max) {
+      /*if (filterMin === filterMax) {
         orders.range([this.width / 2.0, this.width / 2.0]);
       }*/
       // TODO: labels
@@ -174,8 +178,11 @@
 
       // TODO: fix this
       //this.reset('split');
+
+      // TODO: Change the hint on the button, seems like maybe this should go somewhere else?
       $("#split-hint").html("<br>" + filter);
       $("#split-" + filter).addClass('active-filter');
+
       if (data_type === "num") {
         // TODO: implement order_by
         return this.order_by(filter);
@@ -227,23 +234,7 @@
           };
         })(this));
 
-        /////////////////
-        // Add the labels to the svg
-        var text = this.svg.selectAll(".split-labels")
-            .data(this.labels)
-
-        text.enter().append("text")
-            .attr("class", "split-labels")
-            .text(function(d) { return d.val; })
-            .attr("x", function(d) { return d.tarx; })
-            .attr("y", function(d) { return d.tary; });
-
-        text.transition().text(function(d) { return d.val; })
-            .attr("x", function(d) { return d.tarx; })
-            .attr("y", function(d) { return d.tary; });
-
-        text.exit().remove();
-        ///////////////////////
+        this.updateLabels();
 
         var xForceFn = d3.forceX(function(d) {
           return keysToLocation[d[filter]].x;
