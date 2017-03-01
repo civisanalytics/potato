@@ -104,6 +104,43 @@
           .domain([non_zero_min, curr_max])
           .range([220, this.width - 160]);
 
+
+      // TODO: this should probably move to the reset function
+      this.labels = [];
+
+      // Tail
+      this.labels.push({
+        val: non_zero_min,
+        split: filter,
+        tarx: 220,
+        tary: this.height / 2.0 - 50 // TODO: either make this relative to the number of nodes, or do the fancy thing in the old version
+      });
+      // Head
+      this.labels.push({
+        val: curr_max,
+        split: filter,
+        tarx: this.width - 160,
+        tary: this.height / 2.0 - 50 // TODO: either make this relative to the number of nodes, or do the fancy thing in the old version
+      });
+
+      /////////////////
+      // Add the labels to the svg
+      var text = this.svg.selectAll(".split-labels")
+          .data(this.labels)
+
+      text.enter().append("text")
+          .attr("class", "split-labels")
+          .text(function(d) { return d.val; })
+          .attr("x", function(d) { return d.tarx; })
+          .attr("y", function(d) { return d.tary; });
+
+      text.transition().text(function(d) { return d.val; })
+          .attr("x", function(d) { return d.tarx; })
+          .attr("y", function(d) { return d.tary; });
+
+      text.exit().remove();
+      ///////////////////////
+
       var xForceFn = d3.forceX(function(d) {
         var new_x = orders(parseFloat(d[filter]))
         // if this row doesn't have this value, then fly off screen (to left)
