@@ -79,30 +79,36 @@
     };
 
     Potato.prototype.order_by = function(filter) {
-      // TODO: this is all super inefficient to calculate max/min
-      var curr_vals = [];
+
+      // calculate the max and min value
+      var curr_max = 0;
+      var non_zero_min = null;
       for(var i = 0; i < this.data.length; i++) {
-        curr_vals.push(this.parse_numeric_string(this.data[i][filter]));
+        var new_val = this.parse_numeric_string(this.data[i][filter]);
+        if(new_val > curr_max) {
+          curr_max = new_val;
+        }
+
+        // TODO: I wonder if this first conditional can actually just be (new_val > 0)??
+        // For that matter.... why do we want to hide zeros?....
+        // I wonder if this was leftover from coffeescript that was auto parsing nulls to 0?
+        if((!isNaN(new_val) && new_val !== 0) && (non_zero_min === null || new_val < non_zero_min)) {
+          non_zero_min = new_val;
+        }
       }
 
-      var curr_max = d3.max(curr_vals, function(d) {
-        return d;
-      });
-      var non_zero_min = curr_max;
-      $.each(curr_vals, (function(_this) {
-        return function(k, c) {
-          if (c > 0 && c < non_zero_min) {
-            return non_zero_min = c;
-          }
-        };
-      })(this));
-
+      // TODO: should we allow switching between linear and sqrt scale?
       var orders = d3.scaleSqrt()
           .domain([non_zero_min, curr_max])
           .range([220, this.width - 160]);
 
       var xForceFn = d3.forceX(function(d) {
-        return orders(parseFloat(d[filter]));
+        var new_x = orders(parseFloat(d[filter]))
+        // if this row doesn't have this value, then fly off screen (to left)
+        if(isNaN(parseFloat(d[filter]))) {
+          return -100;
+        }
+        return new_x;
       });
 
       var yForceFn = d3.forceY(this.height / 2.0);
