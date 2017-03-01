@@ -19,7 +19,7 @@
       }
 
       this.data = data;
-      this.create_filters();
+      this.calculateFilters();
 
       this.labels = [];
 
@@ -59,13 +59,20 @@
           .force("x", centerXForce)
           .force("y", centerYForce);
 
+      var that = this;
+
       var node = this.svg.selectAll("circle")
           .data(data)
           .enter().append("circle")
           .attr("r", function(d) {
             return d.radius;
           })
-          .attr("fill", "#777");
+          .attr("fill", "#777")
+          .on("mouseover", function(d, i) {
+            that.show_details(d, i, this);
+          }).on("mouseout", function(d, i) {
+            that.hide_details(d, i, this);
+          });
 
       // Add the nodes to the simulation, and specify how to draw
       this.simulation.nodes(data)
@@ -430,14 +437,15 @@
       })(this));
     };
 
-    // return an object containing all the filters and all the unique values in this dataset
+    // Given an array of data (d3 format)
+    // return an object containing all the filters/columns and all unique values
     // - key is the filter type and the value is an array of filters
-    Potato.prototype.uniqueDataValues = function() {
-      var sortedFilters = {};
+    Potato.prototype.uniqueDataValues = function(data) {
+      var uniqueValues = {};
 
-      for(var i=0; i<this.data.length; i++) {
-        for(var key in this.data[i]) {
-          var val = this.data[i][key];
+      for(var i=0; i<data.length; i++) {
+        for(var key in data[i]) {
+          var val = data[i][key];
 
           // TODO: Do we even need the node_id anymore? (might need it for subselection?)
           // ignore the id
@@ -445,17 +453,17 @@
             var key_mod = key.replace(/\(|\)/g, " ");
 
             // this is a new filter we haven't seen before, so add
-            if(!sortedFilters.hasOwnProperty(key_mod)) {
-              sortedFilters[key_mod] = [];
+            if(!uniqueValues.hasOwnProperty(key_mod)) {
+              uniqueValues[key_mod] = [];
             }
 
-            var indexOfCurrVal = sortedFilters[key_mod].map(function(obj) {
+            var indexOfCurrVal = uniqueValues[key_mod].map(function(obj) {
               return obj.value
             }).indexOf(val);
 
             // if < 0, then this is a new value that we should add
             if(indexOfCurrVal < 0) {
-              sortedFilters[key_mod].push({
+              uniqueValues[key_mod].push({
                 filter: key_mod,
                 value: val
               });
@@ -463,43 +471,41 @@
           }
         }
       }
-      return sortedFilters;
+      return uniqueValues;
     };
 
-    // the logic behind taking the csv and determining what the categorical data is
-    Potato.prototype.create_filters = function() {
-      var sortedFilters = this.uniqueDataValues();
+    Potato.prototype.calculateFilters = function() {
+      var uniqueValues = this.uniqueDataValues(this.data);
 
       this.categorical_filters = [];
       this.numeric_filters = [];
-      $.each(sortedFilters, (function(_this) {
-        return function(f, v) {
-          if (isNaN(v[0].value.replace(/%/, "").replace(/,/g, ""))) {
-            if (v.length !== _this.data.length && v.length < 500) {
-              return _this.categorical_filters.push({
-                value: f,
-                type: 'cat'
-              });
-            }
-          } else {
-            return _this.numeric_filters.push({
-              value: f,
-              type: 'num'
+
+      for(var key in uniqueValues) {
+        // if the first value is a number (removing % and ,) then the rest of the filter is
+        // **probably** numeric
+        var isNumeric = !isNaN(uniqueValues[key][0].value.replace(/%/,"").replace(/,/g,""));
+
+        if(isNumeric) {
+          this.numeric_filters.push({
+            value: key,
+            type: 'num'
+          });
+        } else {
+          // If every value is unique, or there are a lot of values
+          // then this filter is, while not numeric, effectively not categorical, and we should ignore
+          if(uniqueValues[key].length != this.data.length && uniqueValues[key].length < 500) {
+            this.categorical_filters.push({
+              value: key,
+              type: 'cat'
             });
           }
-        };
-      })(this));
-      $.each(this.categorical_filters, (function(_this) {
-        return function(k, v) {
-          return sortedFilters[v.value].sort(function(a, b) {
-            if (a.value === b.value) {
-              return 0;
-            } else {
-              return (a.value > b.value) || -1;
-            }
-          });
-        };
-      })(this));
+        }
+      }
+
+      this.createResetButton();
+    };
+
+    Potato.prototype.createResetButton = function() {
       var reset_tooltip = $("<div class='tooltip' id='reset-tooltip'>Click and drag on the canvas to select nodes.</div>");
       var reset_button = $("<button id='reset-button' class='disabled-button modifier-button'><span id='reset-icon'>&#8635;</span> Reset Selection</button>");
       reset_button.on("click", (function(_this) {
@@ -545,6 +551,59 @@
       }
 
       return { min: filterMin, max: filterMax };
+    };
+
+    Potato.prototype.show_details = function(data, i, element) {
+      var content = "";
+      var filters = [];
+      for(var i=0; i<this.numeric_filters.length; i++) {
+        filters.push(this.numeric_filters[i].value);
+      }
+      for(var i=0; i<this.categorical_filters.length; i++) {
+        filters.push(this.categorical_filters[i].value);
+      }
+      for(var i=0; i<filters.length; i++) {
+        var key = filters[i];
+        content += key + ": " + data[key] + "<br/>";
+      }
+      $("#node-tooltip").html(content);
+      this.update_position(d3.event, "node-tooltip");
+      $("#node-tooltip").show();
+//      this.highlight_node(d3.select(element), true);
+    };
+
+    Potato.prototype.hide_details = function(data, i, element) {
+      $("#node-tooltip").hide();
+//      this.highlight_node(d3.select(element), false);
+    };
+
+    // TODO: This is broken b/c new d3v4 doesnt have selection
+    Potato.prototype.highlight_node = function(element, highlight) {
+      // ignore custom colors
+      if (element.attr("class") !== undefined) {
+        var s_width;
+        if (highlight) {
+          s_width = element.attr("r") * 0.3;
+        } else {
+          s_width = 0;
+        }
+        element.attr("stroke-width", s_width);
+        /*
+        element.attr("r", function(d) {
+            return d.radius + (s_width / 2.0);
+          }).attr("stroke-width", s_width);*/
+      }
+    };
+
+    Potato.prototype.update_position = function(e, id) {
+      var tth, ttleft, tttop, ttw, xOffset, yOffset;
+      xOffset = 20;
+      yOffset = 10;
+      ttw = $("#" + id).width();
+      tth = $("#" + id).height();
+      ttleft = (e.pageX + xOffset * 2 + ttw) > $(window).width() ? e.pageX - ttw - xOffset * 2 : e.pageX + xOffset;
+      tttop = (e.pageY + yOffset * 2 + tth) > $(window).height() ? e.pageY - tth - yOffset * 2 : e.pageY + yOffset;
+      return $("#" + id).css('top', tttop + 'px').css('left', ttleft + 'px');
     };
 
     return Potato;
