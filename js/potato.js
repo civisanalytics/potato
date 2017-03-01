@@ -3,10 +3,8 @@
     bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
   window.Potato = (function() {
-    var default_params;
-
     // if true, then interactive, if false, button is hidden
-    default_params = {
+    var defaultParams = {
       split: true,
       color: true,
       size: true,
@@ -15,7 +13,7 @@
 
     function Potato(data, params) {
       if (params == null) {
-        params = default_params;
+        params = defaultParams;
       }
 
       this.data = data;
@@ -34,7 +32,7 @@
       // Only create buttons if param is set to True
       for(var key in params) {
         if(key !== 'class' && params[key] === true) {
-          this.create_buttons(key);
+          this.createButtons(key);
         }
       }
 
@@ -69,9 +67,9 @@
           })
           .attr("fill", "#777")
           .on("mouseover", function(d, i) {
-            that.show_details(d, i, this);
+            that.showDetails(d, i, this);
           }).on("mouseout", function(d, i) {
-            that.hide_details(d, i, this);
+            that.hideDetails(d, i, this);
           });
 
       // Add the nodes to the simulation, and specify how to draw
@@ -93,12 +91,8 @@
       var text = this.svg.selectAll(".split-labels")
           .data(this.labels)
 
-      var enter = text.enter().append("text");
-
-      // .merge() is a new thing from d3v4 if you want the updates to apply to
-      // new/appended elements
-      // http://stackoverflow.com/questions/38297872/d3-js-v4-0-0-alpha-35-transitions-not-working
-      text.merge(enter).transition()
+      text.enter().append("text")
+        .merge(text)
           .attr("class", "split-labels")
           .text(function(d) { return d.val; })
           .attr("x", function(d) { return d.tarx; })
@@ -107,7 +101,7 @@
       text.exit().remove();
     }
 
-    Potato.prototype.order_by = function(filter) {
+    Potato.prototype.orderBy = function(filter) {
 
       var extent = this.getNumericExtent(filter);
 
@@ -140,12 +134,12 @@
       this.updateLabels();
 
       var xForceFn = d3.forceX(function(d) {
-        var new_x = orders(parseFloat(d[filter]))
+        var newX = orders(parseFloat(d[filter]))
         // if this row doesn't have this value, then fly off screen (to left)
         if(isNaN(parseFloat(d[filter]))) {
           return -100;
         }
-        return new_x;
+        return newX;
       });
 
       var yForceFn = d3.forceY(this.height / 2.0);
@@ -161,9 +155,7 @@
       // TODO: labels
     };
 
-    Potato.prototype.split_by = function(filter, data_type) {
-      var curr_col, curr_row, curr_vals, height_2, num_cols, num_rows, width_2;
-
+    Potato.prototype.splitBy = function(filter, dataType) {
       // TODO: this probably needs to be... this.data[]?
       /*
       if (this.nodes === void 0 || this.nodes.length === 0) {
@@ -177,9 +169,9 @@
       $("#split-hint").html("<br>" + filter);
       $("#split-" + filter).addClass('active-filter');
 
-      if (data_type === "num") {
-        // TODO: implement order_by
-        return this.order_by(filter);
+      if (dataType === "num") {
+        // TODO: implement orderBy
+        return this.orderBy(filter);
       } else {
         // first determine the unique values for this category in the dataset, also sort
         var uniqueKeys = d3.map(this.data, function(d) {
@@ -187,14 +179,14 @@
         }).keys().sort();
 
         // then determine what spots all the values should go to
-        num_cols = Math.ceil(Math.sqrt(uniqueKeys.length));
-        num_rows = Math.ceil(uniqueKeys.length / num_cols);
-        curr_row = 0;
-        curr_col = 0;
+        var numCols = Math.ceil(Math.sqrt(uniqueKeys.length));
+        var numRows = Math.ceil(uniqueKeys.length / numCols);
+        var currRow = 0;
+        var currCol = 0;
 
         // padding because the clumps tend to float off the screen
-        width_2 = this.width * 0.8;
-        height_2 = this.height * 0.8;
+        var paddedWidth = this.width * 0.8;
+        var paddedHeight = this.height * 0.8;
 
         var keysToLocation = {};
 
@@ -206,14 +198,14 @@
         uniqueKeys.forEach((function(_this) {
           return function(d) {
             var finalObj = {
-              x: (_this.width * 0.12) + (0.5 + curr_col) * (width_2 / num_cols),
-              y: (_this.height * 0.10) + (0.5 + curr_row) * (height_2 / num_rows)
+              x: (_this.width * 0.12) + (0.5 + currCol) * (paddedWidth / numCols),
+              y: (_this.height * 0.10) + (0.5 + currRow) * (paddedHeight / numRows)
             };
 
-            curr_col++;
-            if (curr_col >= num_cols) {
-              curr_col = 0;
-              curr_row++;
+            currCol++;
+            if (currCol >= numCols) {
+              currCol = 0;
+              currRow++;
             }
 
             keysToLocation[d] = finalObj;
@@ -244,7 +236,7 @@
       }
     };
 
-    Potato.prototype.size_by = function(filter) {
+    Potato.prototype.sizeBy = function(filter) {
       /*
       if (this.nodes === void 0 || this.nodes.length === 0) {
         return;
@@ -289,8 +281,7 @@
       this.simulation.alpha(1).restart();
     };
 
-    Potato.prototype.color_by = function(filter, data_type) {
-      var curr_vals;
+    Potato.prototype.colorBy = function(filter, dataType) {
       /*if (this.nodes === void 0 || this.nodes.length === 0) {
         return;
       }*/
@@ -311,7 +302,7 @@
         return d[filter];
       }).keys().sort();
 
-      var numeric = data_type === 'num';
+      var numeric = dataType === 'num';
 
       var colorScale;
       // if numeric do gradient, else do categorical
@@ -345,11 +336,10 @@
       var legendText = legendWrapper.selectAll("text")
           .data(colorScale.domain());
 
-      var textEnter = legendText.enter().append("text")
+      legendText.enter().append("text")
           .attr("y", function(d, i) { return i * legendDotSize + 12; })
-          .attr("x", 20);
-
-      legendText.merge(textEnter).transition()
+          .attr("x", 20)
+        .merge(legendText)
           .text(function(d) { return d; });
 
       legendText.exit().remove();
@@ -358,48 +348,45 @@
       var legendDot = legendWrapper.selectAll("rect")
           .data(colorScale.domain());
 
-      var dotEnter = legendDot.enter().append("rect")
+      legendDot.enter().append("rect")
           .attr("y", function(d, i) { return i * legendDotSize; })
           .attr("rx", legendDotSize * 0.5)
           .attr("ry", legendDotSize * 0.5)
           .attr("width", legendDotSize * 0.5)
           .attr("height", legendDotSize * 0.5)
-          .style("fill", function(d) { return colorScale(d); }); // we repeat this so it doesnt flash in from black
-
-      legendDot.merge(dotEnter).transition()
+        .merge(legendDot)
           .style("fill", function(d) { return colorScale(d); });
 
       legendDot.exit().remove();
     };
 
-    Potato.prototype.apply_filters = function() {
+    Potato.prototype.applyFilters = function() {
       return $(".active-filter").each((function(_this) {
         return function(i, filterObj) {
-          var filter_id = $(filterObj).attr('id');
-          var dash_loc = filter_id.indexOf('-');
-          var type = filter_id.substr(0, dash_loc);
-          var val = filter_id.substr(dash_loc + 1);
-          return _this.apply_filter(type, val, $(filterObj).attr('data-type'));
+          var filterId = $(filterObj).attr('id');
+          var dashLoc = filterId.indexOf('-');
+          var type = filterId.substr(0, dashLoc);
+          var val = filterId.substr(dashLoc + 1);
+          return _this.applyFilter(type, val, $(filterObj).attr('data-type'));
         };
       })(this));
     };
 
-    Potato.prototype.apply_filter = function(type, filter, data_type) {
+    Potato.prototype.applyFilter = function(type, filter, dataType) {
       if (type === "split") {
-        this.split_by(filter, data_type);
+        this.splitBy(filter, dataType);
       }
       if (type === "color") {
-        this.color_by(filter, data_type);
+        this.colorBy(filter, dataType);
       }
       if (type === "size") {
-        return this.size_by(filter);
+        return this.sizeBy(filter);
       }
     };
 
-    Potato.prototype.create_buttons = function(type) {
-      var button_filters, type_upper;
-      type_upper = type[0].toUpperCase() + type.slice(1);
-      $("#modifiers").append("<div id='" + type + "-wrapper' class='modifier-wrapper'><button id='" + type + "-button' class='modifier-button'>" + type_upper + "<span class='button-arrow'>&#x25BC;</span><span id='" + type + "-hint' class='modifier-hint'></span></button><div id='" + type + "-menu' class='modifier-menu'></div></div>");
+    Potato.prototype.createButtons = function(type) {
+      var typeUpper = type[0].toUpperCase() + type.slice(1);
+      $("#modifiers").append("<div id='" + type + "-wrapper' class='modifier-wrapper'><button id='" + type + "-button' class='modifier-button'>" + typeUpper + "<span class='button-arrow'>&#x25BC;</span><span id='" + type + "-hint' class='modifier-hint'></span></button><div id='" + type + "-menu' class='modifier-menu'></div></div>");
       $("#" + type + "-button").hover(function() {
         return $("#" + type + "-menu").slideDown(100);
       });
@@ -411,14 +398,14 @@
           return _this.reset(type);
         };
       })(this));
-      button_filters = this.numeric_filters;
+      var buttonFilters = this.numericFilters;
       if (type === "color" || type === "split") {
-        button_filters = button_filters.concat({
+        buttonFilters = buttonFilters.concat({
           value: '',
           type: 'divider'
-        }).concat(this.categorical_filters);
+        }).concat(this.categoricalFilters);
       }
-      return d3.select("#" + type + "-menu").selectAll('div').data(button_filters).enter().append("div").text(function(d) {
+      return d3.select("#" + type + "-menu").selectAll('div').data(buttonFilters).enter().append("div").text(function(d) {
         return d.value;
       }).attr("class", function(d) {
         if (d.type === 'divider') {
@@ -432,7 +419,7 @@
         return type + "-" + d.value;
       }).on("click", (function(_this) {
         return function(d) {
-          return _this.apply_filter(type, d.value, d.type);
+          return _this.applyFilter(type, d.value, d.type);
         };
       })(this));
     };
@@ -447,24 +434,24 @@
         for(var key in data[i]) {
           var val = data[i][key];
 
-          // TODO: Do we even need the node_id anymore? (might need it for subselection?)
+          // TODO: Do we even need the nodeId anymore? (might need it for subselection?)
           // ignore the id
           if (key !== 'node_id') {
-            var key_mod = key.replace(/\(|\)/g, " ");
+            var keyMod = key.replace(/\(|\)/g, " ");
 
             // this is a new filter we haven't seen before, so add
-            if(!uniqueValues.hasOwnProperty(key_mod)) {
-              uniqueValues[key_mod] = [];
+            if(!uniqueValues.hasOwnProperty(keyMod)) {
+              uniqueValues[keyMod] = [];
             }
 
-            var indexOfCurrVal = uniqueValues[key_mod].map(function(obj) {
+            var indexOfCurrVal = uniqueValues[keyMod].map(function(obj) {
               return obj.value
             }).indexOf(val);
 
             // if < 0, then this is a new value that we should add
             if(indexOfCurrVal < 0) {
-              uniqueValues[key_mod].push({
-                filter: key_mod,
+              uniqueValues[keyMod].push({
+                filter: keyMod,
                 value: val
               });
             }
@@ -477,8 +464,8 @@
     Potato.prototype.calculateFilters = function() {
       var uniqueValues = this.uniqueDataValues(this.data);
 
-      this.categorical_filters = [];
-      this.numeric_filters = [];
+      this.categoricalFilters = [];
+      this.numericFilters = [];
 
       for(var key in uniqueValues) {
         // if the first value is a number (removing % and ,) then the rest of the filter is
@@ -486,7 +473,7 @@
         var isNumeric = !isNaN(uniqueValues[key][0].value.replace(/%/,"").replace(/,/g,""));
 
         if(isNumeric) {
-          this.numeric_filters.push({
+          this.numericFilters.push({
             value: key,
             type: 'num'
           });
@@ -494,7 +481,7 @@
           // If every value is unique, or there are a lot of values
           // then this filter is, while not numeric, effectively not categorical, and we should ignore
           if(uniqueValues[key].length != this.data.length && uniqueValues[key].length < 500) {
-            this.categorical_filters.push({
+            this.categoricalFilters.push({
               value: key,
               type: 'cat'
             });
@@ -506,26 +493,26 @@
     };
 
     Potato.prototype.createResetButton = function() {
-      var reset_tooltip = $("<div class='tooltip' id='reset-tooltip'>Click and drag on the canvas to select nodes.</div>");
-      var reset_button = $("<button id='reset-button' class='disabled-button modifier-button'><span id='reset-icon'>&#8635;</span> Reset Selection</button>");
-      reset_button.on("click", (function(_this) {
+      var resetTooltip = $("<div class='tooltip' id='reset-tooltip'>Click and drag on the canvas to select nodes.</div>");
+      var resetButton = $("<button id='reset-button' class='disabled-button modifier-button'><span id='reset-icon'>&#8635;</span> Reset Selection</button>");
+      resetButton.on("click", (function(_this) {
         return function(e) {
-          if (!reset_button.hasClass('disabled-button')) {
+          if (!resetButton.hasClass('disabled-button')) {
             return _this.add_all();
           }
         };
       })(this)).on("mouseover", (function(_this) {
         return function(e) {
-          return reset_tooltip.show();
+          return resetTooltip.show();
         };
       })(this)).on("mouseout", (function(_this) {
         return function(e) {
-          return reset_tooltip.hide();
+          return resetTooltip.hide();
         };
       })(this));
-      reset_button.append(reset_tooltip);
-      reset_tooltip.hide();
-      return $("#filter-select-buttons").append(reset_button);
+      resetButton.append(resetTooltip);
+      resetTooltip.hide();
+      return $("#filter-select-buttons").append(resetButton);
     };
 
     Potato.prototype.parseNumericString = function(str) {
@@ -553,49 +540,49 @@
       return { min: filterMin, max: filterMax };
     };
 
-    Potato.prototype.show_details = function(data, i, element) {
+    Potato.prototype.showDetails = function(data, i, element) {
       var content = "";
       var filters = [];
-      for(var i=0; i<this.numeric_filters.length; i++) {
-        filters.push(this.numeric_filters[i].value);
+      for(var i=0; i<this.numericFilters.length; i++) {
+        filters.push(this.numericFilters[i].value);
       }
-      for(var i=0; i<this.categorical_filters.length; i++) {
-        filters.push(this.categorical_filters[i].value);
+      for(var i=0; i<this.categoricalFilters.length; i++) {
+        filters.push(this.categoricalFilters[i].value);
       }
       for(var i=0; i<filters.length; i++) {
         var key = filters[i];
         content += key + ": " + data[key] + "<br/>";
       }
       $("#node-tooltip").html(content);
-      this.update_position(d3.event, "node-tooltip");
+      this.updatePosition(d3.event, "node-tooltip");
       $("#node-tooltip").show();
-//      this.highlight_node(d3.select(element), true);
+//      this.highlightNode(d3.select(element), true);
     };
 
-    Potato.prototype.hide_details = function(data, i, element) {
+    Potato.prototype.hideDetails = function(data, i, element) {
       $("#node-tooltip").hide();
-//      this.highlight_node(d3.select(element), false);
+//      this.highlightNode(d3.select(element), false);
     };
 
     // TODO: This is broken b/c new d3v4 doesnt have selection
-    Potato.prototype.highlight_node = function(element, highlight) {
+    Potato.prototype.highlightNode = function(element, highlight) {
       // ignore custom colors
       if (element.attr("class") !== undefined) {
-        var s_width;
+        var sWidth;
         if (highlight) {
-          s_width = element.attr("r") * 0.3;
+          sWidth = element.attr("r") * 0.3;
         } else {
-          s_width = 0;
+          sWidth = 0;
         }
-        element.attr("stroke-width", s_width);
+        element.attr("stroke-width", sWidth);
         /*
         element.attr("r", function(d) {
-            return d.radius + (s_width / 2.0);
-          }).attr("stroke-width", s_width);*/
+            return d.radius + (sWidth / 2.0);
+          }).attr("stroke-width", sWidth);*/
       }
     };
 
-    Potato.prototype.update_position = function(e, id) {
+    Potato.prototype.updatePosition = function(e, id) {
       var tth, ttleft, tttop, ttw, xOffset, yOffset;
       xOffset = 20;
       yOffset = 10;
