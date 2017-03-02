@@ -38,14 +38,11 @@
 
       // for now arbitrarily start all nodes at radius of 5
       data.forEach(function(d) {
-        d.radius = 5;
+        d.radius = 2;
       });
 
       // "Electric repulsive charge", prevents overlap of nodes
-      var chargeForce = d3.forceManyBody().strength(function(d) {
-        // base it on the radius of the node
-        return -Math.pow(d.radius, 2.0) * 0.2;
-      });
+      var chargeForce = this.getChargeForce();
 
       // Keep nodes centered on screen
       var centerXForce = d3.forceX(this.width / 2);
@@ -83,15 +80,30 @@
             node.attr("cx", function(d) { return d.x; })
                 .attr("cy", function(d) { return d.y; });
 
+            // TODO:
+            // apparently its not very expensive it doesnt affect framerate much....
+            // maybe this optimization is unneeded?...
+
             // Updating the labels is expensive, and also doesn't need to be exact
             // so only do it once at approx 60% of the way through simulation decay
-            if(!that.labelsCreated && that.simulation.alpha() < 0.4) {
+            /*if(!that.labelsCreated && that.simulation.alpha() < 0.3) {*/
               that.labelsCreated = true;
               that.updateLabelPositions(that.labels, that.data);
               that.updateLabels(that.svg, that.labels);
-            }
+            //}
           });
     }
+
+    Potato.prototype.getChargeForce = function() {
+      return d3.forceManyBody().strength(function(d) {
+        // base it on the radius of the node
+        var multiplier = -0.2;
+        var charge = Math.pow((d.radius), 1.8) * multiplier;
+        //console.log(d.radius, charge);
+        return charge;
+      })//.distanceMax(200)
+      //.theta(0.2); // this might speed things up?
+    };
 
     // Dynamic labels that "float" above their current position
     Potato.prototype.updateLabelPositions = function(labels, data) {
@@ -144,7 +156,8 @@
     Potato.prototype.updateLabels = function(svg, labels) {
       var text = this.svg.selectAll(".split-labels")
           .data(labels)
-
+      // update once
+/*
       text.enter().append("text")
           .attr("fill-opacity", 0)
           .attr("x", function(d) { return d.tarx; })
@@ -153,7 +166,14 @@
           .text(function(d) { return d.val; })
         .merge(text).transition().duration(300)
           .attr("fill-opacity", 1); // fancy magic to "fade in" labels
-
+*/
+      // update every tick
+      text.enter().append("text")
+          .attr("class", "split-labels")
+          .text(function(d) { return d.val; })
+        .merge(text)
+          .attr("x", function(d) { return d.tarx; })
+          .attr("y", function(d) { return d.tary; })
       text.exit().remove();
     }
 
@@ -241,9 +261,11 @@
         var currRow = 0;
         var currCol = 0;
 
+        var padding = 0.7;
+
         // padding because the clumps tend to float off the screen
-        var paddedWidth = this.width * 0.8;
-        var paddedHeight = this.height * 0.8;
+        var paddedWidth = this.width * padding;
+        var paddedHeight = this.height * padding;
 
         var keysToLocation = {};
 
@@ -258,8 +280,8 @@
         uniqueKeys.forEach((function(_this) {
           return function(d) {
             var finalObj = {
-              x: (_this.width * 0.12) + (0.5 + currCol) * (paddedWidth / numCols),
-              y: (_this.height * 0.10) + (0.5 + currRow) * (paddedHeight / numRows)
+              x: (_this.width * (padding * 0.22)) + (0.5 + currCol) * (paddedWidth / numCols),
+              y: (_this.height * (padding * 0.22)) + (0.5 + currRow) * (paddedHeight / numRows)
             };
 
             currCol++;
@@ -304,11 +326,27 @@
       $("#size-hint").html("<br>" + filter);
       $("#size-" + filter).addClass('active-filter');
 
+      var maxRadius = 20;
+      var minRadius = 0.5;
+      var extent = this.getNumericExtent(filter);
+      var minVal = minRadius * extent.max / maxRadius;
+
+      // assume largest value =
+      var sizeScale = d3.scaleSqrt()
+          .domain([minVal, extent.max])
+          .range([minRadius, maxRadius]);
+
+      // any values less than minVal will get clamped to 1, effectively, tiny values will at least still be visible
+      // my guess is the human eye cant tell the diff anyways?...
+      sizeScale.clamp(true);
+
+/*
       var extent = this.getNumericExtent(filter);
 
       var sizeScale = d3.scaleSqrt()
           .domain([extent.min, extent.max])
-          .range([3, 12]);
+          .range([1, 10]);
+          */
 
       // handle missing values gracefully by setting circle size to zero
       this.data.forEach(function(d) {
@@ -330,10 +368,8 @@
 
       // but also update the simulation
 
-      var chargeForce = d3.forceManyBody().strength(function(d) {
-        // base it on the radius of the node
-        return -Math.pow(d.radius, 2.0) * 0.2;
-      });
+      // "Electric repulsive charge", prevents overlap of nodes
+      var chargeForce = this.getChargeForce();
 
       // change chargeForce to take into account new node sizes
       this.simulation.force("charge", chargeForce)

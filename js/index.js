@@ -21,10 +21,10 @@
       return function(e) {
         var file, fileReader;
         file = e.target.files[0];
-        console.log(file);
+        //console.log(file);
         fileReader = new FileReader();
         fileReader.onload = function(e) {
-          return render_vis(fileReader.name, d3.csv.parse(fileReader.result));
+          return render_vis(fileReader.name, d3.csvParse(fileReader.result));
         };
         return fileReader.readAsText(file);
       };
