@@ -3,12 +3,16 @@
     bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
   window.Potato = (function() {
-    // if true, then interactive, if false, button is hidden
+    // default behavior is empty string
+    // if string passed, will attempt to init split/color/size by filter passed
+    // if null passed, will hide the button
+    // TODO: passing in more than one causes the simulation to really lag on init
+    // also, passing both a color and size interrupts the size... not sure why?
     var defaultParams = {
-      split: true,
-      color: true,
-      size: true,
-      "class": null
+      split: "",
+      color: "",
+      size: "",
+      //"class": null
     };
 
     function Potato(data, params) {
@@ -31,7 +35,7 @@
 
       // Only create buttons if param is set to True
       for(var key in params) {
-        if(key !== 'class' && params[key] === true) {
+        if(key !== 'class' && params[key] != null) {
           this.createButtons(key);
         }
       }
@@ -47,6 +51,10 @@
       // Keep nodes centered on screen
       var centerXForce = d3.forceX(this.width / 2);
       var centerYForce = d3.forceY(this.height / 2);
+
+      // TODO: might be interesting to set the strengths on the x and y higher
+      // and also raise the force of the chargeForce.  This might cause the groups to not
+      // affect each other as much?...
 
       // Apply default forces to simulation
       this.simulation = d3.forceSimulation()
@@ -68,6 +76,16 @@
           }).on("mouseout", function(d, i) {
             that.hideDetails(d, i, this);
           });
+
+      if(params.size != "") {
+        this.sizeBy(params.size);
+      }
+      if(params.color != "") {
+        this.colorBy(params.color);
+      }
+      if(params.split != "") {
+        this.splitBy(params.split);
+      }
 
       this.labelsCreated = false;
 
