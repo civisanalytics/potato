@@ -72,6 +72,8 @@
             that.hideDetails(d, i, this);
           });
 
+      this.labelsCreated = false;
+
       // Add the nodes to the simulation, and specify how to draw
       this.simulation.nodes(data)
           .on("tick", function() {
@@ -81,22 +83,76 @@
             node.attr("cx", function(d) { return d.x; })
                 .attr("cy", function(d) { return d.y; });
 
-            // TODO: hmmmm so one option is to update labels here, and not actually attach them to the physics simulation
-
+            // Updating the labels is expensive, and also doesn't need to be exact
+            // so only do it once at approx 60% of the way through simulation decay
+            if(!that.labelsCreated && that.simulation.alpha() < 0.4) {
+              that.labelsCreated = true;
+              that.updateLabelPositions(that.labels, that.data);
+              that.updateLabels(that.svg, that.labels);
+            }
           });
     }
 
-    // Update any labels on the screen as needed, called by orderBy and splitBy
-    Potato.prototype.updateLabels = function() {
+    // Dynamic labels that "float" above their current position
+    Potato.prototype.updateLabelPositions = function(labels, data) {
+      if(labels !== undefined) {
+        for(var i=0; i<labels.length; i++) {
+          var minY = 10000;
+
+          var label = labels[i];
+
+          var filter = label.split;
+          var value = label.val;
+
+          // Order labels just need to hover in the correct y location
+          if(label.type == "order") {
+            for(var c=0; c<data.length; c++) {
+              var cir = data[c];
+              if(cir[filter] == value) {
+                if((cir.y - cir.radius) < minY) {
+                  minY = cir.y - cir.radius;
+                }
+              }
+            }
+            label.tary = minY - 20;
+          } else { // split labels though may need to adjust x location too
+            var minX = 10000;
+            var maxX = 0;
+
+            for(var c=0; c<data.length; c++) {
+              var cir = data[c];
+              if(cir[filter] == value) {
+                if((cir.y - cir.radius) < minY) {
+                  minY = cir.y - cir.radius;
+                }
+                if((cir.x - cir.radius) < minX) {
+                  minX = cir.x - cir.radius;
+                }
+                if((cir.x + cir.radius) > maxX) {
+                  maxX = cir.x + cir.radius;
+                }
+              }
+            }
+            label.tary = minY - 10;
+            label.tarx = (maxX - minX) / 2.0 + minX;
+          }
+        }
+      }
+    };
+
+    // Will fade in new labels, the effect really only works if you reset the labels array each time
+    Potato.prototype.updateLabels = function(svg, labels) {
       var text = this.svg.selectAll(".split-labels")
-          .data(this.labels)
+          .data(labels)
 
       text.enter().append("text")
-        .merge(text)
+          .attr("fill-opacity", 0)
+          .attr("x", function(d) { return d.tarx; })
+          .attr("y", function(d) { return d.tary; })
           .attr("class", "split-labels")
           .text(function(d) { return d.val; })
-          .attr("x", function(d) { return d.tarx; })
-          .attr("y", function(d) { return d.tary; });
+        .merge(text).transition().duration(300)
+          .attr("fill-opacity", 1); // fancy magic to "fade in" labels
 
       text.exit().remove();
     }
@@ -113,7 +169,11 @@
           .range([orderPadding, this.width - orderPadding]);
 
       // TODO: this should probably move to the reset function
+      // wipe out the labels to get the fade in effect later
       this.labels = [];
+      // TODO: add the line thing between the labels?
+      this.updateLabels(this.svg, this.labels);
+      this.labelsCreated = false;
 
       // Tail
       this.labels.push({
@@ -129,9 +189,6 @@
         tarx: orders.range()[1],
         tary: this.height / 2.0 - 50 // TODO: either make this relative to the number of nodes, or do the fancy thing in the old version
       });
-
-      // TODO: add the line thing between the labels?
-      this.updateLabels();
 
       var xForceFn = d3.forceX(function(d) {
         var newX = orders(parseFloat(d[filter]))
@@ -191,7 +248,10 @@
         var keysToLocation = {};
 
         // TODO: this should probably move to the reset function
+        // wipe out the labels to get the fade in effect later
         this.labels = [];
+        this.updateLabels(this.svg, this.labels);
+        this.labelsCreated = false;
 
         // then for each category value, increment to give the "row/col" coordinate
         // maybe save this in an object where key == category and value = {row: X, col: Y}
@@ -220,7 +280,6 @@
           };
         })(this));
 
-        this.updateLabels();
 
         var xForceFn = d3.forceX(function(d) {
           return keysToLocation[d[filter]].x;
