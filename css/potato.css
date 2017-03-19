@@ -88,6 +88,7 @@ button:hover {
 .modifier-wrapper {
   display: inline-block;
   vertical-align: top;
+  overflow: auto;
 }
 .modifier-button {
   position: relative;
@@ -245,4 +246,3 @@ button:hover {
   fill: gray;
   fill-opacity: 0.2;
 }
-

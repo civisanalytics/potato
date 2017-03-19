@@ -25,13 +25,30 @@
 
       this.labels = [];
 
-      $("#vis").append("<div class='tooltip' id='node-tooltip'></div>")
-               .append("<div id='toolbar'><div id='modifiers'></div><div id='filter-select-buttons'></div></div>");
-      $("#node-tooltip").hide();
+      var vis = d3.select("#vis");
 
-      this.width = $(window).width();
-      this.height = $(window).height() - 55;
-      this.svg = d3.select("#vis").append("svg").attr("viewBox", "0 0 " + this.width + " " + this.height).attr("id", "vis-svg");
+      vis.append("div")
+        .attr("class", "tooltip")
+        .attr("id", "node-tooltip")
+        .style("display", "none");
+
+      var toolbar = vis.append("div")
+        .attr("id", "toolbar");
+
+      toolbar.append("div")
+        .attr("id", "modifiers");
+
+      toolbar.append("div")
+        .attr("id", "filter-select-buttons");
+
+      vis.append("div")
+        .attr("id", "color-legend").append("svg");
+
+      this.width = window.innerWidth;
+      this.height = window.innerHeight - 55;
+      this.svg = vis.append("svg")
+        .attr("viewBox", "0 0 " + this.width + " " + this.height)
+        .attr("id", "vis-svg");
 
       // Only create buttons if param is set to True
       for(var key in params) {
@@ -261,8 +278,10 @@
       //this.reset('split');
 
       // TODO: Change the hint on the button, seems like maybe this should go somewhere else?
-      $("#split-hint").html("<br>" + filter);
-      $("#split-" + filter).addClass('active-filter');
+      d3.select("#split-hint").html("<br>" + filter);
+
+      // TODO: this isn't working properly b/c we're not turning this class of without a reset function
+      d3.select("#split-" + filter).classed('active-filter', true);
 
       if (dataType === "num") {
         // TODO: implement orderBy
@@ -341,8 +360,8 @@
         return;
       }*/
       //this.reset('size');
-      $("#size-hint").html("<br>" + filter);
-      $("#size-" + filter).addClass('active-filter');
+      d3.select("#size-hint").html("<br>" + filter);
+      d3.select("#size-" + filter).classed('active-filter', true);
 
       var maxRadius = 20;
       var minRadius = 0.5;
@@ -400,13 +419,9 @@
       }*/
       //this.reset('color');
 
-      // hmmmm we should probably just do this at init?
-      if ($("#color-legend").length < 1) {
-        $("#vis").append("<div id='color-legend'></div>")
-        $("#color-legend").append("<svg></svg>");
-      }
-      $("#color-hint").html("<br>" + filter);
-      $("#color-" + filter).addClass('active-filter');
+      d3.select("#color-hint").html("<br>" + filter);
+      d3.select("#color-" + filter).classed('active-filter', true);
+
 
       // first determine the unique values for this category in the dataset, also sort alpha
       // historically it was ranked by number, but I think alpha may actually be better?
@@ -473,18 +488,6 @@
       legendDot.exit().remove();
     };
 
-    Potato.prototype.applyFilters = function() {
-      return $(".active-filter").each((function(_this) {
-        return function(i, filterObj) {
-          var filterId = $(filterObj).attr('id');
-          var dashLoc = filterId.indexOf('-');
-          var type = filterId.substr(0, dashLoc);
-          var val = filterId.substr(dashLoc + 1);
-          return _this.applyFilter(type, val, $(filterObj).attr('data-type'));
-        };
-      })(this));
-    };
-
     Potato.prototype.applyFilter = function(type, filter, dataType) {
       if (type === "split") {
         this.splitBy(filter, dataType);
@@ -499,18 +502,40 @@
 
     Potato.prototype.createButtons = function(type) {
       var typeUpper = type[0].toUpperCase() + type.slice(1);
-      $("#modifiers").append("<div id='" + type + "-wrapper' class='modifier-wrapper'><button id='" + type + "-button' class='modifier-button'>" + typeUpper + "<span class='button-arrow'>&#x25BC;</span><span id='" + type + "-hint' class='modifier-hint'></span></button><div id='" + type + "-menu' class='modifier-menu'></div></div>");
-      $("#" + type + "-button").hover(function() {
-        return $("#" + type + "-menu").slideDown(100);
-      });
-      $("#" + type + "-wrapper").mouseleave(function() {
-        return $("#" + type + "-menu").slideUp(100);
-      });
-      $("#" + type + "-button").on("click", (function(_this) {
-        return function() {
-          return _this.reset(type);
-        };
-      })(this));
+      var wrapper = d3.select("#modifiers")
+        .append("div")
+        .attr("id", type + "-wrapper")
+        .attr("class", "modifier-wrapper")
+        .on("mouseleave", function(d) {
+          var tarMenu = d3.select("#" + type + "-menu");
+          tarMenu.style("display", "none")
+        });
+
+      var modButton = wrapper.append("button")
+        .attr("id", type + "-button")
+        .attr("class", "modifier-button")
+        .html(typeUpper)
+        .on("mouseover", function(d) {
+          var tarMenu = d3.select("#" + type + "-menu");
+          tarMenu.style("display", "block")
+        })
+        .on("click", function(d) {
+          //return _this.reset(type);
+          console.log("reset things eventually");
+        });
+
+      modButton.append("span")
+        .attr("class", "button-arrow")
+        .html("&#x25BC;");
+
+      modButton.append("span")
+        .attr("id", type + "-hint")
+        .attr("class", "modifier-hint");
+
+      wrapper.append("div")
+        .attr("id", type + "-menu")
+        .attr("class", "modifier-menu");
+
       var buttonFilters = this.numericFilters;
       if (type === "color" || type === "split") {
         buttonFilters = buttonFilters.concat({
@@ -606,26 +631,26 @@
     };
 
     Potato.prototype.createResetButton = function() {
-      var resetTooltip = $("<div class='tooltip' id='reset-tooltip'>Click and drag on the canvas to select nodes.</div>");
-      var resetButton = $("<button id='reset-button' class='disabled-button modifier-button'><span id='reset-icon'>&#8635;</span> Reset Selection</button>");
-      resetButton.on("click", (function(_this) {
-        return function(e) {
-          if (!resetButton.hasClass('disabled-button')) {
-            return _this.add_all();
-          }
-        };
-      })(this)).on("mouseover", (function(_this) {
-        return function(e) {
-          return resetTooltip.show();
-        };
-      })(this)).on("mouseout", (function(_this) {
-        return function(e) {
-          return resetTooltip.hide();
-        };
-      })(this));
+      var resetButton = d3.select("#filter-select-buttons").append("button")
+        .attr("id", "reset-button")
+        .attr("class", "disabled-button modifier-button")
+        .html("<span id='reset-icon'>&#8635;</span> Reset Selection</button>")
+        .on("click", function(d) {
+          //this.add_all();
+        }).on("mouseover", function(d) {
+          d3.select("reset-tooltip")
+            .style("display", "block");
+        }).on("mouseleave", function(d) {
+          d3.select("reset-tooltip")
+            .style("display", "hide");
+        });
+
+      var resetTooltip = resetButton.append("div")
+        .attr("class", "tooltip")
+        .attr("id", "reset-tooltip")
+        .html("Click and drag on the canvas to select nodes.");
+
       resetButton.append(resetTooltip);
-      resetTooltip.hide();
-      return $("#filter-select-buttons").append(resetButton);
     };
 
     Potato.prototype.parseNumericString = function(str) {
@@ -666,14 +691,14 @@
         var key = filters[i];
         content += key + ": " + data[key] + "<br/>";
       }
-      $("#node-tooltip").html(content);
+      d3.select("#node-tooltip").html(content).style("display", "block");
       this.updatePosition(d3.event, "node-tooltip");
-      $("#node-tooltip").show();
 //      this.highlightNode(d3.select(element), true);
     };
 
     Potato.prototype.hideDetails = function(data, i, element) {
-      $("#node-tooltip").hide();
+      d3.select("#node-tooltip").style("display", "none");
+
 //      this.highlightNode(d3.select(element), false);
     };
 
@@ -696,14 +721,17 @@
     };
 
     Potato.prototype.updatePosition = function(e, id) {
-      var tth, ttleft, tttop, ttw, xOffset, yOffset;
-      xOffset = 20;
-      yOffset = 10;
-      ttw = $("#" + id).width();
-      tth = $("#" + id).height();
-      ttleft = (e.pageX + xOffset * 2 + ttw) > $(window).width() ? e.pageX - ttw - xOffset * 2 : e.pageX + xOffset;
-      tttop = (e.pageY + yOffset * 2 + tth) > $(window).height() ? e.pageY - tth - yOffset * 2 : e.pageY + yOffset;
-      return $("#" + id).css('top', tttop + 'px').css('left', ttleft + 'px');
+      var xOffset = 20;
+      var yOffset = 10;
+      var rect = d3.select("#" + id).node().getBoundingClientRect();
+      var ttw = rect.width;
+      var tth = rect.height;
+      var ttleft = (e.pageX + xOffset * 2 + ttw) > window.innerWidth ? e.pageX - ttw - xOffset * 2 : e.pageX + xOffset;
+      var tttop = (e.pageY + yOffset * 2 + tth) > window.innerHeight ? e.pageY - tth - yOffset * 2 : e.pageY + yOffset;
+
+      d3.select("#" + id)
+        .style("top", tttop + 'px')
+        .style("left", ttleft + 'px');
     };
 
     return Potato;
