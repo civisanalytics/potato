@@ -74,8 +74,8 @@
       var chargeForce = this.getChargeForce();
 
       // Keep nodes centered on screen
-      var centerXForce = d3.forceX(this.width / 2);
-      var centerYForce = d3.forceY(this.height / 2);
+      this.centerXForce = d3.forceX(this.width / 2);
+      this.centerYForce = d3.forceY(this.height / 2);
 
       // TODO: might be interesting to set the strengths on the x and y higher
       // and also raise the force of the chargeForce.  This might cause the groups to not
@@ -84,8 +84,8 @@
       // Apply default forces to simulation
       this.simulation = d3.forceSimulation()
           .force("charge", chargeForce)
-          .force("x", centerXForce)
-          .force("y", centerYForce);
+          .force("x", this.centerXForce)
+          .force("y", this.centerYForce);
 
       var that = this;
 
@@ -517,6 +517,52 @@
       }
     };
 
+    Potato.prototype.reset = function(type) {
+      d3.select("." + type + "-option").classed('active-filter', false);
+      d3.select("#" + type + "-hint").html("");
+      if (type === 'color') {
+        d3.select("#color-legend").select("svg").selectAll("*").remove();
+
+        this.svg.selectAll("circle")
+            .data(this.data)
+            .transition()
+            .attr("fill", "#777" );
+      } else if (type === 'size') {
+        // for now arbitrarily start all nodes at radius of 5
+        this.data.forEach(function(d) {
+          d.radius = 2;
+        });
+
+        // update the actual circle svg sizes
+        this.svg.selectAll("circle")
+            .data(this.data)
+            .transition()
+            .attr("r", function(d) {
+              return d.radius;
+            });
+
+        // but also update the simulation
+        // "Electric repulsive charge", prevents overlap of nodes
+        var chargeForce = this.getChargeForce();
+
+        // change chargeForce to take into account new node sizes
+        this.simulation.force("charge", chargeForce)
+        this.simulation.alpha(1).restart();
+      } else if (type === 'split' || type === 'order') {
+        /*while (this.axis.length > 0) {
+          this.axis.pop();
+        }*/
+        this.labels = [];
+        this.updateLabels(this.svg, this.labels);
+        this.labelsCreated = false;
+
+        this.simulation.force("x", this.centerXForce);
+        this.simulation.force("y", this.centerYForce);
+
+        this.simulation.alpha(1).restart();
+      }
+    };
+
     Potato.prototype.createButtons = function(type) {
       var typeUpper = type[0].toUpperCase() + type.slice(1);
       var wrapper = d3.select("#modifiers")
@@ -536,10 +582,11 @@
           var tarMenu = d3.select("#" + type + "-menu");
           tarMenu.style("display", "block")
         })
-        .on("click", function(d) {
-          //return _this.reset(type);
-          console.log("reset things eventually");
-        });
+        .on("click", (function(_this) {
+          return function(d) {
+            return _this.reset(type);
+          };
+        })(this));
 
       modButton.append("span")
         .attr("class", "button-arrow")
