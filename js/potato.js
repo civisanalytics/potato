@@ -213,7 +213,7 @@
       // update every tick
       text.enter().append("text")
           .attr("class", "split-labels")
-          .text(function(d) { return d.val; })
+          .text(function(d) { return d.text; })
         .merge(text)
           .attr("x", function(d) { return d.tarx; })
           .attr("y", function(d) { return d.tary; })
@@ -241,6 +241,7 @@
       // Tail
       this.labels.push({
         val: extent.min,
+        text: extent.min,
         split: filter,
         tarx: orders.range()[0],
         tary: this.height / 2.0 - 50 // TODO: either make this relative to the number of nodes, or do the fancy thing in the old version
@@ -248,6 +249,7 @@
       // Head
       this.labels.push({
         val: extent.max,
+        text: extent.max,
         split: filter,
         tarx: orders.range()[1],
         tary: this.height / 2.0 - 50 // TODO: either make this relative to the number of nodes, or do the fancy thing in the old version
@@ -272,7 +274,6 @@
       /*if (filterMin === filterMax) {
         orders.range([this.width / 2.0, this.width / 2.0]);
       }*/
-      // TODO: labels
     };
 
     Potato.prototype.splitBy = function(filter, dataType) {
@@ -296,6 +297,7 @@
         return this.orderBy(filter);
       } else {
         // first determine the unique values for this category in the dataset, also sort
+        // TODO: we could probably replace this with the claculations from this.uniqueValues
         var uniqueKeys = d3.map(this.data, function(d) {
           return d[filter];
         }).keys().sort();
@@ -337,8 +339,11 @@
 
             keysToLocation[d] = finalObj;
 
+            var labelText = d + ": " + _this.uniqueValues[filter].values[d].count.toString();
+
             // also add a filter label
             _this.labels.push({
+              text: labelText,
               val: d,
               split: filter,
               tarx: finalObj.x,
@@ -472,11 +477,15 @@
       var legendText = legendWrapper.selectAll("text")
           .data(colorScale.domain());
 
+      uniqueValues = this.uniqueValues;
+
       legendText.enter().append("text")
           .attr("y", function(d, i) { return i * legendDotSize + 12; })
           .attr("x", 20)
         .merge(legendText)
-          .text(function(d) { return d; });
+          .text(function(d) {
+            return d + ": " + uniqueValues[filter].values[d].count.toString();
+          });
 
       legendText.exit().remove();
 
