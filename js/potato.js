@@ -21,7 +21,15 @@
       }
 
       this.data = data;
-      this.calculateFilters();
+      this.uniqueValues = this.uniqueDataValues(this.data);
+
+      var allFilters = this.calculateFilters(this.uniqueValues);
+
+      this.numericFilters = allFilters.numericFilters;
+      this.categoricalFilters = allFilters.categoricalFilters;
+      this.createResetButton();
+
+      this.uniqueValues = this.enrichData(this.data, this.uniqueValues, this.categoricalFilters, this.numericFilters);
 
       this.labels = [];
 
@@ -564,7 +572,20 @@
 
     // Given an array of data (d3 format)
     // return an object containing all the filters/columns and all unique values
-    // - key is the filter type and the value is an array of filters
+    // as well as some type metadata
+    // eg:
+    //
+    // filterFoo: {
+    //   numValues: 7
+    //   type: "num"
+    //   values: {
+    //     valueBar: {
+    //       filter: "filterFoo",
+    //       value: "valueBar"
+    //     },
+    //     ... // 6 more objects
+    //   }
+    // }
     Potato.prototype.uniqueDataValues = function(data) {
       var uniqueValues = {};
 
@@ -579,19 +600,30 @@
 
             // this is a new filter we haven't seen before, so add
             if(!uniqueValues.hasOwnProperty(keyMod)) {
-              uniqueValues[keyMod] = [];
+              uniqueValues[keyMod] = {
+                values: {},
+                numValues: 0,
+                type: null // "num" or "cat"
+              };
             }
 
-            var indexOfCurrVal = uniqueValues[keyMod].map(function(obj) {
-              return obj.value
-            }).indexOf(val);
+            // if we haven't defined the type yet (and we're not currently dealing with the empty string/null val)
+            if(uniqueValues[keyMod].type == null && val !== "") {
+              // numeric without %,
+              var isNumeric = !isNaN(val.replace(/%/,"").replace(/,/g,""));
+              uniqueValues[keyMod].type = isNumeric? "num" : "cat";
+            }
 
-            // if < 0, then this is a new value that we should add
-            if(indexOfCurrVal < 0) {
-              uniqueValues[keyMod].push({
+            // new value that we should add
+            if(!(val in uniqueValues[keyMod].values)) {
+              uniqueValues[keyMod].numValues += 1;
+              uniqueValues[keyMod].values[val] = {
                 filter: keyMod,
-                value: val
-              });
+                value: val,
+                count: 1,
+              };
+            } else {
+              uniqueValues[keyMod].values[val].count += 1;
             }
           }
         }
@@ -599,35 +631,76 @@
       return uniqueValues;
     };
 
-    Potato.prototype.calculateFilters = function() {
-      var uniqueValues = this.uniqueDataValues(this.data);
+    // given data, and uniqueValues, enrich uniqueValues with sums/averages/counts
+    Potato.prototype.enrichData = function(data, uniqueValues, categoricalFilters, numericFilters) {
 
-      this.categoricalFilters = [];
-      this.numericFilters = [];
+      // iterate over entire dataset
+      for(var d=0; d<data.length; d++) {
+        // for each row, for each categorical column
+        for(var c=0; c<categoricalFilters.length; c++) {
+          var key = categoricalFilters[c].value;
+          var val = data[d][key];
+
+          // TODO: Do we even need the nodeId anymore? (might need it for subselection?)
+          // ignore the id
+          if (key !== 'node_id') {
+            var keyMod = key.replace(/\(|\)/g, " ");
+
+            var subVal = uniqueValues[keyMod].values[val];
+
+            if(!("sums" in subVal)) {
+              subVal.sums = {};
+            }
+
+            // incremental sum each of the numeric coluns
+            for(var n=0; n<numericFilters.length; n++) {
+              var numKey = numericFilters[n].value;
+              var newVal = parseFloat(data[d][numKey]);
+              if(!isNaN(newVal)) {
+                if(!(numKey in subVal.sums)) {
+                  subVal.sums[numKey] = newVal;
+                } else {
+                  subVal.sums[numKey] += newVal;
+                }
+              }
+            }
+          }
+        }
+      }
+      return uniqueValues;
+    };
+
+    // split the filters into two data structures that are easier to use
+    // also apply an additional constraint on categorical values that, while not technically true
+    // is helpful for our visualization
+    Potato.prototype.calculateFilters = function(uniqueValues) {
+      var categoricalFilters = [];
+      var numericFilters = [];
 
       for(var key in uniqueValues) {
-        // if the first value is a number (removing % and ,) then the rest of the filter is
-        // **probably** numeric
-        var isNumeric = !isNaN(uniqueValues[key][0].value.replace(/%/,"").replace(/,/g,""));
+        var type = uniqueValues[key].type;
 
-        if(isNumeric) {
-          this.numericFilters.push({
+        if(type == "num") {
+          numericFilters.push({
             value: key,
-            type: 'num'
+            type: type
           });
         } else {
           // If every value is unique, or there are a lot of values
           // then this filter is, while not numeric, effectively not categorical, and we should ignore
-          if(uniqueValues[key].length != this.data.length && uniqueValues[key].length < 500) {
-            this.categoricalFilters.push({
+          if(uniqueValues[key].numValues != this.data.length && uniqueValues[key].numValues < 500) {
+            categoricalFilters.push({
               value: key,
-              type: 'cat'
+              type: type
             });
           }
         }
       }
 
-      this.createResetButton();
+      return {
+        categoricalFilters: categoricalFilters,
+        numericFilters: numericFilters
+      };
     };
 
     Potato.prototype.createResetButton = function() {
