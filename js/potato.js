@@ -31,8 +31,6 @@
 
       this.uniqueValues = this.enrichData(this.data, this.uniqueValues, this.categoricalFilters, this.numericFilters);
 
-      this.labels = [];
-
       var vis = d3.select("#vis");
 
       vis.append("div")
@@ -65,10 +63,9 @@
         }
       }
 
-      // for now arbitrarily start all nodes at radius of 5
-      data.forEach(function(d) {
-        d.radius = 2;
-      });
+      this.resetToDefaultSize(this.data);
+
+      this.labels = [];
 
       // "Electric repulsive charge", prevents overlap of nodes
       var chargeForce = this.getChargeForce();
@@ -114,8 +111,6 @@
         this.splitBy(params.split);
       }
 
-      this.labelsCreated = false;
-
       // Add the nodes to the simulation, and specify how to draw
       this.simulation.nodes(data)
           .on("tick", function() {
@@ -125,17 +120,8 @@
             node.attr("cx", function(d) { return d.x; })
                 .attr("cy", function(d) { return d.y; });
 
-            // TODO:
-            // apparently its not very expensive it doesnt affect framerate much....
-            // maybe this optimization is unneeded?...
-
-            // Updating the labels is expensive, and also doesn't need to be exact
-            // so only do it once at approx 60% of the way through simulation decay
-            /*if(!that.labelsCreated && that.simulation.alpha() < 0.3) {*/
-              that.labelsCreated = true;
-              that.updateLabelPositions(that.labels, that.data);
-              that.updateLabels(that.svg, that.labels);
-            //}
+            that.updateLabelPositions(that.labels, that.data);
+            that.updateLabels(that.svg, that.labels);
           });
     }
 
@@ -143,82 +129,55 @@
       return d3.forceManyBody().strength(function(d) {
         // base it on the radius of the node
         var multiplier = -0.2;
-        var charge = Math.pow((d.radius), 1.8) * multiplier;
-        //console.log(d.radius, charge);
-        return charge;
-      })//.distanceMax(200)
-      //.theta(0.2); // this might speed things up?
+        return Math.pow((d.radius), 1.8) * multiplier;
+      });
     };
 
     // Dynamic labels that "float" above their current position
-    Potato.prototype.updateLabelPositions = function(labels, data) {
-      if(labels !== undefined) {
-        for(var i=0; i<labels.length; i++) {
-          var minY = 10000;
+    Potato.prototype.updateLabelPositions = function(labels, nodes) {
+      if(labels == undefined) { return; }
 
-          var label = labels[i];
+      labels.forEach(function(label) {
+        var minY = label.tary + 100; // At least 100 pixels within target is probably good
+        var minX = label.tarx;
+        var maxX = label.tarx;
 
-          var filter = label.split;
-          var value = label.val;
+        // Iterate over current nodes, and make adjustments to label based on the node locations
+        nodes.forEach(function(node) {
+          if(node[label.split] == label.val) {
+            if((node.y - node.radius) < minY) {
+              minY = node.y - node.radius;
+            }
 
-          // Order labels just need to hover in the correct y location
-          if(label.type == "order") {
-            for(var c=0; c<data.length; c++) {
-              var cir = data[c];
-              if(cir[filter] == value) {
-                if((cir.y - cir.radius) < minY) {
-                  minY = cir.y - cir.radius;
-                }
+            // Categorical labels may need to adjust x location too
+            if(label.type == "split") {
+              if((node.x - node.radius) < minX) {
+                minX = node.x - node.radius;
+              }
+              if((node.x + node.radius) > maxX) {
+                maxX = node.x + node.radius;
               }
             }
-            label.tary = minY - 20;
-          } else { // split labels though may need to adjust x location too
-            var minX = 10000;
-            var maxX = 0;
-
-            for(var c=0; c<data.length; c++) {
-              var cir = data[c];
-              if(cir[filter] == value) {
-                if((cir.y - cir.radius) < minY) {
-                  minY = cir.y - cir.radius;
-                }
-                if((cir.x - cir.radius) < minX) {
-                  minX = cir.x - cir.radius;
-                }
-                if((cir.x + cir.radius) > maxX) {
-                  maxX = cir.x + cir.radius;
-                }
-              }
-            }
-            label.tary = minY - 10;
-            label.tarx = (maxX - minX) / 2.0 + minX;
           }
-        }
-      }
+        });
+        label.tary = minY - 10;
+        label.tarx = (maxX - minX) / 2.0 + minX;
+      });
     };
 
     // Will fade in new labels, the effect really only works if you reset the labels array each time
     Potato.prototype.updateLabels = function(svg, labels) {
-      var text = this.svg.selectAll(".split-labels")
-          .data(labels)
-      // update once
-/*
-      text.enter().append("text")
-          .attr("fill-opacity", 0)
-          .attr("x", function(d) { return d.tarx; })
-          .attr("y", function(d) { return d.tary; })
-          .attr("class", "split-labels")
-          .text(function(d) { return d.val; })
-        .merge(text).transition().duration(300)
-          .attr("fill-opacity", 1); // fancy magic to "fade in" labels
-*/
+      var text = svg.selectAll(".split-labels")
+          .data(labels);
+
       // update every tick
       text.enter().append("text")
           .attr("class", "split-labels")
           .text(function(d) { return d.text; })
         .merge(text)
           .attr("x", function(d) { return d.tarx; })
-          .attr("y", function(d) { return d.tary; })
+          .attr("y", function(d) { return d.tary; });
+
       text.exit().remove();
     }
 
@@ -238,7 +197,6 @@
       this.labels = [];
       // TODO: add the line thing between the labels?
       this.updateLabels(this.svg, this.labels);
-      this.labelsCreated = false;
 
       // Tail
       this.labels.push({
@@ -322,7 +280,6 @@
         // wipe out the labels to get the fade in effect later
         this.labels = [];
         this.updateLabels(this.svg, this.labels);
-        this.labelsCreated = false;
 
         // then for each category value, increment to give the "row/col" coordinate
         // maybe save this in an object where key == category and value = {row: X, col: Y}
@@ -346,9 +303,9 @@
             var labelVal = "";
             //console.log(this.activeSizeBy);
             if (_this.activeSizeBy != "") {
-              labelVal = _this.uniqueValues[filter].values[d].sums[_this.activeSizeBy].toString();
+              labelVal = _this.uniqueValues[filter].values[d].sums[_this.activeSizeBy].toLocaleString();
             } else {
-              labelVal = _this.uniqueValues[filter].values[d].count.toString();
+              labelVal = _this.uniqueValues[filter].values[d].count.toLocaleString();
             }
             var labelText = d + ": " + labelVal;
 
@@ -423,22 +380,22 @@
         }
       });
 
+      this.applySize(this.svg, this.data, this.simulation);
+    };
+
+    Potato.prototype.applySize = function(svg, data, simulation) {
       // update the actual circle svg sizes
-      this.svg.selectAll("circle")
-          .data(this.data)
+      svg.selectAll("circle")
+          .data(data)
           .transition()
           .attr("r", function(d) {
             return d.radius;
           });
 
-      // but also update the simulation
-
-      // "Electric repulsive charge", prevents overlap of nodes
+      // Reclaculate chargeForce to take into account new node sizes
       var chargeForce = this.getChargeForce();
-
-      // change chargeForce to take into account new node sizes
-      this.simulation.force("charge", chargeForce)
-      this.simulation.alpha(1).restart();
+      simulation.force("charge", chargeForce)
+      simulation.alpha(1).restart();
     };
 
     Potato.prototype.colorBy = function(filter, dataType) {
@@ -532,44 +489,34 @@
       }
     };
 
+    Potato.prototype.resetToDefaultSize = function(data) {
+      data.forEach(function(d) {
+        d.radius = 2;
+      });
+    };
+
     Potato.prototype.reset = function(type) {
+      // Clear the button hints
       d3.select("." + type + "-option").classed('active-filter', false);
       d3.select("#" + type + "-hint").html("");
+
       if (type === 'color') {
         d3.select("#color-legend").select("svg").selectAll("*").remove();
 
         this.svg.selectAll("circle")
             .data(this.data)
             .transition()
-            .attr("fill", "#777" );
+            .attr("fill", "#777");
       } else if (type === 'size') {
-        // for now arbitrarily start all nodes at radius of 5
-        this.data.forEach(function(d) {
-          d.radius = 2;
-        });
+        this.resetToDefaultSize(this.data);
 
-        // update the actual circle svg sizes
-        this.svg.selectAll("circle")
-            .data(this.data)
-            .transition()
-            .attr("r", function(d) {
-              return d.radius;
-            });
-
-        // but also update the simulation
-        // "Electric repulsive charge", prevents overlap of nodes
-        var chargeForce = this.getChargeForce();
-
-        // change chargeForce to take into account new node sizes
-        this.simulation.force("charge", chargeForce)
-        this.simulation.alpha(1).restart();
+        this.applySize(this.svg, this.data, this.simulation);
       } else if (type === 'split' || type === 'order') {
         /*while (this.axis.length > 0) {
           this.axis.pop();
         }*/
         this.labels = [];
         this.updateLabels(this.svg, this.labels);
-        this.labelsCreated = false;
 
         this.simulation.force("x", this.centerXForce);
         this.simulation.force("y", this.centerYForce);
