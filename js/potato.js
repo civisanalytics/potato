@@ -102,6 +102,8 @@
             that.hideDetails(d, i, this);
           });
 
+      this.activeSizeBy = "";
+
       if(params.size != "") {
         this.sizeBy(params.size);
       }
@@ -339,7 +341,16 @@
 
             keysToLocation[d] = finalObj;
 
-            var labelText = d + ": " + _this.uniqueValues[filter].values[d].count.toString();
+            // TODO:
+            // if a size is active, then instead get the sum of that?
+            var labelVal = "";
+            //console.log(this.activeSizeBy);
+            if (_this.activeSizeBy != "") {
+              labelVal = _this.uniqueValues[filter].values[d].sums[_this.activeSizeBy].toString();
+            } else {
+              labelVal = _this.uniqueValues[filter].values[d].count.toString();
+            }
+            var labelText = d + ": " + labelVal;
 
             // also add a filter label
             _this.labels.push({
@@ -368,6 +379,10 @@
     };
 
     Potato.prototype.sizeBy = function(filter) {
+      this.activeSizeBy = filter;
+      // TODO: if there are any labels, modify them to reflect the new sum
+
+
       /*
       if (this.nodes === void 0 || this.nodes.length === 0) {
         return;
