@@ -1,3 +1,5 @@
+const d3 = require('./d3.v4.min.js');
+
 (function() {
   var root,
     bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
