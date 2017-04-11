@@ -185,7 +185,7 @@ const d3 = require('./d3.v4.min.js');
 
     Potato.prototype.orderBy = function(filter) {
 
-      var extent = this.getNumericExtent(filter);
+      var extent = this.getNumericExtent(filter, this.data);
 
       var orderPadding = 160;
 
@@ -341,7 +341,6 @@ const d3 = require('./d3.v4.min.js');
       this.activeSizeBy = filter;
       // TODO: if there are any labels, modify them to reflect the new sum
 
-
       /*
       if (this.nodes === void 0 || this.nodes.length === 0) {
         return;
@@ -352,7 +351,7 @@ const d3 = require('./d3.v4.min.js');
 
       var maxRadius = 20;
       var minRadius = 0.5;
-      var extent = this.getNumericExtent(filter);
+      var extent = this.getNumericExtent(filter, this.data);
       var minVal = minRadius * extent.max / maxRadius;
 
       // assume largest value =
@@ -422,7 +421,7 @@ const d3 = require('./d3.v4.min.js');
       var colorScale;
       // if numeric do gradient, else do categorical
       if(numeric === true) {
-        var extent = this.getNumericExtent(filter);
+        var extent = this.getNumericExtent(filter, this.data);
 
         colorScale = d3.scaleLinear()
             .domain([extent.min, extent.max])
@@ -750,12 +749,14 @@ const d3 = require('./d3.v4.min.js');
       return parseFloat(str.replace(/%/, "").replace(/,/g, ""));
     };
 
-    // for a given filter, get the extent (min and max)
-    Potato.prototype.getNumericExtent = function(filter) {
+    // For a given filter, get the extent (min and max)
+    // it's a bit fancier than d3.extent as it ignores NaNs and also does
+    // string parsing of "numerics"
+    Potato.prototype.getNumericExtent = function(filter, data) {
       var filterMax = 0;
       var filterMin = null;
-      for(var i = 0; i < this.data.length; i++) {
-        var currVal = this.parseNumericString(this.data[i][filter]);
+      for(var i = 0; i < data.length; i++) {
+        var currVal = this.parseNumericString(data[i][filter]);
 
         // ignore emptys (NaN)
         if(!isNaN(currVal)) {
