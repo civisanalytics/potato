@@ -21,7 +21,7 @@ describe("end to end tests", () => {
 describe("functional unit tests", () => {
   describe("#uniqueDataValues", () => {
     test("base case", () => {
-      const inputData = [
+      const input = [
         { "age": "60", "name": "bob" },
         { "age": "23", "name": "john" }
       ];
@@ -40,6 +40,96 @@ describe("functional unit tests", () => {
           "values": {
             "bob": { "count": 1, "filter": "name", "value": "bob" },
             "john": { "count": 1, "filter": "name", "value": "john" }
+          }
+        }
+      };
+      expect(Potato.prototype.uniqueDataValues(input)).toEqual(output);
+    });
+
+    test("identifies as categorical if at least one data point is non-numeric", () => {
+      const input = [
+        { "life": "1337" },
+        { "life": "42" },
+        { "life": "pursuit of happiness" },
+        { "life": "n0mz" }
+      ];
+      const output = {
+        "life": {
+          "numValues": 4,
+          "type": "cat",
+          "values": {
+            "1337": { "count": 1, "filter": "life", "value": "1337" },
+            "42": { "count": 1, "filter": "life", "value": "42" },
+            "pursuit of happiness": { "count": 1, "filter": "life", "value": "pursuit of happiness" },
+            "n0mz": { "count": 1, "filter": "life", "value": "n0mz" }
+          }
+        }
+      };
+      expect(Potato.prototype.uniqueDataValues(input)).toEqual(output);
+    });
+
+    test("handles nulls", () => {
+      const input = [
+        { "color": "red", "country": "" },
+        { "color": "", "country": "USA" },
+        { "color": "blue", "country": "USA" },
+      ];
+      const output = {
+        "color": {
+          "numValues": 3,
+          "type": "cat",
+          "values": {
+            "red": { "count": 1, "filter": "color", "value": "red" },
+            "blue": { "count": 1, "filter": "color", "value": "blue" },
+            "": { "count": 1, "filter": "color", "value": "" }
+          }
+        },
+        "country": {
+          "numValues": 2,
+          "type": "cat",
+          "values": {
+            "USA": { "count": 2, "filter": "country", "value": "USA" },
+            "": { "count": 1, "filter": "country", "value": "" }
+          }
+        }
+      };
+      expect(Potato.prototype.uniqueDataValues(input)).toEqual(output);
+    });
+
+    test("counts duplicate categorical values", () => {
+      const input = [
+        { "color": "red" },
+        { "color": "red" },
+        { "color": "blue" },
+      ];
+      const output = {
+        "color": {
+          "numValues": 2,
+          "type": "cat",
+          "values": {
+            "red": { "count": 2, "filter": "color", "value": "red" },
+            "blue": { "count": 1, "filter": "color", "value": "blue" }
+          }
+        }
+      };
+      expect(Potato.prototype.uniqueDataValues(input)).toEqual(output);
+    });
+
+    test("counts duplicate numerics and rounds properly", () => {
+      const inputData = [
+        { "age": "61" },
+        { "age": "61" },
+        { "age": "61.0" }, // TODO: I'd like this to round properly?
+        { "age": "15" }
+      ];
+      const output = {
+        "age": {
+          "numValues": 3,
+          "type": "num",
+          "values": {
+            "15": { "count": 1, "filter": "age", "value": "15" },
+            "61": { "count": 2, "filter": "age", "value": "61" },
+            "61.0": { "count": 1, "filter": "age", "value": "61.0" }
           }
         }
       };
@@ -75,7 +165,7 @@ describe("functional unit tests", () => {
       { "age": "60", "height": "3.5", "weight": "21.5%" }
     ];
 
-    test("default case", () => {
+    test("base case", () => {
       const output = { "min": 23, "max": 60 };
       expect(Potato.prototype.getNumericExtent("age", input)).toEqual(output);
     });

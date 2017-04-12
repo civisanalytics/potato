@@ -584,67 +584,6 @@ Potato.prototype.createButtons = function(type) {
   })(this));
 };
 
-// Given an array of data (d3 format)
-// return an object containing all the filters/columns and all unique values
-// as well as some type metadata
-// eg:
-//
-// filterFoo: {
-//   numValues: 7
-//   type: "num"
-//   values: {
-//     valueBar: {
-//       filter: "filterFoo",
-//       value: "valueBar"
-//     },
-//     ... // 6 more objects
-//   }
-// }
-Potato.prototype.uniqueDataValues = function(data) {
-  var uniqueValues = {};
-
-  for(var i=0; i<data.length; i++) {
-    for(var key in data[i]) {
-      var val = data[i][key];
-
-      // TODO: Do we even need the nodeId anymore? (might need it for subselection?)
-      // ignore the id
-      if (key !== 'node_id') {
-        var keyMod = key.replace(/\(|\)/g, " ");
-
-        // this is a new filter we haven't seen before, so add
-        if(!uniqueValues.hasOwnProperty(keyMod)) {
-          uniqueValues[keyMod] = {
-            values: {},
-            numValues: 0,
-            type: null // "num" or "cat"
-          };
-        }
-
-        // if we haven't defined the type yet (and we're not currently dealing with the empty string/null val)
-        if(uniqueValues[keyMod].type == null && val !== "") {
-          // numeric without %,
-          var isNumeric = !isNaN(val.replace(/%/,"").replace(/,/g,""));
-          uniqueValues[keyMod].type = isNumeric? "num" : "cat";
-        }
-
-        // new value that we should add
-        if(!(val in uniqueValues[keyMod].values)) {
-          uniqueValues[keyMod].numValues += 1;
-          uniqueValues[keyMod].values[val] = {
-            filter: keyMod,
-            value: val,
-            count: 1,
-          };
-        } else {
-          uniqueValues[keyMod].values[val].count += 1;
-        }
-      }
-    }
-  }
-  return uniqueValues;
-};
-
 // given data, and uniqueValues, enrich uniqueValues with sums/averages/counts
 Potato.prototype.enrichData = function(data, uniqueValues, categoricalFilters, numericFilters) {
 
@@ -743,33 +682,6 @@ Potato.prototype.createResetButton = function() {
   resetButton.append(resetTooltip);
 };
 
-Potato.prototype.parseNumericString = function(str) {
-  return parseFloat(str.replace(/%/, "").replace(/,/g, ""));
-};
-
-// For a given filter, get the extent (min and max)
-// it's a bit fancier than d3.extent as it ignores NaNs and also does
-// string parsing of "numerics"
-Potato.prototype.getNumericExtent = function(filter, data) {
-  var filterMax = 0;
-  var filterMin = null;
-  for(var i = 0; i < data.length; i++) {
-    var currVal = this.parseNumericString(data[i][filter]);
-
-    // ignore emptys (NaN)
-    if(!isNaN(currVal)) {
-      if(currVal > filterMax) {
-        filterMax = currVal;
-      }
-      if(filterMin === null || currVal < filterMin) {
-        filterMin = currVal;
-      }
-    }
-  }
-
-  return { min: filterMin, max: filterMax };
-};
-
 Potato.prototype.showDetails = function(data, i, element) {
   var content = "";
   var filters = [];
@@ -824,6 +736,100 @@ Potato.prototype.updatePosition = function(e, id) {
   d3.select("#" + id)
     .style("top", tttop + 'px')
     .style("left", ttleft + 'px');
+};
+
+
+
+//////////////////
+//
+// THESE HAVE TEST COVERAGE YAY!
+//
+
+
+// Given an array of data (d3 format)
+// return an object containing all the filters/columns and all unique values
+// as well as some type metadata
+// eg:
+//
+// filterFoo: {
+//   numValues: 7
+//   type: "num"
+//   values: {
+//     valueBar: {
+//       filter: "filterFoo",
+//       value: "valueBar"
+//     },
+//     ... // 6 more objects
+//   }
+// }
+Potato.prototype.uniqueDataValues = function(data) {
+  var uniqueValues = {};
+
+  for(var i=0; i<data.length; i++) {
+    for(var key in data[i]) {
+      var val = data[i][key];
+
+      var keyMod = key.replace(/\(|\)/g, " ");
+
+      // this is a new filter we haven't seen before, so add
+      if(!uniqueValues.hasOwnProperty(keyMod)) {
+        uniqueValues[keyMod] = {
+          values: {},
+          numValues: 0,
+          type: "num" // "num" or "cat"
+        };
+      }
+
+      // If we ever encounter a non-numeric, than this filter is actually categorical
+      if(uniqueValues[keyMod].type == "num" && val !== "") {
+        // numeric without %,
+        var isCategorical = isNaN(val.replace(/%/,"").replace(/,/g,""));
+        if(isCategorical) {
+          uniqueValues[keyMod].type = "cat";
+        }
+      }
+
+      // new value that we should add
+      if(!(val in uniqueValues[keyMod].values)) {
+        uniqueValues[keyMod].numValues += 1;
+        uniqueValues[keyMod].values[val] = {
+          filter: keyMod,
+          value: val,
+          count: 1,
+        };
+      } else {
+        uniqueValues[keyMod].values[val].count += 1;
+      }
+    }
+  }
+  return uniqueValues;
+};
+
+Potato.prototype.parseNumericString = function(str) {
+  return parseFloat(str.replace(/%/, "").replace(/,/g, ""));
+};
+
+// For a given filter, get the extent (min and max)
+// it's a bit fancier than d3.extent as it ignores NaNs and also does
+// string parsing of "numerics"
+Potato.prototype.getNumericExtent = function(filter, data) {
+  var filterMax = 0;
+  var filterMin = null;
+  for(var i = 0; i < data.length; i++) {
+    var currVal = this.parseNumericString(data[i][filter]);
+
+    // ignore emptys (NaN)
+    if(!isNaN(currVal)) {
+      if(currVal > filterMax) {
+        filterMax = currVal;
+      }
+      if(filterMin === null || currVal < filterMin) {
+        filterMin = currVal;
+      }
+    }
+  }
+
+  return { min: filterMin, max: filterMax };
 };
 
 module.exports = Potato;
