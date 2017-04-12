@@ -3,9 +3,6 @@
   "scripts": {
     "test": "jest"
   },
-  "jest": {
-    "testEnvironment": "node"
-  },
   "devDependencies": {
     "jest-cli": "^19.0.2"
   }
