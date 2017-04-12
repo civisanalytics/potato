@@ -19,13 +19,13 @@ describe("end to end tests", () => {
 });
 
 describe("functional unit tests", () => {
-  describe("#uniqueDataValues", () => {
+  describe("#calculateFilters", () => {
     test("base case", () => {
-      const input = [
-        { "age": "60", "name": "bob" },
-        { "age": "23", "name": "john" }
-      ];
       const output = {
+        "categoricalFilters": ["name"],
+        "numericFilters": ["age"]
+      };
+      const input = {
         "age": {
           "numValues": 2,
           "type": "num",
@@ -40,6 +40,38 @@ describe("functional unit tests", () => {
           "values": {
             "bob": { "count": 1, "filter": "name", "value": "bob" },
             "john": { "count": 1, "filter": "name", "value": "john" }
+          }
+        }
+      };
+      expect(Potato.prototype.calculateFilters(input)).toEqual(output);
+    });
+  });
+
+
+  describe("#uniqueDataValues", () => {
+    test("base case", () => {
+      const input = [
+        { "age": "60", "name": "bob" },
+        { "age": "47", "name": "mary" },
+        { "age": "23", "name": "ellen" }
+      ];
+      const output = {
+        "age": {
+          "numValues": 3,
+          "type": "num",
+          "values": {
+            "60": { "count": 1, "filter": "age", "value": "60" },
+            "47": { "count": 1, "filter": "age", "value": "47" },
+            "23": { "count": 1, "filter": "age", "value": "23" }
+          }
+        },
+        "name": {
+          "numValues": 3,
+          "type": "cat",
+          "values": {
+            "bob": { "count": 1, "filter": "name", "value": "bob" },
+            "mary": { "count": 1, "filter": "name", "value": "mary" },
+            "ellen": { "count": 1, "filter": "name", "value": "ellen" }
           }
         }
       };
@@ -134,6 +166,31 @@ describe("functional unit tests", () => {
         }
       };
       expect(Potato.prototype.uniqueDataValues(inputData)).toEqual(output);
+    });
+
+    test("categoricals with more than 100 values are labeled unique", () => {
+      let inputData = [];
+      for(var i=0; i<100; i++) {
+        inputData.push({ "age": `${i}_foobar` });
+      }
+      const output = {
+        "age": {
+          "numValues": 100,
+          "type": "cat",
+          "values": expect.any(Object)
+        }
+      };
+      expect(Potato.prototype.uniqueDataValues(inputData)).toEqual(output);
+
+      inputData.push({ "age": "100_foobar" });
+      const newOutput = {
+        "age": {
+          "numValues": 101,
+          "type": "unique",
+          "values": expect.any(Object)
+        }
+      };
+      expect(Potato.prototype.uniqueDataValues(inputData)).toEqual(newOutput);
     });
   });
 

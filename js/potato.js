@@ -558,12 +558,22 @@ Potato.prototype.createButtons = function(type) {
     .attr("id", type + "-menu")
     .attr("class", "modifier-menu");
 
-  var buttonFilters = this.numericFilters;
+  var buttonFilters = this.numericFilters.map(function(f) {
+    return {
+      value: f,
+      type: 'num'
+    };
+  });
   if (type === "color" || type === "split") {
     buttonFilters = buttonFilters.concat({
       value: '',
       type: 'divider'
-    }).concat(this.categoricalFilters);
+    }).concat(this.categoricalFilters.map(function(f) {
+      return {
+        value: f,
+        type: 'cat'
+      };
+    }));
   }
   return d3.select("#" + type + "-menu").selectAll('div').data(buttonFilters).enter().append("div").text(function(d) {
     return d.value;
@@ -591,7 +601,7 @@ Potato.prototype.enrichData = function(data, uniqueValues, categoricalFilters, n
   for(var d=0; d<data.length; d++) {
     // for each row, for each categorical column
     for(var c=0; c<categoricalFilters.length; c++) {
-      var key = categoricalFilters[c].value;
+      var key = categoricalFilters[c];
       var val = data[d][key];
 
       // TODO: Do we even need the nodeId anymore? (might need it for subselection?)
@@ -607,7 +617,7 @@ Potato.prototype.enrichData = function(data, uniqueValues, categoricalFilters, n
 
         // incremental sum each of the numeric coluns
         for(var n=0; n<numericFilters.length; n++) {
-          var numKey = numericFilters[n].value;
+          var numKey = numericFilters[n];
           var newVal = parseFloat(data[d][numKey]);
           if(!isNaN(newVal)) {
             if(!(numKey in subVal.sums)) {
@@ -626,9 +636,8 @@ Potato.prototype.enrichData = function(data, uniqueValues, categoricalFilters, n
   return uniqueValues;
 };
 
+// TODO: do we really need this?
 // split the filters into two data structures that are easier to use
-// also apply an additional constraint on categorical values that, while not technically true
-// is helpful for our visualization
 Potato.prototype.calculateFilters = function(uniqueValues) {
   var categoricalFilters = [];
   var numericFilters = [];
@@ -637,19 +646,9 @@ Potato.prototype.calculateFilters = function(uniqueValues) {
     var type = uniqueValues[key].type;
 
     if(type == "num") {
-      numericFilters.push({
-        value: key,
-        type: type
-      });
+      numericFilters.push(key);
     } else {
-      // If every value is unique, or there are a lot of values
-      // then this filter is, while not numeric, effectively not categorical, and we should ignore
-      if(uniqueValues[key].numValues != this.data.length && uniqueValues[key].numValues < 500) {
-        categoricalFilters.push({
-          value: key,
-          type: type
-        });
-      }
+      categoricalFilters.push(key);
     }
   }
 
@@ -686,10 +685,10 @@ Potato.prototype.showDetails = function(data, i, element) {
   var content = "";
   var filters = [];
   for(var i=0; i<this.numericFilters.length; i++) {
-    filters.push(this.numericFilters[i].value);
+    filters.push(this.numericFilters[i]);
   }
   for(var i=0; i<this.categoricalFilters.length; i++) {
-    filters.push(this.categoricalFilters[i].value);
+    filters.push(this.categoricalFilters[i]);
   }
   for(var i=0; i<filters.length; i++) {
     var key = filters[i];
@@ -776,13 +775,12 @@ Potato.prototype.uniqueDataValues = function(data) {
         uniqueValues[keyMod] = {
           values: {},
           numValues: 0,
-          type: "num" // "num" or "cat"
+          type: "num" // "num", "cat", "unique"
         };
       }
 
-      // If we ever encounter a non-numeric, than this filter is actually categorical
+      // If we ever encounter a non-numeric, than assume categorical
       if(uniqueValues[keyMod].type == "num" && val !== "") {
-        // numeric without %,
         var isCategorical = isNaN(val.replace(/%/,"").replace(/,/g,""));
         if(isCategorical) {
           uniqueValues[keyMod].type = "cat";
@@ -800,6 +798,14 @@ Potato.prototype.uniqueDataValues = function(data) {
       } else {
         uniqueValues[keyMod].values[val].count += 1;
       }
+    }
+  }
+
+  // If it's categorical but there are more than 100 diff values, it's probably not
+  // usefully categorical any more.
+  for(var key in uniqueValues) {
+    if(uniqueValues[key].type === "cat" && uniqueValues[key].numValues > 100) {
+      uniqueValues[key].type = "unique";
     }
   }
   return uniqueValues;
