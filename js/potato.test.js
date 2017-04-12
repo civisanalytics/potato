@@ -1,16 +1,15 @@
 const potato = require('./potato');
-const d3 = require('./d3.v4.min.js');
+//const d3 = require('./d3.v4.min.js');
 
 describe('non stateful tests', () => {
   let chart = undefined;
+  const csvData = [
+    { "age": "60", "name": "bob", "country": "USA" },
+    { "age": "23", "name": "john", "country": "USA" }
+  ];
   let potatoData = undefined;
 
   beforeEach(() => {
-    const data = [
-      { "age": "60", "name": "bob", "country": "USA" },
-      { "age": "23", "name": "john", "country": "USA" }
-    ];
-
     // this is the data structure that ^ data is transformed into in the app
     // it is usually the input to a lot of the helper functions
     potatoData = [
@@ -19,13 +18,43 @@ describe('non stateful tests', () => {
       {"age": "23", "country": "USA", "index": 1, "name": "john",
        "radius": 2, "vx": 0, "vy": 0, "x": -7.373688780783198, "y": 6.754902942615239}
     ];
-    chart = new Potato(data);
+    chart = new Potato(csvData);
   });
 
   test("init and parse data", () => {
     expect(chart.data).toEqual(potatoData);
   });
+/*
+  describe("#uniqueDataValues", () => {
+    test("base case", () => {
+      const inputData = [
+        { "age": "60", "name": "bob" },
+        { "age": "23", "name": "john" }
+      ];
+      const fnOutput = chart.uniqueDataValues(inputData);
 
+      const output = {
+        "age": {
+          "numValues": 2,
+          "type": "num",
+          "values": {
+            "23": { "count": 1, "filter": "age", "value": "23" },
+            "60": { "count": 1, "filter": "age", "value": "60" }
+          }
+        },
+        "name": {
+          "numValues": 2,
+          "type": "cat",
+          "values": {
+            "bob": { "count": 1, "filter": "name", "value": "bob" },
+            "john": { "count": 1, "filter": "name", "value": "john" }
+          }
+        }
+      };
+      expect(chart.uniqueDataValues(inputData)).toEqual(output);
+    });
+  });
+*/
 
   describe("#parseNumericString", () => {
     const output = 100000;
