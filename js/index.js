@@ -1,16 +1,18 @@
 
 document.addEventListener("DOMContentLoaded", function(event) {
   initMenuButtons();
-  var renderVis = function(dataset_name, data, params) {
+  var renderVis = function(datasetName, data, params) {
     d3.select(".load-screen").style("display", "none");
     var chart = new Potato(data, params);
     d3.select(".menu-button-wrapper").style("display", "block");
     d3.select(".help-wrapper").style("display", "block");
+    // setHelpText(datasetName);
   };
 
   d3.select("#file-uploader").on('change', function(e) {
     var file = e.target.files[0];
     var fileReader = new FileReader();
+    // if file.type == "text/csv" ?...
     fileReader.onload = function(e) {
       return renderVis(fileReader.name, d3.csvParse(fileReader.result));
     };
@@ -50,6 +52,8 @@ var initMenuButtons = function() {
   });
 
   d3.select("#new-option").on("click", function() {
+    // not really sure how to properly garbage collect chart...
+    // so the hack workaround is just reload the page?
     location.reload();
   });
 
@@ -66,6 +70,8 @@ var initMenuButtons = function() {
 // TODO: Not currently being used
 /*
 var setHelpText = function(name) {
+  // $(".dataset-name").html(name);
+
   $("#toolbar").append("<div class='dataset-info'></div>");
   if (name === "basketball") {
     $(".dataset-info").html("<b>Fun things to try:</b> <ul> <li>split by 'position' and size by 'height' </li> <li>split by 'age' and size by 'salary'</li> <li>split by 'team', click-n-drag to select your favorite team, and explore from there</li> </ul>");
