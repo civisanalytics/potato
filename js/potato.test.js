@@ -19,6 +19,47 @@ describe("end to end tests", () => {
 });
 
 describe("functional unit tests", () => {
+
+  describe("#enrichData", () => {
+    test("base case", () => {
+
+      const csvData = [
+        { "money": "60", "age": "19", "country": "USA" },
+        { "money": "23", "age": "27", "country": "USA" },
+        { "money": "15", "age": "12", "country": "USA" },
+        { "money": "92", "age": "100", "country": "USA" },
+      ];
+
+      const uniqueValues = Potato.prototype.uniqueDataValues(csvData);
+      const uniqueFilters = Potato.prototype.calculateFilters(uniqueValues);
+
+      const categoricalFilters = uniqueFilters.categoricalFilters;
+      const numericFilters = uniqueFilters.numericFilters;
+
+      const output = {
+        "money": uniqueValues.money, // numeric filters should be unchanged!
+        "age": uniqueValues.age, // numeric filters should be unchanged!
+        "country": {
+          "numValues": 1,
+          "type": "cat",
+          "values": {
+            "USA": { "count": 4, "filter": "country", "value": "USA",
+              "sums": {
+                "money": 190,
+                "age": 158
+              },
+              "means": {
+                "money": 47.5,
+                "age": 39.5
+              }
+            }
+          }
+        }
+      };
+      expect(Potato.prototype.enrichData(csvData, uniqueValues, categoricalFilters, numericFilters)).toEqual(output);
+    });
+  });
+
   describe("#calculateFilters", () => {
     test("base case", () => {
       const output = {
@@ -46,7 +87,6 @@ describe("functional unit tests", () => {
       expect(Potato.prototype.calculateFilters(input)).toEqual(output);
     });
   });
-
 
   describe("#uniqueDataValues", () => {
     test("base case", () => {
@@ -194,7 +234,6 @@ describe("functional unit tests", () => {
     });
   });
 
-
   describe("#parseNumericString", () => {
     const output = 100000;
 
@@ -213,7 +252,6 @@ describe("functional unit tests", () => {
       expect(Potato.prototype.parseNumericString(input3)).toBe(output);
     });
   });
-
 
   describe("#getNumericExtent", () => {
     const input = [

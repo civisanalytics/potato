@@ -594,70 +594,6 @@ Potato.prototype.createButtons = function(type) {
   })(this));
 };
 
-// given data, and uniqueValues, enrich uniqueValues with sums/averages/counts
-Potato.prototype.enrichData = function(data, uniqueValues, categoricalFilters, numericFilters) {
-
-  // iterate over entire dataset
-  for(var d=0; d<data.length; d++) {
-    // for each row, for each categorical column
-    for(var c=0; c<categoricalFilters.length; c++) {
-      var key = categoricalFilters[c];
-      var val = data[d][key];
-
-      // TODO: Do we even need the nodeId anymore? (might need it for subselection?)
-      // ignore the id
-      if (key !== 'node_id') {
-        var keyMod = key.replace(/\(|\)/g, " ");
-
-        var subVal = uniqueValues[keyMod].values[val];
-
-        if(!("sums" in subVal)) {
-          subVal.sums = {};
-        }
-
-        // incremental sum each of the numeric coluns
-        for(var n=0; n<numericFilters.length; n++) {
-          var numKey = numericFilters[n];
-          var newVal = parseFloat(data[d][numKey]);
-          if(!isNaN(newVal)) {
-            if(!(numKey in subVal.sums)) {
-              subVal.sums[numKey] = newVal;
-            } else {
-              /*if(numKey == "net-worth" && keyMod == "source" && subVal.value == "Inherited") {
-                console.log(subVal.sums[numKey], newVal);
-              }*/
-              subVal.sums[numKey] += newVal;
-            }
-          }
-        }
-      }
-    }
-  }
-  return uniqueValues;
-};
-
-// TODO: do we really need this?
-// split the filters into two data structures that are easier to use
-Potato.prototype.calculateFilters = function(uniqueValues) {
-  var categoricalFilters = [];
-  var numericFilters = [];
-
-  for(var key in uniqueValues) {
-    var type = uniqueValues[key].type;
-
-    if(type == "num") {
-      numericFilters.push(key);
-    } else {
-      categoricalFilters.push(key);
-    }
-  }
-
-  return {
-    categoricalFilters: categoricalFilters,
-    numericFilters: numericFilters
-  };
-};
-
 Potato.prototype.createResetButton = function() {
   var resetButton = d3.select("#filter-select-buttons").append("button")
     .attr("id", "reset-button")
@@ -744,6 +680,77 @@ Potato.prototype.updatePosition = function(e, id) {
 // THESE HAVE TEST COVERAGE YAY!
 //
 
+
+// given data, and uniqueValues, enrich uniqueValues with sums/means/counts
+Potato.prototype.enrichData = function(data, uniqueValues, categoricalFilters, numericFilters) {
+
+  // iterate over entire dataset
+  for(var d=0; d<data.length; d++) {
+    // for each row, for each categorical column
+    for(var c=0; c<categoricalFilters.length; c++) {
+      var key = categoricalFilters[c];
+      var val = data[d][key];
+
+      var keyMod = key.replace(/\(|\)/g, " ");
+
+      var subVal = uniqueValues[keyMod].values[val];
+
+      if(!("sums" in subVal)) {
+        subVal.sums = {};
+      }
+
+      // cumultative sum each of the numeric coluns
+      for(var n=0; n<numericFilters.length; n++) {
+        var numKey = numericFilters[n];
+        var newVal = parseFloat(data[d][numKey]);
+        if(!isNaN(newVal)) {
+          if(!(numKey in subVal.sums)) {
+            subVal.sums[numKey] = newVal;
+          } else {
+            subVal.sums[numKey] += newVal;
+          }
+        }
+      }
+    }
+  }
+
+  // finally, iterate over numeric filters and calculate averages
+  for(var key in uniqueValues) {
+    if(uniqueValues[key].type == "cat") {
+      var values = uniqueValues[key].values;
+
+      for(var key2 in values) {
+        values[key2].means = {};
+
+        for(var n=0; n<numericFilters.length; n++) {
+          var numKey = numericFilters[n];
+          values[key2].means[numKey] = values[key2].sums[numKey] / values[key2].count;
+        }
+      }
+    }
+  }
+
+  return uniqueValues;
+};
+
+// Two arrays of the num and categoricalFilters, particularly useful for enrichData later
+Potato.prototype.calculateFilters = function(uniqueValues) {
+  var categoricalFilters = [];
+  var numericFilters = [];
+
+  for(var key in uniqueValues) {
+    if(uniqueValues[key].type == "num") {
+      numericFilters.push(key);
+    } else {
+      categoricalFilters.push(key);
+    }
+  }
+
+  return {
+    categoricalFilters: categoricalFilters,
+    numericFilters: numericFilters
+  };
+};
 
 // Given an array of data (d3 format)
 // return an object containing all the filters/columns and all unique values
