@@ -1,3 +1,5 @@
+"use strict";
+
 const Potato = require('./potato.js');
 
 describe("end to end tests", () => {
@@ -13,7 +15,7 @@ describe("end to end tests", () => {
        "radius": 2, "vx": 0, "vy": 0, "x": -7.373688780783198, "y": 6.754902942615239}
     ];
 
-    chart = new Potato(csvData);
+    var chart = new Potato(csvData);
     expect(chart.data).toEqual(potatoData);
   });
 });
