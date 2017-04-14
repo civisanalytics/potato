@@ -846,3 +846,4 @@ Potato.prototype.getNumericExtent = function(filter, data) {
 };
 
 module.exports = Potato;
+window.Potato = Potato; // Hmmmm is this a bad idea?...

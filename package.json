@@ -1,14 +1,13 @@
 {
   "name": "potato",
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "build-js": "browserify src/js/potato.js > build/js/main.js -d",
+    "watch-js": "watchify src/js/potato.js -o build/js/main.js -d"
   },
   "devDependencies": {
-    "gulp": "^3.9.1",
-    "gulp-concat": "^2.6.1",
-    "gulp-deporder": "^1.1.0",
-    "gulp-strip-debug": "^1.1.0",
-    "gulp-uglify": "^2.1.2",
-    "jest-cli": "^19.0.2"
+    "browserify": "^14.3.0",
+    "jest-cli": "^19.0.2",
+    "watchify": "^3.9.0"
   }
 }

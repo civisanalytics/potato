@@ -1,6 +1,6 @@
 "use strict";
 
-const Potato = require('./potato.js');
+const Potato = require('../js/potato.js');
 
 describe("end to end tests", () => {
   test("init and parse data", () => {
