@@ -93,9 +93,9 @@ describe("functional unit tests", () => {
   describe("#uniqueDataValues", () => {
     test("base case", () => {
       const input = [
-        { "age": "60", "name": "bob" },
-        { "age": "47", "name": "mary" },
-        { "age": "23", "name": "ellen" }
+        { "age": "60", "country": "USA" },
+        { "age": "47", "country": "USA" },
+        { "age": "23", "country": "Canada" }
       ];
       const output = {
         "age": {
@@ -107,13 +107,12 @@ describe("functional unit tests", () => {
             "23": { "count": 1, "filter": "age", "value": "23" }
           }
         },
-        "name": {
-          "numValues": 3,
+        "country": {
+          "numValues": 2,
           "type": "cat",
           "values": {
-            "bob": { "count": 1, "filter": "name", "value": "bob" },
-            "mary": { "count": 1, "filter": "name", "value": "mary" },
-            "ellen": { "count": 1, "filter": "name", "value": "ellen" }
+            "USA": { "count": 2, "filter": "country", "value": "USA" },
+            "Canada": { "count": 1, "filter": "country", "value": "Canada" }
           }
         }
       };
@@ -125,6 +124,7 @@ describe("functional unit tests", () => {
         { "life": "1337" },
         { "life": "42" },
         { "life": "pursuit of happiness" },
+        { "life": "n0mz" },
         { "life": "n0mz" }
       ];
       const output = {
@@ -135,7 +135,7 @@ describe("functional unit tests", () => {
             "1337": { "count": 1, "filter": "life", "value": "1337" },
             "42": { "count": 1, "filter": "life", "value": "42" },
             "pursuit of happiness": { "count": 1, "filter": "life", "value": "pursuit of happiness" },
-            "n0mz": { "count": 1, "filter": "life", "value": "n0mz" }
+            "n0mz": { "count": 2, "filter": "life", "value": "n0mz" }
           }
         }
       };
@@ -147,6 +147,7 @@ describe("functional unit tests", () => {
         { "color": "red", "country": "" },
         { "color": "", "country": "USA" },
         { "color": "blue", "country": "USA" },
+        { "color": "blue", "country": "USA" }
       ];
       const output = {
         "color": {
@@ -154,7 +155,7 @@ describe("functional unit tests", () => {
           "type": "cat",
           "values": {
             "red": { "count": 1, "filter": "color", "value": "red" },
-            "blue": { "count": 1, "filter": "color", "value": "blue" },
+            "blue": { "count": 2, "filter": "color", "value": "blue" },
             "": { "count": 1, "filter": "color", "value": "" }
           }
         },
@@ -162,7 +163,7 @@ describe("functional unit tests", () => {
           "numValues": 2,
           "type": "cat",
           "values": {
-            "USA": { "count": 2, "filter": "country", "value": "USA" },
+            "USA": { "count": 3, "filter": "country", "value": "USA" },
             "": { "count": 1, "filter": "country", "value": "" }
           }
         }
@@ -210,9 +211,25 @@ describe("functional unit tests", () => {
       expect(Potato.prototype.uniqueDataValues(inputData)).toEqual(output);
     });
 
-    test("categoricals with more than 100 values are labeled unique", () => {
+    test("categoricals with only unique values are labeled unique", () => {
       let inputData = [];
+      for(var i=0; i<10; i++) {
+        inputData.push({ "age": `${i}_foobar` });
+      }
+      const output = {
+        "age": {
+          "numValues": 10,
+          "type": "unique",
+          "values": expect.any(Object)
+        }
+      };
+      expect(Potato.prototype.uniqueDataValues(inputData)).toEqual(output);
+    });
+
+    test("categoricals with more than 100 values are labeled unique", () => {
+      let inputData = [{ "age": "0_foobar" }];
       for(var i=0; i<100; i++) {
+        // the first one is a duplicate to prevent this from being identified as unique
         inputData.push({ "age": `${i}_foobar` });
       }
       const output = {

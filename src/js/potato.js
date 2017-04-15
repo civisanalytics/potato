@@ -684,37 +684,32 @@ Potato.prototype.updatePosition = function(e, id) {
 // given data, and uniqueValues, enrich uniqueValues with sums/means/counts
 Potato.prototype.enrichData = function(data, uniqueValues, categoricalFilters, numericFilters) {
 
-  // iterate over entire dataset
-  for(var d=0; d<data.length; d++) {
-    // for each row, for each categorical column
-    for(var c=0; c<categoricalFilters.length; c++) {
-      var key = categoricalFilters[c];
-      var val = data[d][key];
+  data.forEach(function(row) {
 
-      var keyMod = key.replace(/\(|\)/g, " ");
+    categoricalFilters.forEach(function(catFilter) {
+      var val = row[catFilter];
 
-      var subVal = uniqueValues[keyMod].values[val];
+      var subVal = uniqueValues[catFilter].values[val];
 
       if(!("sums" in subVal)) {
         subVal.sums = {};
       }
 
       // cumultative sum each of the numeric coluns
-      for(var n=0; n<numericFilters.length; n++) {
-        var numKey = numericFilters[n];
-        var newVal = parseFloat(data[d][numKey]);
+      numericFilters.forEach(function(numFilter) {
+        var newVal = parseFloat(row[numFilter]);
         if(!isNaN(newVal)) {
-          if(!(numKey in subVal.sums)) {
-            subVal.sums[numKey] = newVal;
+          if(!(numFilter in subVal.sums)) {
+            subVal.sums[numFilter] = newVal;
           } else {
-            subVal.sums[numKey] += newVal;
+            subVal.sums[numFilter] += newVal;
           }
         }
-      }
-    }
-  }
+      });
+    });
+  });
 
-  // finally, iterate over numeric filters and calculate averages
+  // finally, iterate over categorical filters and calculate averages
   for(var key in uniqueValues) {
     if(uniqueValues[key].type == "cat") {
       var values = uniqueValues[key].values;
@@ -722,10 +717,9 @@ Potato.prototype.enrichData = function(data, uniqueValues, categoricalFilters, n
       for(var key2 in values) {
         values[key2].means = {};
 
-        for(var n=0; n<numericFilters.length; n++) {
-          var numKey = numericFilters[n];
-          values[key2].means[numKey] = values[key2].sums[numKey] / values[key2].count;
-        }
+        numericFilters.forEach(function(numFilter) {
+          values[key2].means[numFilter] = values[key2].sums[numFilter] / values[key2].count;
+        });
       }
     }
   }
@@ -771,15 +765,13 @@ Potato.prototype.calculateFilters = function(uniqueValues) {
 Potato.prototype.uniqueDataValues = function(data) {
   var uniqueValues = {};
 
-  for(var i=0; i<data.length; i++) {
-    for(var key in data[i]) {
-      var val = data[i][key];
-
-      var keyMod = key.replace(/\(|\)/g, " ");
+  data.forEach(function(row) {
+    for(var key in row) {
+      var val = row[key];
 
       // this is a new filter we haven't seen before, so add
-      if(!uniqueValues.hasOwnProperty(keyMod)) {
-        uniqueValues[keyMod] = {
+      if(!uniqueValues.hasOwnProperty(key)) {
+        uniqueValues[key] = {
           values: {},
           numValues: 0,
           type: "num" // "num", "cat", "unique"
@@ -787,32 +779,34 @@ Potato.prototype.uniqueDataValues = function(data) {
       }
 
       // If we ever encounter a non-numeric, than assume categorical
-      if(uniqueValues[keyMod].type == "num" && val !== "") {
+      if(uniqueValues[key].type == "num" && val !== "") {
         var isCategorical = isNaN(val.replace(/%/,"").replace(/,/g,""));
+
         if(isCategorical) {
-          uniqueValues[keyMod].type = "cat";
+          uniqueValues[key].type = "cat";
         }
       }
 
       // new value that we should add
-      if(!(val in uniqueValues[keyMod].values)) {
-        uniqueValues[keyMod].numValues += 1;
-        uniqueValues[keyMod].values[val] = {
-          filter: keyMod,
+      if(!(val in uniqueValues[key].values)) {
+        uniqueValues[key].numValues += 1;
+        uniqueValues[key].values[val] = {
+          filter: key,
           value: val,
           count: 1,
         };
       } else {
-        uniqueValues[keyMod].values[val].count += 1;
+        uniqueValues[key].values[val].count += 1;
       }
     }
-  }
+  });
 
-  // If it's categorical but there are more than 100 diff values, it's probably not
-  // usefully categorical any more.
+  // If it's categorical AND there are more than 100 diff values or every value is unique
+  // it's probably not usefully categorical any more.
   for(var key in uniqueValues) {
-    if(uniqueValues[key].type === "cat" && uniqueValues[key].numValues > 100) {
-      uniqueValues[key].type = "unique";
+    var val = uniqueValues[key];
+    if(val.type === "cat" && (val.numValues > 100 || val.numValues === data.length)) {
+      val.type = "unique";
     }
   }
   return uniqueValues;
@@ -828,9 +822,9 @@ Potato.prototype.parseNumericString = function(str) {
 Potato.prototype.getNumericExtent = function(filter, data) {
   var filterMax = 0;
   var filterMin = null;
-  for(var i = 0; i < data.length; i++) {
-    var currVal = this.parseNumericString(data[i][filter]);
 
+  data.forEach(function(row) {
+    var currVal = Potato.prototype.parseNumericString(row[filter]);
     // ignore emptys (NaN)
     if(!isNaN(currVal)) {
       if(currVal > filterMax) {
@@ -840,7 +834,7 @@ Potato.prototype.getNumericExtent = function(filter, data) {
         filterMin = currVal;
       }
     }
-  }
+  });
 
   return { min: filterMin, max: filterMax };
 };
