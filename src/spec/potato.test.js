@@ -20,7 +20,35 @@ describe("end to end tests", () => {
   });
 });
 
-describe("functional unit tests", () => {
+describe.only("label unit tests", () => {
+
+  describe("#updateLabelPosition", () => {
+    const leftNode = { "country": "USA", "x": 200, "y": 200, "radius": 10 };
+    const rightNode = { "country": "USA", "x": 240, "y": 200, "radius": 10 };
+    const otherNode = { "country": "Canada", "x": 50, "y": 200, "radius": 10 };
+    const label = {
+      "tarx": 100,
+      "tary": 100,
+      "type": "split",
+      "split": "country",
+      "val": "USA"
+    };
+
+    test("centers over correct node and ignores non related nodes", () => {
+      const nodes = [ leftNode, otherNode ];
+      const output = { tarx: 200, tary: 180 }; // tary is 20 pixels higher, 10 for radius + 10 for manual offset
+      expect(Potato.prototype.updateLabelPosition(label, nodes)).toEqual(output);
+    });
+
+    test("centers between multiple correct nodes", () => {
+      const nodes = [ leftNode, rightNode ];
+      const output = { tarx: 220, tary: 180 };
+      expect(Potato.prototype.updateLabelPosition(label, nodes)).toEqual(output);
+    });
+  });
+});
+
+describe("data unit tests", () => {
 
   describe("#enrichData", () => {
     test("base case", () => {

@@ -117,7 +117,7 @@ function Potato(data, params) {
         node.attr("cx", function(d) { return d.x; })
             .attr("cy", function(d) { return d.y; });
 
-        that.updateLabelPositions(that.labels, that.data);
+        that.updateAllLabelPositions(that.labels, that.data);
         that.updateLabels(that.svg, that.labels);
       });
 }
@@ -131,35 +131,44 @@ Potato.prototype.getChargeForce = function() {
 };
 
 // Dynamic labels that "float" above their current position
-Potato.prototype.updateLabelPositions = function(labels, nodes) {
+Potato.prototype.updateAllLabelPositions = function(labels, nodes) {
   if(labels == undefined) { return; }
 
   labels.forEach(function(label) {
-    var minY = label.tary + 100; // At least 100 pixels within target is probably good
-    var minX = label.tarx;
-    var maxX = label.tarx;
+    var newPos = Potato.prototype.updateLabelPosition(label, nodes);
+    label.tary = newPos.tary;
+    label.tarx = newPos.tarx;
+  });
+};
 
-    // Iterate over current nodes, and make adjustments to label based on the node locations
-    nodes.forEach(function(node) {
-      if(node[label.split] == label.val) {
-        if((node.y - node.radius) < minY) {
-          minY = node.y - node.radius;
+Potato.prototype.updateLabelPosition = function(label, nodes) {
+  var minY, minX, maxX;
+
+  // Iterate over current nodes, and make adjustments to label based on the node locations
+  nodes.forEach(function(node) {
+
+    // Only take into account nodes related to this label
+    if(node[label.split] == label.val) {
+      if(minY === undefined || ((node.y - node.radius) < minY)) {
+        minY = node.y - node.radius;
+      }
+
+      // Categorical labels may need to adjust x location too
+      if(label.type == "split") {
+        if(minX === undefined || ((node.x - node.radius) < minX)) {
+          minX = node.x - node.radius;
         }
-
-        // Categorical labels may need to adjust x location too
-        if(label.type == "split") {
-          if((node.x - node.radius) < minX) {
-            minX = node.x - node.radius;
-          }
-          if((node.x + node.radius) > maxX) {
-            maxX = node.x + node.radius;
-          }
+        if(maxX === undefined || ((node.x + node.radius) > maxX)) {
+          maxX = node.x + node.radius;
         }
       }
-    });
-    label.tary = minY - 10;
-    label.tarx = (maxX - minX) / 2.0 + minX;
+    }
   });
+
+  return {
+    tary: minY - 10, // little bit of offset so label is above nodes
+    tarx: (maxX - minX) / 2.0 + minX
+  };
 };
 
 // Will fade in new labels, the effect really only works if you reset the labels array each time
@@ -200,6 +209,7 @@ Potato.prototype.orderBy = function(filter) {
     val: extent.min,
     text: extent.min,
     split: filter,
+    type: "order",
     tarx: orders.range()[0],
     tary: this.height / 2.0 - 50 // TODO: either make this relative to the number of nodes, or do the fancy thing in the old version
   });
@@ -208,6 +218,7 @@ Potato.prototype.orderBy = function(filter) {
     val: extent.max,
     text: extent.max,
     split: filter,
+    type: "order",
     tarx: orders.range()[1],
     tary: this.height / 2.0 - 50 // TODO: either make this relative to the number of nodes, or do the fancy thing in the old version
   });
@@ -311,6 +322,7 @@ Potato.prototype.splitBy = function(filter, dataType) {
           text: labelText,
           val: d,
           split: filter,
+          type: "split",
           tarx: finalObj.x,
           tary: finalObj.y - 50 // TODO: either make this relative to the number of nodes, or do the fancy thing in the old version
         });
