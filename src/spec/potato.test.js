@@ -20,7 +20,57 @@ describe("end to end tests", () => {
   });
 });
 
-describe.only("label unit tests", () => {
+describe("split unit tests", () => {
+  describe("#calculateSplitLocations", () => {
+    const width = 800;
+    const height = 600;
+
+    test("base case, just one key", () => {
+      const uniqueKeys = ["Canada"];
+      const output = Potato.prototype.calculateSplitLocations(uniqueKeys, width, height);
+
+      expect(output["Canada"].x).toEqual(width / 2);
+      expect(output["Canada"].y).toEqual(height / 2);
+    });
+
+    test("four keys, (2x2)", () => {
+      const uniqueKeys = ["Canada", "Uganda", "USA", "Venezuela"];
+      const output = Potato.prototype.calculateSplitLocations(uniqueKeys, width, height);
+
+      expect(output["Canada"].x).toEqual(output["USA"].x);
+      expect(output["Uganda"].x).toEqual(output["Venezuela"].x);
+
+      expect(output["Canada"].y).toEqual(output["Uganda"].y);
+      expect(output["USA"].y).toEqual(output["Venezuela"].y);
+
+      expect(output["Canada"].x).toBeLessThan(output["Uganda"].x);
+
+      expect(output["Uganda"].y).toBeLessThan(output["Venezuela"].y);
+    });
+
+    test("five keys, aka awkward imbalanced grid", () => {
+      const uniqueKeys = ["Canada", "Uganda", "USA", "Venezuela", "Togo"];
+      // We expect 2 rows, 3 columns, first row has 3 items, second row has 2 items
+      // ie.
+      // Canada     --   Uganda   -- USA
+      // Venezuela  --    Togo
+      const output = Potato.prototype.calculateSplitLocations(uniqueKeys, width, height);
+
+      expect(output["Canada"].x).toEqual(output["Venezuela"].x);
+      expect(output["Uganda"].x).toEqual(output["Togo"].x);
+
+      expect(output["Canada"].y).toEqual(output["Uganda"].y);
+      expect(output["Canada"].y).toEqual(output["USA"].y);
+      expect(output["Venezuela"].y).toEqual(output["Togo"].y);
+
+      expect(output["Uganda"].x).toBeLessThan(output["USA"].x);
+
+      expect(output["Canada"].y).toBeLessThan(output["Venezuela"].x);
+    });
+  });
+});
+
+describe("label unit tests", () => {
 
   describe("#updateLabelPosition", () => {
     const leftNode = { "country": "USA", "x": 200, "y": 200, "radius": 10 };
@@ -63,8 +113,8 @@ describe("data unit tests", () => {
       const uniqueValues = Potato.prototype.uniqueDataValues(csvData);
       const uniqueFilters = Potato.prototype.calculateFilters(uniqueValues);
 
-      const categoricalFilters = uniqueFilters.categoricalFilters;
-      const numericFilters = uniqueFilters.numericFilters;
+      const categorical = uniqueFilters.categorical;
+      const numeric = uniqueFilters.numeric;
 
       const output = {
         "money": uniqueValues.money, // numeric filters should be unchanged!
@@ -86,15 +136,15 @@ describe("data unit tests", () => {
           }
         }
       };
-      expect(Potato.prototype.enrichData(csvData, uniqueValues, categoricalFilters, numericFilters)).toEqual(output);
+      expect(Potato.prototype.enrichData(csvData, uniqueValues, categorical, numeric)).toEqual(output);
     });
   });
 
   describe("#calculateFilters", () => {
     test("base case", () => {
       const output = {
-        "categoricalFilters": ["name"],
-        "numericFilters": ["age"]
+        "categorical": ["name"],
+        "numeric": ["age"]
       };
       const input = {
         "age": {

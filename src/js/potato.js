@@ -18,15 +18,11 @@ function Potato(data, params) {
   }
 
   this.data = data;
-  this.uniqueValues = this.uniqueDataValues(this.data);
+  this.uniqueValues = this.uniqueDataValues(data);
 
-  var allFilters = this.calculateFilters(this.uniqueValues);
-
-  this.numericFilters = allFilters.numericFilters;
-  this.categoricalFilters = allFilters.categoricalFilters;
   this.createResetButton();
 
-  this.uniqueValues = this.enrichData(this.data, this.uniqueValues, this.categoricalFilters, this.numericFilters);
+  this.uniqueValues = this.enrichData(data, this.uniqueValues);
 
   var vis = d3.select("#vis");
 
@@ -60,7 +56,7 @@ function Potato(data, params) {
     }
   }
 
-  this.resetToDefaultSize(this.data);
+  this.resetToDefaultSize(data);
 
   this.labels = [];
 
@@ -211,7 +207,7 @@ Potato.prototype.orderBy = function(filter) {
     split: filter,
     type: "order",
     tarx: orders.range()[0],
-    tary: this.height / 2.0 - 50 // TODO: either make this relative to the number of nodes, or do the fancy thing in the old version
+    tary: this.height / 2.0 - 50
   });
   // Head
   this.labels.push({
@@ -220,7 +216,7 @@ Potato.prototype.orderBy = function(filter) {
     split: filter,
     type: "order",
     tarx: orders.range()[1],
-    tary: this.height / 2.0 - 50 // TODO: either make this relative to the number of nodes, or do the fancy thing in the old version
+    tary: this.height / 2.0 - 50
   });
 
   var xForceFn = d3.forceX(function(d) {
@@ -264,84 +260,89 @@ Potato.prototype.splitBy = function(filter, dataType) {
     // TODO: implement orderBy
     return this.orderBy(filter);
   } else {
-    // first determine the unique values for this category in the dataset, also sort
-    // TODO: we could probably replace this with the claculations from this.uniqueValues
-    var uniqueKeys = d3.map(this.data, function(d) {
-      return d[filter];
-    }).keys().sort();
+    // first determine the unique values for this filter, also sort alpha
+    var uniqueKeys = Object.keys(this.uniqueValues[filter].values).sort()
 
-    // then determine what spots all the values should go to
-    var numCols = Math.ceil(Math.sqrt(uniqueKeys.length));
-    var numRows = Math.ceil(uniqueKeys.length / numCols);
-    var currRow = 0;
-    var currCol = 0;
-
-    var padding = 0.7;
-
-    // padding because the clumps tend to float off the screen
-    var paddedWidth = this.width * padding;
-    var paddedHeight = this.height * padding;
-
-    var keysToLocation = {};
-
-    // TODO: this should probably move to the reset function
-    // wipe out the labels to get the fade in effect later
-    this.labels = [];
-    this.updateLabels(this.svg, this.labels);
-
-    // then for each category value, increment to give the "row/col" coordinate
-    // maybe save this in an object where key == category and value = {row: X, col: Y}
-    uniqueKeys.forEach((function(_this) {
-      return function(d) {
-        var finalObj = {
-          x: (_this.width * (padding * 0.22)) + (0.5 + currCol) * (paddedWidth / numCols),
-          y: (_this.height * (padding * 0.22)) + (0.5 + currRow) * (paddedHeight / numRows)
-        };
-
-        currCol++;
-        if (currCol >= numCols) {
-          currCol = 0;
-          currRow++;
-        }
-
-        keysToLocation[d] = finalObj;
-
-        // TODO:
-        // if a size is active, then instead get the sum of that?
-        var labelVal = "";
-        //console.log(this.activeSizeBy);
-        if (_this.activeSizeBy != "") {
-          labelVal = _this.uniqueValues[filter].values[d].sums[_this.activeSizeBy].toLocaleString();
-        } else {
-          labelVal = _this.uniqueValues[filter].values[d].count.toLocaleString();
-        }
-        var labelText = d + ": " + labelVal;
-
-        // also add a filter label
-        _this.labels.push({
-          text: labelText,
-          val: d,
-          split: filter,
-          type: "split",
-          tarx: finalObj.x,
-          tary: finalObj.y - 50 // TODO: either make this relative to the number of nodes, or do the fancy thing in the old version
-        });
-      };
-    })(this));
-
+    var splitLocations = this.calculateSplitLocations(uniqueKeys, this.width, this.height);
+    this.labels = this.createSplitLabels(filter, splitLocations);
 
     var xForceFn = d3.forceX(function(d) {
-      return keysToLocation[d[filter]].x;
+      return splitLocations[d[filter]].x;
     });
 
     var yForceFn = d3.forceY(function(d) {
-      return keysToLocation[d[filter]].y;
+      return splitLocations[d[filter]].y;
     });
     this.simulation.force("x", xForceFn);
     this.simulation.force("y", yForceFn);
 
     this.simulation.alpha(1).restart();
   }
+};
+
+Potato.prototype.createSplitLabels = function(filter, splitLocations) {
+  var newLabels = [];
+  this.updateLabels(this.svg, newLabels);
+
+  for(var label in splitLocations) {
+    var labelVal = "";
+    if (this.activeSizeBy != "") {
+      labelVal = this.uniqueValues[filter].values[label].sums[this.activeSizeBy].toLocaleString();
+    } else {
+      labelVal = this.uniqueValues[filter].values[label].count.toLocaleString();
+    }
+    var labelText = label + ": " + labelVal;
+
+    // also add a filter label
+    newLabels.push({
+      text: labelText,
+      val: label,
+      split: filter,
+      type: "split",
+      tarx: splitLocations[label].x,
+      tary: splitLocations[label].y
+    });
+  }
+
+  return newLabels
+};
+
+// Given an array of uniqueKeys (strings), return an array of x/y coord positions that form a grid
+Potato.prototype.calculateSplitLocations = function(uniqueKeys, width, height) {
+  var numCols = Math.ceil(Math.sqrt(uniqueKeys.length));
+  var numRows = Math.ceil(uniqueKeys.length / numCols);
+
+  var padding = 0.8;
+
+  // Some padding for when the circle groups get large, also to make room for color legend
+  var paddedWidth = width * padding;
+  var paddedHeight = height * padding;
+  var leftPadding = (width - paddedWidth) / 2;
+  var topPadding = (height - paddedHeight) / 2;
+
+  var colSize = paddedWidth / (numCols + 1);
+  var rowSize = paddedHeight / (numRows + 1);
+
+  var splitLocations = {};
+
+  // then for each category value, increment to give the "row/col" coordinate
+  // maybe save this in an object where key == category and value = {row: X, col: Y}
+  var currRow = 1;
+  var currCol = 1;
+  uniqueKeys.forEach(function(d) {
+    splitLocations[d] = {
+      x: currCol * colSize + leftPadding,
+      y: currRow * rowSize + topPadding
+    };
+
+    currCol++;
+    if (currCol > numCols) {
+      currCol = 1;
+      currRow++;
+    }
+  });
+
+  return splitLocations;
 };
 
 Potato.prototype.sizeBy = function(filter) {
@@ -369,14 +370,6 @@ Potato.prototype.sizeBy = function(filter) {
   // any values less than minVal will get clamped to 1, effectively, tiny values will at least still be visible
   // my guess is the human eye cant tell the diff anyways?...
   sizeScale.clamp(true);
-
-/*
-  var extent = this.getNumericExtent(filter);
-
-  var sizeScale = d3.scaleSqrt()
-      .domain([extent.min, extent.max])
-      .range([1, 10]);
-      */
 
   // handle missing values gracefully by setting circle size to zero
   this.data.forEach(function(d) {
@@ -570,7 +563,9 @@ Potato.prototype.createButtons = function(type) {
     .attr("id", type + "-menu")
     .attr("class", "modifier-menu");
 
-  var buttonFilters = this.numericFilters.map(function(f) {
+  var filters = this.calculateFilters(this.uniqueValues);
+
+  var buttonFilters = filters.numeric.map(function(f) {
     return {
       value: f,
       type: 'num'
@@ -580,7 +575,7 @@ Potato.prototype.createButtons = function(type) {
     buttonFilters = buttonFilters.concat({
       value: '',
       type: 'divider'
-    }).concat(this.categoricalFilters.map(function(f) {
+    }).concat(filters.categorical.map(function(f) {
       return {
         value: f,
         type: 'cat'
@@ -631,17 +626,10 @@ Potato.prototype.createResetButton = function() {
 
 Potato.prototype.showDetails = function(data, i, element) {
   var content = "";
-  var filters = [];
-  for(var i=0; i<this.numericFilters.length; i++) {
-    filters.push(this.numericFilters[i]);
-  }
-  for(var i=0; i<this.categoricalFilters.length; i++) {
-    filters.push(this.categoricalFilters[i]);
-  }
-  for(var i=0; i<filters.length; i++) {
-    var key = filters[i];
+
+  Object.keys(this.uniqueValues).forEach(function(key) {
     content += key + ": " + data[key] + "<br/>";
-  }
+  });
   d3.select("#node-tooltip").html(content).style("display", "block");
   this.updatePosition(d3.event, "node-tooltip");
 //      this.highlightNode(d3.select(element), true);
@@ -694,11 +682,12 @@ Potato.prototype.updatePosition = function(e, id) {
 
 
 // given data, and uniqueValues, enrich uniqueValues with sums/means/counts
-Potato.prototype.enrichData = function(data, uniqueValues, categoricalFilters, numericFilters) {
+Potato.prototype.enrichData = function(data, uniqueValues) {
+  var filters = this.calculateFilters(uniqueValues);
 
   data.forEach(function(row) {
 
-    categoricalFilters.forEach(function(catFilter) {
+    filters.categorical.forEach(function(catFilter) {
       var val = row[catFilter];
 
       var subVal = uniqueValues[catFilter].values[val];
@@ -708,7 +697,7 @@ Potato.prototype.enrichData = function(data, uniqueValues, categoricalFilters, n
       }
 
       // cumultative sum each of the numeric coluns
-      numericFilters.forEach(function(numFilter) {
+      filters.numeric.forEach(function(numFilter) {
         var newVal = parseFloat(row[numFilter]);
         if(!isNaN(newVal)) {
           if(!(numFilter in subVal.sums)) {
@@ -729,7 +718,7 @@ Potato.prototype.enrichData = function(data, uniqueValues, categoricalFilters, n
       for(var key2 in values) {
         values[key2].means = {};
 
-        numericFilters.forEach(function(numFilter) {
+        filters.numeric.forEach(function(numFilter) {
           values[key2].means[numFilter] = values[key2].sums[numFilter] / values[key2].count;
         });
       }
@@ -753,8 +742,8 @@ Potato.prototype.calculateFilters = function(uniqueValues) {
   }
 
   return {
-    categoricalFilters: categoricalFilters,
-    numericFilters: numericFilters
+    categorical: categoricalFilters,
+    numeric: numericFilters
   };
 };
 
