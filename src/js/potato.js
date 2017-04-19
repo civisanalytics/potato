@@ -19,35 +19,12 @@ function Potato(data, params) {
 
   this.data = data;
   this.uniqueValues = this.uniqueDataValues(data);
-
-  this.createResetButton();
-
   this.uniqueValues = this.enrichData(data, this.uniqueValues);
-
-  var vis = d3.select("#vis");
-
-  vis.append("div")
-    .attr("class", "tooltip")
-    .attr("id", "node-tooltip")
-    .style("display", "none");
-
-  var toolbar = vis.append("div")
-    .attr("id", "toolbar");
-
-  toolbar.append("div")
-    .attr("id", "modifiers");
-
-  toolbar.append("div")
-    .attr("id", "filter-select-buttons");
-
-  vis.append("div")
-    .attr("id", "color-legend").append("svg");
 
   this.width = window.innerWidth;
   this.height = window.innerHeight - 55;
-  this.svg = vis.append("svg")
-    .attr("viewBox", "0 0 " + this.width + " " + this.height)
-    .attr("id", "vis-svg");
+
+  this.svg = this.createSVG(this.width, this.height);
 
   // Only create buttons if param is set to True
   for(var key in params) {
@@ -55,6 +32,8 @@ function Potato(data, params) {
       this.createButtons(key);
     }
   }
+
+  this.createResetButton();
 
   this.resetToDefaultSize(data);
 
@@ -117,6 +96,23 @@ function Potato(data, params) {
         that.updateLabels(that.svg, that.labels);
       });
 }
+
+Potato.prototype.createSVG = function(width, height) {
+  d3.select("#vis")
+    .html(`
+      <div class='tooltip' id='node-tooltip' style='display:none;'></div>
+      <div id='toolbar'>
+        <div id='modifiers'></div>
+        <div id='filter-select-buttons'></div>
+      </div>
+      <div id='color-legend'>
+        <svg></svg>
+      </div>
+      <svg viewBox='0 0 ${width} ${height}' id='vis-svg'></svg>
+    `);
+
+  return d3.select("#vis-svg");
+};
 
 Potato.prototype.getChargeForce = function() {
   return d3.forceManyBody().strength(function(d) {
@@ -528,40 +524,33 @@ Potato.prototype.reset = function(type) {
 
 Potato.prototype.createButtons = function(type) {
   var typeUpper = type[0].toUpperCase() + type.slice(1);
-  var wrapper = d3.select("#modifiers")
+
+  d3.select("#modifiers")
     .append("div")
     .attr("id", type + "-wrapper")
     .attr("class", "modifier-wrapper")
     .on("mouseleave", function(d) {
-      var tarMenu = d3.select("#" + type + "-menu");
-      tarMenu.style("display", "none")
-    });
+      d3.select("#" + type + "-menu")
+        .style("display", "none")
+    }).html(`
+      <button id='${type}-button' class='modifier-button'>
+        ${typeUpper}
+        <span class='button-arrow'>&#x25BC;</span>
+        <span id='${type}-hint' class='modifier-hint'></span>
+      </button>
+      <div id='${type}-menu' class='modifier-menu'></div>
+    `);
 
-  var modButton = wrapper.append("button")
-    .attr("id", type + "-button")
-    .attr("class", "modifier-button")
-    .html(typeUpper)
+  d3.select(`#${type}-button`)
     .on("mouseover", function(d) {
-      var tarMenu = d3.select("#" + type + "-menu");
-      tarMenu.style("display", "block")
+      d3.select("#" + type + "-menu")
+        .style("display", "block")
     })
     .on("click", (function(_this) {
       return function(d) {
         return _this.reset(type);
       };
     })(this));
-
-  modButton.append("span")
-    .attr("class", "button-arrow")
-    .html("&#x25BC;");
-
-  modButton.append("span")
-    .attr("id", type + "-hint")
-    .attr("class", "modifier-hint");
-
-  wrapper.append("div")
-    .attr("id", type + "-menu")
-    .attr("class", "modifier-menu");
 
   var filters = this.calculateFilters(this.uniqueValues);
 
@@ -602,10 +591,15 @@ Potato.prototype.createButtons = function(type) {
 };
 
 Potato.prototype.createResetButton = function() {
-  var resetButton = d3.select("#filter-select-buttons").append("button")
+  d3.select("#filter-select-buttons").append("button")
     .attr("id", "reset-button")
     .attr("class", "disabled-button modifier-button")
-    .html("<span id='reset-icon'>&#8635;</span> Reset Selection</button>")
+    .html(`
+      <span id='reset-icon'>&#8635;</span> Reset Selection
+      <div class='tooltip' id='reset-tooltip'>
+        Click and drag on the canvas to select nodes.
+      </div>
+    `)
     .on("click", function(d) {
       //this.add_all();
     }).on("mouseover", function(d) {
@@ -615,13 +609,6 @@ Potato.prototype.createResetButton = function() {
       d3.select("reset-tooltip")
         .style("display", "hide");
     });
-
-  var resetTooltip = resetButton.append("div")
-    .attr("class", "tooltip")
-    .attr("id", "reset-tooltip")
-    .html("Click and drag on the canvas to select nodes.");
-
-  resetButton.append(resetTooltip);
 };
 
 Potato.prototype.showDetails = function(data, i, element) {
@@ -728,7 +715,7 @@ Potato.prototype.enrichData = function(data, uniqueValues) {
   return uniqueValues;
 };
 
-// Two arrays of the num and categoricalFilters, particularly useful for enrichData later
+// Two arrays of the numeric and categorical filters
 Potato.prototype.calculateFilters = function(uniqueValues) {
   var categoricalFilters = [];
   var numericFilters = [];
