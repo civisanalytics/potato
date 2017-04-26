@@ -18,22 +18,12 @@ function Potato(data, params) {
   }
 
   this.data = data;
-  this.uniqueValues = this.uniqueDataValues(data);
-  this.uniqueValues = this.enrichData(data, this.uniqueValues);
+  this.uniqueValues = this.enrichData(data, this.uniqueDataValues(data));
 
   this.width = window.innerWidth;
   this.height = window.innerHeight - 55;
 
-  this.svg = this.createSVG(this.width, this.height);
-
-  // Only create buttons if param is set to True
-  for(var key in params) {
-    if(key !== 'class' && params[key] != null) {
-      this.createButtons(key);
-    }
-  }
-
-  this.createResetButton();
+  this.generateDOM(this.width, this.height, params);
 
   this.resetToDefaultSize(data);
 
@@ -46,10 +36,6 @@ function Potato(data, params) {
   this.centerXForce = d3.forceX(this.width / 2);
   this.centerYForce = d3.forceY(this.height / 2);
 
-  // TODO: might be interesting to set the strengths on the x and y higher
-  // and also raise the force of the chargeForce.  This might cause the groups to not
-  // affect each other as much?...
-
   // Apply default forces to simulation
   this.simulation = d3.forceSimulation()
       .force("charge", chargeForce)
@@ -58,7 +44,7 @@ function Potato(data, params) {
 
   var that = this;
 
-  var node = this.svg.selectAll("circle")
+  var node = d3.select("#vis-svg").selectAll("circle")
       .data(data)
       .enter().append("circle")
       .attr("r", function(d) {
@@ -93,11 +79,11 @@ function Potato(data, params) {
             .attr("cy", function(d) { return d.y; });
 
         that.updateAllLabelPositions(that.labels, that.data);
-        that.updateLabels(that.svg, that.labels);
+        that.updateLabels(that.labels);
       });
 }
 
-Potato.prototype.createSVG = function(width, height) {
+Potato.prototype.generateDOM = function(width, height, params) {
   d3.select("#vis")
     .html(`
       <div class='tooltip' id='node-tooltip' style='display:none;'></div>
@@ -111,7 +97,14 @@ Potato.prototype.createSVG = function(width, height) {
       <svg viewBox='0 0 ${width} ${height}' id='vis-svg'></svg>
     `);
 
-  return d3.select("#vis-svg");
+  // Only create buttons if param is set to True
+  for(var key in params) {
+    if(key !== 'class' && params[key] != null) {
+      this.createFilterButton(key);
+    }
+  }
+
+  this.createResetButton();
 };
 
 Potato.prototype.getChargeForce = function() {
@@ -164,8 +157,8 @@ Potato.prototype.updateLabelPosition = function(label, nodes) {
 };
 
 // Will fade in new labels, the effect really only works if you reset the labels array each time
-Potato.prototype.updateLabels = function(svg, labels) {
-  var text = svg.selectAll(".split-labels")
+Potato.prototype.updateLabels = function(labels) {
+  var text = d3.select("#vis-svg").selectAll(".split-labels")
       .data(labels);
 
   // update every tick
@@ -194,7 +187,7 @@ Potato.prototype.orderBy = function(filter) {
   // wipe out the labels to get the fade in effect later
   this.labels = [];
   // TODO: add the line thing between the labels?
-  this.updateLabels(this.svg, this.labels);
+  this.updateLabels(this.labels);
 
   // Tail
   this.labels.push({
@@ -278,7 +271,7 @@ Potato.prototype.splitBy = function(filter, dataType) {
 
 Potato.prototype.createSplitLabels = function(filter, splitLocations) {
   var newLabels = [];
-  this.updateLabels(this.svg, newLabels);
+  this.updateLabels(newLabels);
 
   for(var label in splitLocations) {
     var labelVal = "";
@@ -377,12 +370,12 @@ Potato.prototype.sizeBy = function(filter) {
     }
   });
 
-  this.applySize(this.svg, this.data, this.simulation);
+  this.applySize(this.data, this.simulation);
 };
 
-Potato.prototype.applySize = function(svg, data, simulation) {
+Potato.prototype.applySize = function(data, simulation) {
   // update the actual circle svg sizes
-  svg.selectAll("circle")
+  d3.select("#vis-svg").selectAll("circle")
       .data(data)
       .transition()
       .attr("r", function(d) {
@@ -428,7 +421,7 @@ Potato.prototype.colorBy = function(filter, dataType) {
         .range(['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#bcbd22', '#17becf', '#aec7e8', '#ffbb78', '#98df8a', '#ff9896', '#c5b0d5', '#c49c94', '#f7b6d2', '#dbdb8d', '#9edae5', '#777777']);
   }
 
-  this.svg.selectAll("circle")
+  d3.select("#vis-svg").selectAll("circle")
       .data(this.data)
       .transition()
       .attr("fill", function(d) { return colorScale(d[filter]); } );
@@ -500,20 +493,20 @@ Potato.prototype.reset = function(type) {
   if (type === 'color') {
     d3.select("#color-legend").select("svg").selectAll("*").remove();
 
-    this.svg.selectAll("circle")
+    d3.select("#vis-svg").selectAll("circle")
         .data(this.data)
         .transition()
         .attr("fill", "#777");
   } else if (type === 'size') {
     this.resetToDefaultSize(this.data);
 
-    this.applySize(this.svg, this.data, this.simulation);
+    this.applySize(this.data, this.simulation);
   } else if (type === 'split' || type === 'order') {
     /*while (this.axis.length > 0) {
       this.axis.pop();
     }*/
     this.labels = [];
-    this.updateLabels(this.svg, this.labels);
+    this.updateLabels(this.labels);
 
     this.simulation.force("x", this.centerXForce);
     this.simulation.force("y", this.centerYForce);
@@ -522,7 +515,7 @@ Potato.prototype.reset = function(type) {
   }
 };
 
-Potato.prototype.createButtons = function(type) {
+Potato.prototype.createFilterButton = function(type) {
   var typeUpper = type[0].toUpperCase() + type.slice(1);
 
   d3.select("#modifiers")
@@ -571,23 +564,26 @@ Potato.prototype.createButtons = function(type) {
       };
     }));
   }
-  return d3.select("#" + type + "-menu").selectAll('div').data(buttonFilters).enter().append("div").text(function(d) {
-    return d.value;
-  }).attr("class", function(d) {
-    if (d.type === 'divider') {
-      return 'divider-option';
-    } else {
-      return "modifier-option " + type + "-option";
-    }
-  }).attr("data-type", function(d) {
-    return "" + d.type;
-  }).attr("id", function(d) {
-    return type + "-" + d.value;
-  }).on("click", (function(_this) {
-    return function(d) {
-      return _this.applyFilter(type, d.value, d.type);
-    };
-  })(this));
+
+  d3.select("#" + type + "-menu")
+    .selectAll('div')
+    .data(buttonFilters)
+    .enter().append("div")
+    .text(function(d) {
+      return d.value;
+    }).attr("class", function(d) {
+      if (d.type === 'divider') {
+        return 'divider-option';
+      } else {
+        return "modifier-option " + type + "-option";
+      }
+    }).attr("id", function(d) {
+      return type + "-" + d.value;
+    }).on("click", (function(_this) {
+      return function(d) {
+        return _this.applyFilter(type, d.value, d.type);
+      };
+    })(this));
 };
 
 Potato.prototype.createResetButton = function() {
@@ -596,7 +592,7 @@ Potato.prototype.createResetButton = function() {
     .attr("class", "disabled-button modifier-button")
     .html(`
       <span id='reset-icon'>&#8635;</span> Reset Selection
-      <div class='tooltip' id='reset-tooltip'>
+      <div class='tooltip' id='reset-tooltip' style='display: none;'>
         Click and drag on the canvas to select nodes.
       </div>
     `)
@@ -607,7 +603,7 @@ Potato.prototype.createResetButton = function() {
         .style("display", "block");
     }).on("mouseleave", function(d) {
       d3.select("reset-tooltip")
-        .style("display", "hide");
+        .style("display", "none");
     });
 };
 
