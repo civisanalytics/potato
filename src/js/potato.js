@@ -66,13 +66,17 @@ Potato.prototype.initVis = function() {
 
   var that = this;
 
+  var defaultFill = "#777";
+
   var node = d3.select("#vis-svg").selectAll("circle")
       .data(data)
       .enter().append("circle")
       .attr("r", function(d) {
         return d.radius;
       })
-      .attr("fill", "#777")
+      .attr("fill", defaultFill)
+      .attr("stroke", d3.rgb(defaultFill).darker()) // these are for the "hover border"
+      .attr("stroke-width", 0) // hide border until hover is active
       .on("mouseover", function(d, i) {
         that.showDetails(d, i, this);
       }).on("mouseout", function(d, i) {
@@ -530,7 +534,8 @@ Potato.prototype.colorBy = function(filter, dataType) {
   d3.select("#vis-svg").selectAll("circle")
       .data(this.data)
       .transition()
-      .attr("fill", function(d) { return colorScale(d[filter]); } );
+      .attr("fill", function(d) { return colorScale(d[filter]); } )
+      .attr("stroke", function(d) { return d3.rgb(colorScale(d[filter])).darker(); }); // these are for the "hover border"
 
   // TODO: there used to be code to limit to 18 total colors, and then group the rest in "other"
 
@@ -721,30 +726,31 @@ Potato.prototype.showDetails = function(data, i, element) {
   });
   d3.select("#node-tooltip").html(content).style("display", "block");
   this.updatePosition(d3.event, "node-tooltip");
-//      this.highlightNode(d3.select(element), true);
+  this.highlightNode(element, true);
 };
 
 Potato.prototype.hideDetails = function(data, i, element) {
   d3.select("#node-tooltip").style("display", "none");
 
-//      this.highlightNode(d3.select(element), false);
+
+  this.highlightNode(element, false);
 };
 
 // TODO: This is broken b/c new d3v4 doesnt have selection
-Potato.prototype.highlightNode = function(element, highlight) {
+Potato.prototype.highlightNode = function(inElement, highlight) {
+
+  var element = d3.select(inElement);
+
   // ignore custom colors
   if (element.attr("class") !== undefined) {
-    var sWidth;
-    if (highlight) {
-      sWidth = element.attr("r") * 0.3;
-    } else {
-      sWidth = 0;
-    }
-    element.attr("stroke-width", sWidth);
-    /*
+    var sWidth = highlight ? element.attr("r") * 0.3 : 0;
+
+    // temporarily make the circle "bigger"
+    // this has the effect of making the border appear "around" the existing circle
+    // rather than "just inside" the circle
     element.attr("r", function(d) {
-        return d.radius + (sWidth / 2.0);
-      }).attr("stroke-width", sWidth);*/
+      return d.radius + (sWidth / 2.0);
+    }).attr("stroke-width", sWidth);
   }
 };
 
