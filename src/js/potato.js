@@ -17,6 +17,11 @@ function Potato(data, params) {
     params = defaultParams;
   }
 
+  // need to assign ids to everything
+  data.forEach(function (d, idx) {
+    d.potatoID = idx;
+  });
+
   this.originalData = data;
 
   this.data = data;
@@ -71,9 +76,8 @@ Potato.prototype.initVis = function() {
   var node = d3.select("#vis-svg").selectAll("circle")
       .data(data)
       .enter().append("circle")
-      .attr("r", function(d) {
-        return d.radius;
-      })
+      .attr("r", function(d) { return d.radius; })
+      .attr("id", function(d) { return "node_" + d.potatoID; })
       .attr("fill", defaultFill)
       .attr("stroke", d3.rgb(defaultFill).darker()) // these are for the "hover border"
       .attr("stroke-width", 0) // hide border until hover is active
@@ -149,16 +153,14 @@ Potato.prototype.dragSelect = function() {
        .attr("y", d.y)
        .attr("width", d.width)
        .attr("height", d.height);
-      /*
-      return that.circles.each((function(_this) {
-        return function(c) {
-          if (c.x > d.x && c.x < d.x + d.width && c.y > d.y && c.y < d.y + d.height) {
-            return that.highlight_node(d3.select("#bubble_" + c.id), true);
-          } else {
-            return that.highlight_node(d3.select("#bubble_" + c.id), false);
-          }
-        };
-      })(this));*/
+
+      that.data.forEach(function(c) {
+        if (c.x > d.x && c.x < d.x + d.width && c.y > d.y && c.y < d.y + d.height) {
+          that.highlightNode(d3.select("#node_" + c.potatoID).node(), true);
+        } else {
+          that.highlightNode(d3.select("#node_" + c.potatoID).node(), false);
+        }
+      });
     }
   }).on("mouseup", (function(_this) {
     return function() {
@@ -863,36 +865,38 @@ Potato.prototype.uniqueDataValues = function(data) {
 
   data.forEach(function(row) {
     for(var key in row) {
-      var val = row[key];
+      if(key !== "potatoID") {
+        var val = row[key];
 
-      // this is a new filter we haven't seen before, so add
-      if(!uniqueValues.hasOwnProperty(key)) {
-        uniqueValues[key] = {
-          values: {},
-          numValues: 0,
-          type: "num" // "num", "cat", "unique"
-        };
-      }
-
-      // If we ever encounter a non-numeric, than assume categorical
-      if(uniqueValues[key].type == "num" && val !== "") {
-        var isCategorical = isNaN(val.replace(/%/,"").replace(/,/g,""));
-
-        if(isCategorical) {
-          uniqueValues[key].type = "cat";
+        // this is a new filter we haven't seen before, so add
+        if(!uniqueValues.hasOwnProperty(key)) {
+          uniqueValues[key] = {
+            values: {},
+            numValues: 0,
+            type: "num" // "num", "cat", "unique"
+          };
         }
-      }
 
-      // new value that we should add
-      if(!(val in uniqueValues[key].values)) {
-        uniqueValues[key].numValues += 1;
-        uniqueValues[key].values[val] = {
-          filter: key,
-          value: val,
-          count: 1,
-        };
-      } else {
-        uniqueValues[key].values[val].count += 1;
+        // If we ever encounter a non-numeric, than assume categorical
+        if(uniqueValues[key].type == "num" && val !== "") {
+          var isCategorical = isNaN(val.replace(/%/,"").replace(/,/g,""));
+
+          if(isCategorical) {
+            uniqueValues[key].type = "cat";
+          }
+        }
+
+        // new value that we should add
+        if(!(val in uniqueValues[key].values)) {
+          uniqueValues[key].numValues += 1;
+          uniqueValues[key].values[val] = {
+            filter: key,
+            value: val,
+            count: 1,
+          };
+        } else {
+          uniqueValues[key].values[val].count += 1;
+        }
       }
     }
   });
