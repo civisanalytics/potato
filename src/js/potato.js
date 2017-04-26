@@ -17,7 +17,7 @@ function Potato(data, params) {
     params = defaultParams;
   }
 
-  // need to assign ids to everything
+  // need to assign ids to everything for the subselection
   data.forEach(function (d, idx) {
     d.potatoID = idx;
   });
@@ -74,9 +74,9 @@ Potato.prototype.initVis = function() {
   var defaultFill = "#777";
 
   var node = d3.select("#vis-svg").selectAll("circle")
-      .data(data)
-      .enter().append("circle")
-      .attr("r", function(d) { return d.radius; })
+      .data(data);
+
+  var mergedNodes = node.enter().append("circle")
       .attr("id", function(d) { return "node_" + d.potatoID; })
       .attr("fill", defaultFill)
       .attr("stroke", d3.rgb(defaultFill).darker()) // these are for the "hover border"
@@ -85,7 +85,11 @@ Potato.prototype.initVis = function() {
         that.showDetails(d, i, this);
       }).on("mouseout", function(d, i) {
         that.hideDetails(d, i, this);
-      });
+      })
+    .merge(node)
+      .attr("r", function(d) { return d.radius; });
+
+  node.exit().remove();
 
   // Add the nodes to the simulation, and specify how to draw
   this.simulation.nodes(data)
@@ -93,7 +97,7 @@ Potato.prototype.initVis = function() {
         // The d3 force simulation updates the x & y coordinates
         // of each node every tick/frame, based on the various active forces.
         // It is up to us to translate these coordinates to the screen.
-        node.attr("cx", function(d) { return d.x; })
+        mergedNodes.attr("cx", function(d) { return d.x; })
             .attr("cy", function(d) { return d.y; });
 
         that.updateAllLabelPositions(that.labels, that.data);
@@ -105,7 +109,6 @@ Potato.prototype.dragSelect = function() {
   var that = this;
 
   d3.select("#vis-svg").on("mousedown", function() {
-    that.mousedown = true;
     d3.select(this).select("rect.select-box").remove();
 
     var p = d3.mouse(this);
@@ -119,7 +122,6 @@ Potato.prototype.dragSelect = function() {
       .attr("height", 0)
       .attr("x0", p[0])
       .attr("y0", p[1]);
-
 
   }).on("mousemove", function() {
     var s = d3.select(this).select("rect.select-box");
@@ -162,38 +164,32 @@ Potato.prototype.dragSelect = function() {
         }
       });
     }
-  }).on("mouseup", (function(_this) {
-    return function() {
-      var nodes_to_remove, s, sx, sx2, sy, sy2;
-      var s = d3.select("#vis-svg").select("rect.select-box");
+  }).on("mouseup", function() {
+    var s = d3.select("#vis-svg").select("rect.select-box");
 
-      /*
-      sx = parseInt(s.attr('x'), 10);
-      sx2 = sx + parseInt(s.attr('width'), 10);
-      sy = parseInt(s.attr('y'), 10);
-      sy2 = sy + parseInt(s.attr('height'), 10);
-      nodes_to_remove = [];
-      */
+    var sx = parseInt(s.attr('x'), 10);
+    var sx2 = sx + parseInt(s.attr('width'), 10);
+    var sy = parseInt(s.attr('y'), 10);
+    var sy2 = sy + parseInt(s.attr('height'), 10);
 
-      /*
-      _this.circles.each(function(c) {
-        that.highlight_node(d3.select("#bubble_" + c.id), false);
-        if (c.x < sx || c.x > sx2 || c.y < sy || c.y > sy2) {
-          return nodes_to_remove.push(c.id);
-        }
-      });
-      if (nodes_to_remove.length > 0 && nodes_to_remove.length !== _this.nodes.length) {
-        _this.remove_nodes(nodes_to_remove);
+    var newData = that.data.filter(function(c) {
+      if (c.x < sx || c.x > sx2 || c.y < sy || c.y > sy2) {
+        return null;
+      } else {
+        that.highlightNode(d3.select("#node_" + c.potatoID).node(), false);
+        return c;
       }
-      */
-      s.remove();
-      _this.mousedown = false;
-    };
-  })(this));
+    });
+
+    s.remove();
+
+    // only subselect if at least one node was selected
+    if (newData.length > 0 && newData.length !== that.data.length) {
+      that.data = newData;
+      that.initVis();
+    }
+  });
 };
-
-
-
 
 Potato.prototype.generateDOM = function(width, height, params) {
   d3.select("#vis")
