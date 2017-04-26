@@ -69,12 +69,14 @@ function Potato(data, params) {
 Potato.prototype.initVis = function() {
   var data = this.data;
 
+  this.uniqueValues = this.enrichData(data, this.uniqueDataValues(data));
+
   var that = this;
 
   var defaultFill = "#777";
 
   var node = d3.select("#vis-svg").selectAll("circle")
-      .data(data);
+      .data(data, function(d) { return d.potatoID }); // IMPORTANT, make sure it tracks by our ID, and not just by index
 
   var mergedNodes = node.enter().append("circle")
       .attr("id", function(d) { return "node_" + d.potatoID; })
@@ -185,6 +187,10 @@ Potato.prototype.dragSelect = function() {
 
     // only subselect if at least one node was selected
     if (newData.length > 0 && newData.length !== that.data.length) {
+
+      d3.select("#reset-button")
+        .classed("disabled-button", false);
+
       that.data = newData;
       that.initVis();
     }
@@ -594,6 +600,15 @@ Potato.prototype.resetToDefaultSize = function(data) {
   });
 };
 
+Potato.prototype.resetSubselection = function() {
+
+  d3.select("#reset-button")
+    .classed("disabled-button", true);
+
+  this.data = this.originalData;
+  this.initVis();
+};
+
 Potato.prototype.reset = function(type) {
   // Clear the button hints
   d3.select("." + type + "-option").classed('active-filter', false);
@@ -696,6 +711,8 @@ Potato.prototype.createFilterButton = function(type) {
 };
 
 Potato.prototype.createResetButton = function() {
+  var that = this;
+
   d3.select("#filter-select-buttons").append("button")
     .attr("id", "reset-button")
     .attr("class", "disabled-button modifier-button")
@@ -706,7 +723,7 @@ Potato.prototype.createResetButton = function() {
       </div>
     `)
     .on("click", function(d) {
-      //this.add_all();
+      that.resetSubselection();
     }).on("mouseover", function(d) {
       d3.select("reset-tooltip")
         .style("display", "block");
@@ -861,9 +878,11 @@ Potato.prototype.uniqueDataValues = function(data) {
 
   data.forEach(function(row) {
     for(var key in row) {
-      if(key !== "potatoID") {
-        var val = row[key];
+      var val = row[key];
 
+      // TODO: this is probably not a safe assumption...
+      // the integers are the ids and node coords and other non dataset things
+      if(typeof val === 'string') {
         // this is a new filter we haven't seen before, so add
         if(!uniqueValues.hasOwnProperty(key)) {
           uniqueValues[key] = {
