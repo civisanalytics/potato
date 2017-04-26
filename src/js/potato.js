@@ -17,6 +17,8 @@ function Potato(data, params) {
     params = defaultParams;
   }
 
+  this.originalData = data;
+
   this.data = data;
   this.uniqueValues = this.enrichData(data, this.uniqueDataValues(data));
 
@@ -42,6 +44,24 @@ function Potato(data, params) {
       .force("x", this.centerXForce)
       .force("y", this.centerYForce);
 
+  this.initVis();
+
+  this.activeSizeBy = "";
+
+  if(params.size != "") {
+    this.sizeBy(params.size);
+  }
+  if(params.color != "") {
+    this.colorBy(params.color);
+  }
+  if(params.split != "") {
+    this.splitBy(params.split);
+  }
+}
+
+Potato.prototype.initVis = function() {
+  var data = this.data;
+
   var that = this;
 
   var node = d3.select("#vis-svg").selectAll("circle")
@@ -57,18 +77,6 @@ function Potato(data, params) {
         that.hideDetails(d, i, this);
       });
 
-  this.activeSizeBy = "";
-
-  if(params.size != "") {
-    this.sizeBy(params.size);
-  }
-  if(params.color != "") {
-    this.colorBy(params.color);
-  }
-  if(params.split != "") {
-    this.splitBy(params.split);
-  }
-
   // Add the nodes to the simulation, and specify how to draw
   this.simulation.nodes(data)
       .on("tick", function() {
@@ -81,7 +89,7 @@ function Potato(data, params) {
         that.updateAllLabelPositions(that.labels, that.data);
         that.updateLabels(that.labels);
       });
-}
+};
 
 Potato.prototype.generateDOM = function(width, height, params) {
   d3.select("#vis")
