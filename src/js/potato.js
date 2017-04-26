@@ -57,6 +57,8 @@ function Potato(data, params) {
   if(params.split != "") {
     this.splitBy(params.split);
   }
+
+  this.dragSelect();
 }
 
 Potato.prototype.initVis = function() {
@@ -90,6 +92,102 @@ Potato.prototype.initVis = function() {
         that.updateLabels(that.labels);
       });
 };
+
+Potato.prototype.dragSelect = function() {
+  var that = this;
+
+  d3.select("#vis-svg").on("mousedown", function() {
+    that.mousedown = true;
+    d3.select(this).select("rect.select-box").remove();
+
+    var p = d3.mouse(this);
+    d3.select(this).append("rect")
+      .attr("class", "select-box")
+      .attr("rx", 6)
+      .attr("ry", 6)
+      .attr("x", p[0])
+      .attr("y", p[1])
+      .attr("width", 0)
+      .attr("height", 0)
+      .attr("x0", p[0])
+      .attr("y0", p[1]);
+
+
+  }).on("mousemove", function() {
+    var s = d3.select(this).select("rect.select-box");
+
+    if (!s.empty()) {
+      var p = d3.mouse(this);
+      var d = {
+        x: parseInt(s.attr("x"), 10),
+        y: parseInt(s.attr("y"), 10),
+        width: parseInt(s.attr("width"), 10),
+        height: parseInt(s.attr("height"), 10)
+      };
+      var x0 = parseInt(s.attr("x0"), 10);
+      var y0 = parseInt(s.attr("y0"), 10);
+
+      if (p[0] < x0) {
+        d.width = x0 - p[0];
+        d.x = p[0];
+      } else {
+        d.width = p[0] - d.x;
+        d.x = x0;
+      }
+      if (p[1] < y0) {
+        d.height = y0 - p[1];
+        d.y = p[1];
+      } else {
+        d.height = p[1] - d.y;
+        d.y = y0;
+      }
+      s.attr("x", d.x)
+       .attr("y", d.y)
+       .attr("width", d.width)
+       .attr("height", d.height);
+      /*
+      return that.circles.each((function(_this) {
+        return function(c) {
+          if (c.x > d.x && c.x < d.x + d.width && c.y > d.y && c.y < d.y + d.height) {
+            return that.highlight_node(d3.select("#bubble_" + c.id), true);
+          } else {
+            return that.highlight_node(d3.select("#bubble_" + c.id), false);
+          }
+        };
+      })(this));*/
+    }
+  }).on("mouseup", (function(_this) {
+    return function() {
+      var nodes_to_remove, s, sx, sx2, sy, sy2;
+      var s = d3.select("#vis-svg").select("rect.select-box");
+
+      /*
+      sx = parseInt(s.attr('x'), 10);
+      sx2 = sx + parseInt(s.attr('width'), 10);
+      sy = parseInt(s.attr('y'), 10);
+      sy2 = sy + parseInt(s.attr('height'), 10);
+      nodes_to_remove = [];
+      */
+
+      /*
+      _this.circles.each(function(c) {
+        that.highlight_node(d3.select("#bubble_" + c.id), false);
+        if (c.x < sx || c.x > sx2 || c.y < sy || c.y > sy2) {
+          return nodes_to_remove.push(c.id);
+        }
+      });
+      if (nodes_to_remove.length > 0 && nodes_to_remove.length !== _this.nodes.length) {
+        _this.remove_nodes(nodes_to_remove);
+      }
+      */
+      s.remove();
+      _this.mousedown = false;
+    };
+  })(this));
+};
+
+
+
 
 Potato.prototype.generateDOM = function(width, height, params) {
   d3.select("#vis")
