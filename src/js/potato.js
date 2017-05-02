@@ -107,6 +107,17 @@ Potato.prototype.initVis = function() {
       });
 };
 
+// px,py are current pointer location
+// x0,y0 are the coordinates of the original mouse down
+Potato.prototype.calculateDragBox = function(xPointer, yPointer, xOrigin, yOrigin) {
+  return {
+    width: Math.abs(xOrigin - xPointer),
+    height: Math.abs(yOrigin - yPointer),
+    x: (xPointer < xOrigin) ? xPointer : xOrigin,
+    y: (yPointer < yOrigin) ? yPointer : yOrigin,
+  };
+};
+
 Potato.prototype.dragSelect = function() {
   var that = this;
 
@@ -130,29 +141,11 @@ Potato.prototype.dragSelect = function() {
 
     if (!s.empty()) {
       var p = d3.mouse(this);
-      var d = {
-        x: parseInt(s.attr("x"), 10),
-        y: parseInt(s.attr("y"), 10),
-        width: parseInt(s.attr("width"), 10),
-        height: parseInt(s.attr("height"), 10)
-      };
       var x0 = parseInt(s.attr("x0"), 10);
       var y0 = parseInt(s.attr("y0"), 10);
 
-      if (p[0] < x0) {
-        d.width = x0 - p[0];
-        d.x = p[0];
-      } else {
-        d.width = p[0] - d.x;
-        d.x = x0;
-      }
-      if (p[1] < y0) {
-        d.height = y0 - p[1];
-        d.y = p[1];
-      } else {
-        d.height = p[1] - d.y;
-        d.y = y0;
-      }
+      var d = Potato.prototype.calculateDragBox(p[0], p[1], x0, y0);
+
       s.attr("x", d.x)
        .attr("y", d.y)
        .attr("width", d.width)
