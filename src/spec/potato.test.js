@@ -35,16 +35,23 @@ describe("drag select unit tests", () => {
       expect(Potato.prototype.calculateDragBox(150, 200, 100, 100)).toEqual(dragOutput);
     });
   });
+
+  describe("#nodeInBox", () => {
+    test("base case", () => {
+      expect(Potato.prototype.nodeInBox(100, 100, 50, 50, 200, 200)).toEqual(true);
+      expect(Potato.prototype.nodeInBox(0, 0, 50, 50, 200, 200)).toEqual(false);
+    });
+  });
 });
 
 describe("split unit tests", () => {
   describe("#calculateSplitLocations", () => {
-    const width = 800;
-    const height = 600;
+    const width = Potato.prototype.getWidth();
+    const height = Potato.prototype.getHeight();
 
     test("base case, just one key", () => {
       const uniqueKeys = ["Canada"];
-      const output = Potato.prototype.calculateSplitLocations(uniqueKeys, width, height);
+      const output = Potato.prototype.calculateSplitLocations(uniqueKeys);
 
       expect(output["Canada"].x).toEqual(width / 2);
       expect(output["Canada"].y).toEqual(height / 2);
@@ -52,7 +59,7 @@ describe("split unit tests", () => {
 
     test("four keys, (2x2)", () => {
       const uniqueKeys = ["Canada", "Uganda", "USA", "Venezuela"];
-      const output = Potato.prototype.calculateSplitLocations(uniqueKeys, width, height);
+      const output = Potato.prototype.calculateSplitLocations(uniqueKeys);
 
       expect(output["Canada"].x).toEqual(output["USA"].x);
       expect(output["Uganda"].x).toEqual(output["Venezuela"].x);
@@ -71,7 +78,7 @@ describe("split unit tests", () => {
       // ie.
       // Canada     --   Uganda   -- USA
       // Venezuela  --    Togo
-      const output = Potato.prototype.calculateSplitLocations(uniqueKeys, width, height);
+      const output = Potato.prototype.calculateSplitLocations(uniqueKeys);
 
       expect(output["Canada"].x).toEqual(output["Venezuela"].x);
       expect(output["Uganda"].x).toEqual(output["Togo"].x);

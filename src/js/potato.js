@@ -27,25 +27,19 @@ function Potato(data, params) {
   this.data = data;
   this.uniqueValues = this.enrichData(data, this.uniqueDataValues(data));
 
-  this.width = window.innerWidth;
-  this.height = window.innerHeight - 55;
-
-  this.generateDOM(this.width, this.height, params);
+  this.generateDOM(params);
 
   this.resetToDefaultSize(data);
 
   this.labels = [];
 
-  // "Electric repulsive charge", prevents overlap of nodes
-  var chargeForce = this.getChargeForce();
-
   // Keep nodes centered on screen
-  this.centerXForce = d3.forceX(this.width / 2);
-  this.centerYForce = d3.forceY(this.height / 2);
+  this.centerXForce = d3.forceX(this.getWidth() / 2);
+  this.centerYForce = d3.forceY(this.getHeight() / 2);
 
   // Apply default forces to simulation
   this.simulation = d3.forceSimulation()
-      .force("charge", chargeForce)
+      .force("charge", this.getChargeForce())
       .force("x", this.centerXForce)
       .force("y", this.centerYForce);
 
@@ -64,6 +58,14 @@ function Potato(data, params) {
   }
 
   this.dragSelect();
+}
+
+Potato.prototype.getWidth = function() {
+  return window.innerWidth;
+}
+
+Potato.prototype.getHeight = function() {
+  return window.innerHeight - 55; // to make room for toolbar
 }
 
 Potato.prototype.initVis = function() {
@@ -107,8 +109,8 @@ Potato.prototype.initVis = function() {
       });
 };
 
-// px,py are current pointer location
-// x0,y0 are the coordinates of the original mouse down
+// xPointer,yPointer are current pointer location
+// xOrigin,yOrigin are the coordinates of the original mouse down
 Potato.prototype.calculateDragBox = function(xPointer, yPointer, xOrigin, yOrigin) {
   return {
     width: Math.abs(xOrigin - xPointer),
@@ -116,6 +118,10 @@ Potato.prototype.calculateDragBox = function(xPointer, yPointer, xOrigin, yOrigi
     x: (xPointer < xOrigin) ? xPointer : xOrigin,
     y: (yPointer < yOrigin) ? yPointer : yOrigin,
   };
+};
+
+Potato.prototype.nodeInBox = function(nx, ny, bx, by, bx2, by2) {
+  return !(nx < bx || nx > bx2 || ny < by || ny > by2);
 };
 
 Potato.prototype.dragSelect = function() {
@@ -151,11 +157,11 @@ Potato.prototype.dragSelect = function() {
        .attr("width", d.width)
        .attr("height", d.height);
 
-      that.data.forEach(function(c) {
-        if (c.x > d.x && c.x < d.x + d.width && c.y > d.y && c.y < d.y + d.height) {
-          that.highlightNode(d3.select("#node_" + c.potatoID).node(), true);
+      that.data.forEach(function(n) {
+        if (Potato.prototype.nodeInBox(n.x, n.y, d.x, d.y, d.x + d.width, d.y + d.height)) {
+          that.highlightNode(d3.select("#node_" + n.potatoID).node(), true);
         } else {
-          that.highlightNode(d3.select("#node_" + c.potatoID).node(), false);
+          that.highlightNode(d3.select("#node_" + n.potatoID).node(), false);
         }
       });
     }
@@ -168,11 +174,11 @@ Potato.prototype.dragSelect = function() {
     var sy2 = sy + parseInt(s.attr('height'), 10);
 
     var newData = that.data.filter(function(c) {
-      if (c.x < sx || c.x > sx2 || c.y < sy || c.y > sy2) {
-        return null;
-      } else {
+      if (Potato.prototype.nodeInBox(c.x, c.y, sx, sy, sx2, sy2)) {
         that.highlightNode(d3.select("#node_" + c.potatoID).node(), false);
         return c;
+      } else {
+        return null;
       }
     });
 
@@ -190,7 +196,7 @@ Potato.prototype.dragSelect = function() {
   });
 };
 
-Potato.prototype.generateDOM = function(width, height, params) {
+Potato.prototype.generateDOM = function(params) {
   d3.select("#vis")
     .html(`
       <div class='tooltip' id='node-tooltip' style='display:none;'></div>
@@ -201,7 +207,7 @@ Potato.prototype.generateDOM = function(width, height, params) {
       <div id='color-legend'>
         <svg></svg>
       </div>
-      <svg viewBox='0 0 ${width} ${height}' id='vis-svg'></svg>
+      <svg viewBox='0 0 ${this.getWidth()} ${this.getHeight()}' id='vis-svg'></svg>
     `);
 
   // Only create buttons if param is set to True
@@ -288,7 +294,7 @@ Potato.prototype.orderBy = function(filter) {
   // TODO: should we allow switching between linear and sqrt scale?
   var orders = d3.scaleLinear()
       .domain([extent.min, extent.max])
-      .range([orderPadding, this.width - orderPadding]);
+      .range([orderPadding, this.getWidth() - orderPadding]);
 
   // TODO: this should probably move to the reset function
   // wipe out the labels to get the fade in effect later
@@ -303,7 +309,7 @@ Potato.prototype.orderBy = function(filter) {
     split: filter,
     type: "order",
     tarx: orders.range()[0],
-    tary: this.height / 2.0 - 50
+    tary: this.getHeight() / 2.0 - 50
   });
   // Head
   this.labels.push({
@@ -312,7 +318,7 @@ Potato.prototype.orderBy = function(filter) {
     split: filter,
     type: "order",
     tarx: orders.range()[1],
-    tary: this.height / 2.0 - 50
+    tary: this.getHeight() / 2.0 - 50
   });
 
   var xForceFn = d3.forceX(function(d) {
@@ -324,7 +330,7 @@ Potato.prototype.orderBy = function(filter) {
     return newX;
   });
 
-  var yForceFn = d3.forceY(this.height / 2.0);
+  var yForceFn = d3.forceY(this.getHeight() / 2.0);
   this.simulation.force("x", xForceFn);
   this.simulation.force("y", yForceFn);
 
@@ -332,7 +338,7 @@ Potato.prototype.orderBy = function(filter) {
 
   //TODO: Handle edge case with only one value
   /*if (filterMin === filterMax) {
-    orders.range([this.width / 2.0, this.width / 2.0]);
+    orders.range([this.getWidth() / 2.0, this.getWidth() / 2.0]);
   }*/
 };
 
@@ -359,7 +365,7 @@ Potato.prototype.splitBy = function(filter, dataType) {
     // first determine the unique values for this filter, also sort alpha
     var uniqueKeys = Object.keys(this.uniqueValues[filter].values).sort()
 
-    var splitLocations = this.calculateSplitLocations(uniqueKeys, this.width, this.height);
+    var splitLocations = this.calculateSplitLocations(uniqueKeys);
     this.labels = this.createSplitLabels(filter, splitLocations);
 
     var xForceFn = d3.forceX(function(d) {
@@ -404,17 +410,17 @@ Potato.prototype.createSplitLabels = function(filter, splitLocations) {
 };
 
 // Given an array of uniqueKeys (strings), return an array of x/y coord positions that form a grid
-Potato.prototype.calculateSplitLocations = function(uniqueKeys, width, height) {
+Potato.prototype.calculateSplitLocations = function(uniqueKeys) {
   var numCols = Math.ceil(Math.sqrt(uniqueKeys.length));
   var numRows = Math.ceil(uniqueKeys.length / numCols);
 
   var padding = 0.8;
 
   // Some padding for when the circle groups get large, also to make room for color legend
-  var paddedWidth = width * padding;
-  var paddedHeight = height * padding;
-  var leftPadding = (width - paddedWidth) / 2;
-  var topPadding = (height - paddedHeight) / 2;
+  var paddedWidth = this.getWidth() * padding;
+  var paddedHeight = this.getHeight() * padding;
+  var leftPadding = (this.getWidth() - paddedWidth) / 2;
+  var topPadding = (this.getHeight() - paddedHeight) / 2;
 
   var colSize = paddedWidth / (numCols + 1);
   var rowSize = paddedHeight / (numRows + 1);
@@ -490,8 +496,7 @@ Potato.prototype.applySize = function(data, simulation) {
       });
 
   // Reclaculate chargeForce to take into account new node sizes
-  var chargeForce = this.getChargeForce();
-  simulation.force("charge", chargeForce)
+  simulation.force("charge", this.getChargeForce())
   simulation.alpha(1).restart();
 };
 
