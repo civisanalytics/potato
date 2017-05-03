@@ -22,31 +22,30 @@ function Potato(data, params) {
     d.potatoID = idx;
   });
 
-  this.originalData = data;
-
-  this.data = data;
-  this.uniqueValues = this.enrichData(data, this.uniqueDataValues(data));
-
-  this.generateDOM(params);
-
   this.resetToDefaultSize(data);
 
-  this.labels = [];
+  this.originalData = JSON.parse(JSON.stringify(data));
 
-  // Keep nodes centered on screen
-  this.centerXForce = d3.forceX(this.getWidth() / 2);
-  this.centerYForce = d3.forceY(this.getHeight() / 2);
+  this.generateDOM();
 
   // Apply default forces to simulation
   this.simulation = d3.forceSimulation()
       .force("charge", this.getChargeForce())
-      .force("x", this.centerXForce)
-      .force("y", this.centerYForce);
+      .force("x", this.centerXForce())
+      .force("y", this.centerYForce());
 
-  this.initVis();
+  this.generateVis(data);
+
+  this.generateFilterButtons(params);
 
   this.activeSizeBy = "";
 
+  this.dragSelect();
+
+  this.handleDefaultParams(params);
+}
+
+Potato.prototype.handleDefaultParams = function(params) {
   if(params.size != "") {
     this.sizeBy(params.size);
   }
@@ -56,8 +55,6 @@ function Potato(data, params) {
   if(params.split != "") {
     this.splitBy(params.split);
   }
-
-  this.dragSelect();
 }
 
 Potato.prototype.getWidth = function() {
@@ -68,9 +65,21 @@ Potato.prototype.getHeight = function() {
   return window.innerHeight - 55; // to make room for toolbar
 }
 
-Potato.prototype.initVis = function() {
-  var data = this.data;
+Potato.prototype.centerXForce = function() {
+  return d3.forceX(this.getWidth() / 2);
+}
 
+Potato.prototype.centerYForce = function() {
+  return d3.forceY(this.getHeight() / 2);
+}
+
+// sets a few global variables
+//  this.data
+//  this.labels
+//  this.uniqueValues
+Potato.prototype.generateVis = function(data) {
+  this.data = data;
+  this.labels = [];
   this.uniqueValues = this.enrichData(data, this.uniqueDataValues(data));
 
   var that = this;
@@ -190,13 +199,12 @@ Potato.prototype.dragSelect = function() {
       d3.select("#reset-button")
         .classed("disabled-button", false);
 
-      that.data = newData;
-      that.initVis();
+      that.generateVis(newData);
     }
   });
 };
 
-Potato.prototype.generateDOM = function(params) {
+Potato.prototype.generateDOM = function() {
   d3.select("#vis")
     .html(`
       <div class='tooltip' id='node-tooltip' style='display:none;'></div>
@@ -209,8 +217,10 @@ Potato.prototype.generateDOM = function(params) {
       </div>
       <svg viewBox='0 0 ${this.getWidth()} ${this.getHeight()}' id='vis-svg'></svg>
     `);
+}
 
-  // Only create buttons if param is set to True
+Potato.prototype.generateFilterButtons = function(params) {
+  // Only create buttons if param is not null
   for(var key in params) {
     if(key !== 'class' && params[key] != null) {
       this.createFilterButton(key);
@@ -330,9 +340,8 @@ Potato.prototype.orderBy = function(filter) {
     return newX;
   });
 
-  var yForceFn = d3.forceY(this.getHeight() / 2.0);
   this.simulation.force("x", xForceFn);
-  this.simulation.force("y", yForceFn);
+  this.simulation.force("y", this.centerYForce());
 
   this.simulation.alpha(1).restart();
 
@@ -599,12 +608,11 @@ Potato.prototype.resetToDefaultSize = function(data) {
 };
 
 Potato.prototype.resetSubselection = function() {
-
   d3.select("#reset-button")
     .classed("disabled-button", true);
 
-  this.data = this.originalData;
-  this.initVis();
+  var newData = JSON.parse(JSON.stringify(this.originalData));
+  this.generateVis(newData);
 };
 
 Potato.prototype.reset = function(type) {
@@ -630,8 +638,8 @@ Potato.prototype.reset = function(type) {
     this.labels = [];
     this.updateLabels(this.labels);
 
-    this.simulation.force("x", this.centerXForce);
-    this.simulation.force("y", this.centerYForce);
+    this.simulation.force("x", this.centerXForce());
+    this.simulation.force("y", this.centerYForce());
 
     this.simulation.alpha(1).restart();
   }
