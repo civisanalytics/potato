@@ -240,16 +240,45 @@ Potato.prototype.getChargeForce = function() {
 
 // Dynamic labels that "float" above their current position
 Potato.prototype.updateAllLabelPositions = function(labels, nodes) {
-  if(labels == undefined) { return; }
+  if(labels === undefined || labels.length === 0) { return; }
 
   labels.forEach(function(label) {
-    var newPos = Potato.prototype.updateLabelPosition(label, nodes);
-    label.tary = newPos.tary;
-    label.tarx = newPos.tarx;
+    if(label.type === "split") {
+      var newPos = Potato.prototype.updateSplitLabelPosition(label, nodes);
+      label.tary = newPos.tary;
+      label.tarx = newPos.tarx;
+    } else if(label.type === "order") {
+      var newPosY = Potato.prototype.updateOrderLabelPosition(label, nodes);
+      label.tary = newPosY - 10;
+    }
   });
+
+  if(labels[0].type === "order") {
+    this.axis.x1 = labels[0].tarx + 30;
+    this.axis.x2 = labels[1].tarx - 35;
+
+    this.axis.y1 = labels[0].tary - 8;
+    this.axis.y2 = labels[0].tary - 8;
+  }
 };
 
-Potato.prototype.updateLabelPosition = function(label, nodes) {
+Potato.prototype.updateOrderLabelPosition = function(label, nodes) {
+  var minY;
+  // TODO: b/c of the way the physics engine works
+  // the "ends" of the x axis often get bumped out, might be good
+  // to fake this by pushing out the nodes? It's a little misleading
+  // hm.....
+
+  // Basically push the labels so that they're above the "highest" node
+  nodes.forEach(function(node) {
+    if(minY === undefined || ((node.y - node.radius) < minY)) {
+      minY = node.y - node.radius;
+    }
+  });
+  return minY;
+}
+
+Potato.prototype.updateSplitLabelPosition = function(label, nodes) {
   var minY, minX, maxX;
 
   // Iterate over current nodes, and make adjustments to label based on the node locations
@@ -260,15 +289,11 @@ Potato.prototype.updateLabelPosition = function(label, nodes) {
       if(minY === undefined || ((node.y - node.radius) < minY)) {
         minY = node.y - node.radius;
       }
-
-      // Categorical labels may need to adjust x location too
-      if(label.type == "split") {
-        if(minX === undefined || ((node.x - node.radius) < minX)) {
-          minX = node.x - node.radius;
-        }
-        if(maxX === undefined || ((node.x + node.radius) > maxX)) {
-          maxX = node.x + node.radius;
-        }
+      if(minX === undefined || ((node.x - node.radius) < minX)) {
+        minX = node.x - node.radius;
+      }
+      if(maxX === undefined || ((node.x + node.radius) > maxX)) {
+        maxX = node.x + node.radius;
       }
     }
   });
@@ -293,6 +318,22 @@ Potato.prototype.updateLabels = function(labels) {
       .attr("y", function(d) { return d.tary; });
 
   text.exit().remove();
+
+  var axisData = this.axis ? [this.axis] : [];
+
+  var axis = d3.select("#vis-svg").selectAll(".axis-label")
+    .data(axisData);
+
+  axis.enter().append("line")
+      .attr("stroke", "#999")
+      .attr("class", "axis-label")
+    .merge(axis)
+      .attr("x1", function(d) { return d.x1; })
+      .attr("x2", function(d) { return d.x2; })
+      .attr("y1", function(d) { return d.y1; })
+      .attr("y2", function(d) { return d.y2; });
+
+  axis.exit().remove();
 }
 
 Potato.prototype.orderBy = function(filter) {
@@ -330,14 +371,21 @@ Potato.prototype.orderBy = function(filter) {
     tarx: orders.range()[1],
     tary: this.getHeight() / 2.0 - 50
   });
+  // axis
+  this.axis = {
+    x1: 220,
+    x2: this.getWidth() - 160,
+    y1: 0,
+    y2: 0
+  };
 
   var xForceFn = d3.forceX(function(d) {
-    var newX = orders(parseFloat(d[filter]))
+    var currVal = parseFloat(d[filter])
     // if this row doesn't have this value, then fly off screen (to left)
-    if(isNaN(parseFloat(d[filter]))) {
+    if(isNaN(currVal)) {
       return -100;
     }
-    return newX;
+    return orders(currVal);
   });
 
   this.simulation.force("x", xForceFn);
@@ -358,8 +406,8 @@ Potato.prototype.splitBy = function(filter, dataType) {
     return;
   }*/
 
-  // TODO: fix this
-  //this.reset('split');
+  // TODO: is the only reason I'm doing this to get rid of the axis?...
+  this.reset('split');
 
   // TODO: Change the hint on the button, seems like maybe this should go somewhere else?
   d3.select("#split-hint").html("<br>" + filter);
@@ -402,11 +450,10 @@ Potato.prototype.createSplitLabels = function(filter, splitLocations) {
     } else {
       labelVal = this.uniqueValues[filter].values[label].count.toLocaleString();
     }
-    var labelText = label + ": " + labelVal;
 
     // also add a filter label
     newLabels.push({
-      text: labelText,
+      text: label + ": " + labelVal,
       val: label,
       split: filter,
       type: "split",
@@ -415,7 +462,7 @@ Potato.prototype.createSplitLabels = function(filter, splitLocations) {
     });
   }
 
-  return newLabels
+  return newLabels;
 };
 
 // Given an array of uniqueKeys (strings), return an array of x/y coord positions that form a grid
@@ -632,10 +679,8 @@ Potato.prototype.reset = function(type) {
 
     this.applySize(this.data, this.simulation);
   } else if (type === 'split' || type === 'order') {
-    /*while (this.axis.length > 0) {
-      this.axis.pop();
-    }*/
     this.labels = [];
+    this.axis = undefined;
     this.updateLabels(this.labels);
 
     this.simulation.force("x", this.centerXForce());
