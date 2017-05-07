@@ -1,4 +1,5 @@
 function DataParse(data) {
+  this.uniqueValues = this.enrichData(data, this.uniqueDataValues(data));
 }
 
 // given data, and uniqueValues, enrich uniqueValues with sums/means/counts
@@ -46,25 +47,6 @@ DataParse.prototype.enrichData = function(data, uniqueValues) {
   }
 
   return uniqueValues;
-};
-
-// Two arrays of the numeric and categorical filters
-DataParse.prototype.calculateFilters = function(uniqueValues) {
-  var categoricalFilters = [];
-  var numericFilters = [];
-
-  for(var key in uniqueValues) {
-    if(uniqueValues[key].type == "num") {
-      numericFilters.push(key);
-    } else {
-      categoricalFilters.push(key);
-    }
-  }
-
-  return {
-    categorical: categoricalFilters,
-    numeric: numericFilters
-  };
 };
 
 // Given an array of data (d3 format)
@@ -137,6 +119,25 @@ DataParse.prototype.uniqueDataValues = function(data) {
   return uniqueValues;
 };
 
+// Two arrays of the numeric and categorical filters
+DataParse.prototype.calculateFilters = function(uniqueValues) {
+  var categoricalFilters = [];
+  var numericFilters = [];
+
+  for(var key in uniqueValues) {
+    if(uniqueValues[key].type == "num") {
+      numericFilters.push(key);
+    } else {
+      categoricalFilters.push(key);
+    }
+  }
+
+  return {
+    categorical: categoricalFilters,
+    numeric: numericFilters
+  };
+};
+
 DataParse.prototype.parseNumericString = function(str) {
   return parseFloat(str.replace(/%/, "").replace(/,/g, ""));
 }
@@ -163,6 +164,5 @@ DataParse.prototype.getNumericExtent = function(filter, data) {
 
   return { min: filterMin, max: filterMax };
 };
-
 
 module.exports = DataParse;

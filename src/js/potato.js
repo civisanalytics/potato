@@ -81,7 +81,8 @@ Potato.prototype.centerYForce = function() {
 Potato.prototype.generateVis = function(data) {
   this.data = data;
   this.labels = [];
-  this.uniqueValues = DataParse.prototype.enrichData(data, DataParse.prototype.uniqueDataValues(data));
+
+  this.parsedData = new DataParse(data);
 
   var that = this;
 
@@ -107,7 +108,7 @@ Potato.prototype.generateVis = function(data) {
 
   // Add the nodes to the simulation, and specify how to draw
   this.simulation.nodes(data)
-      .on("tick", function() {
+      .on("tick.main", function() {
         // The d3 force simulation updates the x & y coordinates
         // of each node every tick/frame, based on the various active forces.
         // It is up to us to translate these coordinates to the screen.
@@ -351,7 +352,6 @@ Potato.prototype.orderBy = function(filter) {
   // TODO: this should probably move to the reset function
   // wipe out the labels to get the fade in effect later
   this.labels = [];
-  // TODO: add the line thing between the labels?
   this.updateLabels(this.labels);
 
   // Tail
@@ -417,24 +417,20 @@ Potato.prototype.splitBy = function(filter, dataType) {
   d3.select("#split-" + filter).classed('active-filter', true);
 
   if (dataType === "num") {
-    // TODO: implement orderBy
     return this.orderBy(filter);
   } else {
     // first determine the unique values for this filter, also sort alpha
-    var uniqueKeys = Object.keys(this.uniqueValues[filter].values).sort()
+    var uniqueKeys = Object.keys(this.parsedData.uniqueValues[filter].values).sort()
 
     var splitLocations = this.calculateSplitLocations(uniqueKeys);
     this.labels = this.createSplitLabels(filter, splitLocations);
 
-    var xForceFn = d3.forceX(function(d) {
+    this.simulation.force("x", d3.forceX(function(d) {
       return splitLocations[d[filter]].x;
-    });
-
-    var yForceFn = d3.forceY(function(d) {
+    }));
+    this.simulation.force("y", d3.forceY(function(d) {
       return splitLocations[d[filter]].y;
-    });
-    this.simulation.force("x", xForceFn);
-    this.simulation.force("y", yForceFn);
+    }));
 
     this.simulation.alpha(1).restart();
   }
@@ -447,9 +443,9 @@ Potato.prototype.createSplitLabels = function(filter, splitLocations) {
   for(var label in splitLocations) {
     var labelVal = "";
     if (this.activeSizeBy != "") {
-      labelVal = this.uniqueValues[filter].values[label].sums[this.activeSizeBy].toLocaleString();
+      labelVal = this.parsedData.uniqueValues[filter].values[label].sums[this.activeSizeBy].toLocaleString();
     } else {
-      labelVal = this.uniqueValues[filter].values[label].count.toLocaleString();
+      labelVal = this.parsedData.uniqueValues[filter].values[label].count.toLocaleString();
     }
 
     // also add a filter label
@@ -504,7 +500,7 @@ Potato.prototype.calculateSplitLocations = function(uniqueKeys) {
   return splitLocations;
 };
 
-Potato.prototype.sizeBy = function(filter) {
+Potato.prototype.sizeBy = function(filter, maxRadius=20) {
   this.activeSizeBy = filter;
   // TODO: if there are any labels, modify them to reflect the new sum
 
@@ -516,7 +512,6 @@ Potato.prototype.sizeBy = function(filter) {
   d3.select("#size-hint").html("<br>" + filter);
   d3.select("#size-" + filter).classed('active-filter', true);
 
-  var maxRadius = 20;
   var minRadius = 0.5;
   var extent = DataParse.prototype.getNumericExtent(filter, this.data);
   var minVal = minRadius * extent.max / maxRadius;
@@ -541,6 +536,36 @@ Potato.prototype.sizeBy = function(filter) {
   });
 
   this.applySize(this.data, this.simulation);
+
+  var that = this;
+
+  // TODO: the end result is really cool, but the effect
+  // is a little choppy, is there a way to smooth this out?
+  // Maybe temporarily turn off tick.main or something?
+  // while this runs?...
+  this.simulation.on('tick.size', function() {
+    if(that.simulation.alpha() < 0.8) {
+      that.adjustSize(that.data, filter, maxRadius);
+    }
+  });
+};
+
+// check all the nodes, if any are off the screen, then try resizing with a smaller
+// maxRadius?
+Potato.prototype.adjustSize = function(data, filter, maxRadius) {
+  if(maxRadius > 5) {
+    var nodeOutOfBounds = false;
+    data.forEach(function(d) {
+      var pad = 30; // 20 pixels of padding for any labels
+      if(!Potato.prototype.nodeInBox(d.x, d.y, pad, pad, Potato.prototype.getWidth() - pad, Potato.prototype.getHeight() - pad)) {
+        nodeOutOfBounds = true;
+      }
+    });
+
+    if(nodeOutOfBounds) {
+      this.sizeBy(filter, maxRadius - 1);
+    }
+  }
 };
 
 Potato.prototype.applySize = function(data, simulation) {
@@ -552,7 +577,7 @@ Potato.prototype.applySize = function(data, simulation) {
         return d.radius;
       });
 
-  // Reclaculate chargeForce to take into account new node sizes
+  // Recalculate chargeForce to take into account new node sizes
   simulation.force("charge", this.getChargeForce())
   simulation.alpha(1).restart();
 };
@@ -609,7 +634,7 @@ Potato.prototype.colorBy = function(filter, dataType) {
   var legendText = legendWrapper.selectAll("text")
       .data(colorScale.domain());
 
-  uniqueValues = this.uniqueValues;
+  uniqueValues = this.parsedData.uniqueValues;
 
   legendText.enter().append("text")
       .attr("y", function(d, i) { return i * legendDotSize + 12; })
@@ -721,7 +746,7 @@ Potato.prototype.createFilterButton = function(type) {
       };
     })(this));
 
-  var filters = DataParse.prototype.calculateFilters(this.uniqueValues);
+  var filters = DataParse.prototype.calculateFilters(this.parsedData.uniqueValues);
 
   var buttonFilters = filters.numeric.map(function(f) {
     return {
@@ -788,7 +813,7 @@ Potato.prototype.createResetButton = function() {
 Potato.prototype.showDetails = function(data, i, element) {
   var content = "";
 
-  Object.keys(this.uniqueValues).forEach(function(key) {
+  Object.keys(this.parsedData.uniqueValues).forEach(function(key) {
     content += key + ": " + data[key] + "<br/>";
   });
   d3.select("#node-tooltip").html(content).style("display", "block");
