@@ -82,7 +82,7 @@ Potato.prototype.generateVis = function(data) {
   this.data = data;
   this.labels = [];
 
-  this.parsedData = new DataParse(data);
+  this.uniqueValues = DataParse.prototype.enrichData(data);
 
   var that = this;
 
@@ -244,54 +244,44 @@ Potato.prototype.getChargeForce = function() {
 Potato.prototype.updateAllLabelPositions = function(labels, nodes) {
   if(labels === undefined || labels.length === 0) { return; }
 
-  labels.forEach(function(label) {
-    if(label.type === "split") {
-      var newPos = Potato.prototype.updateSplitLabelPosition(label, nodes);
-      label.tary = newPos.tary;
-      label.tarx = newPos.tarx;
-    } else if(label.type === "order") {
-      var newPosY = Potato.prototype.updateOrderLabelPosition(label, nodes);
-      label.tary = newPosY - 10;
-    }
-  });
+  if(labels[0].type === "split") {
+    labels.forEach(function(label) {
+      var newPos = Potato.prototype.calculateLabelBounds(nodes, label);
+      label.tary = newPos.minY - 10;
+      label.tarx = newPos.avgX;
+    });
+  } else if(labels[0].type === "order") {
+    var newPos = Potato.prototype.calculateLabelBounds(nodes);
+    labels[0].tary = newPos.minY - 10;
+    labels[0].tarx = newPos.minX;
+    labels[1].tary = newPos.minY - 10;
+    labels[1].tarx = newPos.maxX;
 
-  if(labels[0].type === "order") {
-    this.axis.x1 = labels[0].tarx + 30;
-    this.axis.x2 = labels[1].tarx - 35;
+    this.axis.x1 = newPos.minX + 30;
+    this.axis.x2 = newPos.maxX - 35;
 
-    this.axis.y1 = labels[0].tary - 8;
-    this.axis.y2 = labels[0].tary - 8;
+    this.axis.y1 = newPos.minY - 8;
+    this.axis.y2 = newPos.minY - 8;
   }
 };
 
-Potato.prototype.updateOrderLabelPosition = function(label, nodes) {
-  var minY;
-  // TODO: b/c of the way the physics engine works
-  // the "ends" of the x axis often get bumped out, might be good
-  // to fake this by pushing out the nodes? It's a little misleading
-  // hm.....
-
-  // Basically push the labels so that they're above the "highest" node
-  nodes.forEach(function(node) {
-    if(minY === undefined || ((node.y - node.radius) < minY)) {
-      minY = node.y - node.radius;
-    }
-  });
-  return minY;
-}
-
-Potato.prototype.updateSplitLabelPosition = function(label, nodes) {
+// label is optional, if specified, will only calculate bounds for nodes
+// that are related to the given label
+Potato.prototype.calculateLabelBounds = function(nodes, label) {
   var minY, minX, maxX;
 
   // Iterate over current nodes, and make adjustments to label based on the node locations
   nodes.forEach(function(node) {
 
-    // Only take into account nodes related to this label
-    if(node[label.split] == label.val) {
+    // If label is specified, only check nodes related to this label
+    // also ignore nodes that are out of bounds
+    if((label === undefined || node[label.split] == label.val) &&
+       (node.x > 0 && node.y > 0 && node.x < Potato.prototype.getWidth() && node.y < Potato.prototype.getHeight())) {
+
       if(minY === undefined || ((node.y - node.radius) < minY)) {
         minY = node.y - node.radius;
       }
-      if(minX === undefined || ((node.x - node.radius) < minX)) {
+      if(minX === undefined || (node.x > 0 && (node.x - node.radius) < minX)) {
         minX = node.x - node.radius;
       }
       if(maxX === undefined || ((node.x + node.radius) > maxX)) {
@@ -301,8 +291,10 @@ Potato.prototype.updateSplitLabelPosition = function(label, nodes) {
   });
 
   return {
-    tary: minY - 10, // little bit of offset so label is above nodes
-    tarx: (maxX - minX) / 2.0 + minX
+    minY: minY,
+    avgX: (maxX - minX) / 2.0 + minX,
+    minX: minX,
+    maxX: maxX
   };
 };
 
@@ -420,7 +412,7 @@ Potato.prototype.splitBy = function(filter, dataType) {
     return this.orderBy(filter);
   } else {
     // first determine the unique values for this filter, also sort alpha
-    var uniqueKeys = Object.keys(this.parsedData.uniqueValues[filter].values).sort()
+    var uniqueKeys = Object.keys(this.uniqueValues[filter].values).sort()
 
     var splitLocations = this.calculateSplitLocations(uniqueKeys);
     this.labels = this.createSplitLabels(filter, splitLocations);
@@ -443,9 +435,9 @@ Potato.prototype.createSplitLabels = function(filter, splitLocations) {
   for(var label in splitLocations) {
     var labelVal = "";
     if (this.activeSizeBy != "") {
-      labelVal = this.parsedData.uniqueValues[filter].values[label].sums[this.activeSizeBy].toLocaleString();
+      labelVal = this.uniqueValues[filter].values[label].sums[this.activeSizeBy].toLocaleString();
     } else {
-      labelVal = this.parsedData.uniqueValues[filter].values[label].count.toLocaleString();
+      labelVal = this.uniqueValues[filter].values[label].count.toLocaleString();
     }
 
     // also add a filter label
@@ -634,7 +626,7 @@ Potato.prototype.colorBy = function(filter, dataType) {
   var legendText = legendWrapper.selectAll("text")
       .data(colorScale.domain());
 
-  uniqueValues = this.parsedData.uniqueValues;
+  uniqueValues = this.uniqueValues;
 
   legendText.enter().append("text")
       .attr("y", function(d, i) { return i * legendDotSize + 12; })
@@ -746,7 +738,7 @@ Potato.prototype.createFilterButton = function(type) {
       };
     })(this));
 
-  var filters = DataParse.prototype.calculateFilters(this.parsedData.uniqueValues);
+  var filters = DataParse.prototype.calculateFilters(this.uniqueValues);
 
   var buttonFilters = filters.numeric.map(function(f) {
     return {
@@ -811,13 +803,12 @@ Potato.prototype.createResetButton = function() {
 };
 
 Potato.prototype.showDetails = function(data, i, element) {
-  var content = "";
+  var content = Object.keys(this.uniqueValues).map(function(key) {
+    return key + ": " + data[key];
+  }).join("<br/>");
 
-  Object.keys(this.parsedData.uniqueValues).forEach(function(key) {
-    content += key + ": " + data[key] + "<br/>";
-  });
   d3.select("#node-tooltip").html(content).style("display", "block");
-  this.updatePosition(d3.event, "node-tooltip");
+  this.updateTooltipPosition(d3.event, "node-tooltip");
   this.highlightNode(element, true);
 };
 
@@ -827,9 +818,8 @@ Potato.prototype.hideDetails = function(data, i, element) {
   this.highlightNode(element, false);
 };
 
-Potato.prototype.highlightNode = function(inElement, highlight) {
-
-  var element = d3.select(inElement);
+Potato.prototype.highlightNode = function(elementID, highlight) {
+  var element = d3.select(elementID);
 
   // ignore custom colors
   if (element.attr("class") !== undefined) {
@@ -838,18 +828,19 @@ Potato.prototype.highlightNode = function(inElement, highlight) {
     // temporarily make the circle "bigger"
     // this has the effect of making the border appear "around" the existing circle
     // rather than "just inside" the circle
-    element.attr("r", function(d) {
-      return d.radius + (sWidth / 2.0);
-    }).attr("stroke-width", sWidth);
+    element.attr("r", function(d) { return d.radius + (sWidth / 2.0); })
+           .attr("stroke-width", sWidth);
   }
 };
 
-Potato.prototype.updatePosition = function(e, id) {
+Potato.prototype.updateTooltipPosition = function(e, id) {
   var xOffset = 20;
   var yOffset = 10;
   var rect = d3.select("#" + id).node().getBoundingClientRect();
   var ttw = rect.width;
   var tth = rect.height;
+
+  // If the tooltip is on the right or bottom edge, then flip the tooltip to keep on the screen.
   var ttleft = (e.pageX + xOffset * 2 + ttw) > window.innerWidth ? e.pageX - ttw - xOffset * 2 : e.pageX + xOffset;
   var tttop = (e.pageY + yOffset * 2 + tth) > window.innerHeight ? e.pageY - tth - yOffset * 2 : e.pageY + yOffset;
 

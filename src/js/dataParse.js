@@ -1,9 +1,12 @@
 function DataParse(data) {
-  this.uniqueValues = this.enrichData(data, this.uniqueDataValues(data));
 }
 
-// given data, and uniqueValues, enrich uniqueValues with sums/means/counts
-DataParse.prototype.enrichData = function(data, uniqueValues) {
+// Given a standard d3 data array,
+// return an object with metadata about the data array
+// 2 way cross-tab counts/sums/averages
+DataParse.prototype.enrichData = function(data) {
+  var uniqueValues = DataParse.prototype.uniqueDataValues(data);
+
   var filters = this.calculateFilters(uniqueValues);
 
   data.forEach(function(row) {
@@ -17,7 +20,7 @@ DataParse.prototype.enrichData = function(data, uniqueValues) {
         subVal.sums = {};
       }
 
-      // cumultative sum each of the numeric coluns
+      // cumultative sum each of the numeric columns
       filters.numeric.forEach(function(numFilter) {
         var newVal = parseFloat(row[numFilter]);
         if(!isNaN(newVal)) {

@@ -235,7 +235,6 @@ describe("data unit tests", () => {
     });
   });
 
-
   describe("#parseNumericString", () => {
     const output = 100000;
 
