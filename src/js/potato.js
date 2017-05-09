@@ -48,15 +48,12 @@ function Potato(data, params) {
 }
 
 Potato.prototype.handleDefaultParams = function(params) {
-  if(params.size != "") {
-    this.sizeBy(params.size);
-  }
-  if(params.color != "") {
-    this.colorBy(params.color);
-  }
-  if(params.split != "") {
-    this.splitBy(params.split);
-  }
+  ["size", "color", "split"].forEach(function(key) {
+    if(params[key] != "") {
+      // TODO, we're not passing the type param here (third param)...
+      Potato.prototype.applyFilter(key, params[key]);
+    }
+  });
 }
 
 Potato.prototype.getWidth = function() {
@@ -286,6 +283,7 @@ Potato.prototype.orderBy = function(filter) {
   var xForceFn = d3.forceX(function(d) {
     var currVal = parseFloat(d[filter])
     // if this row doesn't have this value, then fly off screen (to left)
+    // TODO: should I shrink them to 0 radius instead?
     if(isNaN(currVal)) {
       return -100;
     }
@@ -304,23 +302,11 @@ Potato.prototype.orderBy = function(filter) {
 };
 
 Potato.prototype.splitBy = function(filter, dataType) {
-  // TODO: this probably needs to be... this.data[]?
-  /*
-  if (this.nodes === void 0 || this.nodes.length === 0) {
-    return;
-  }*/
-
   // TODO: is the only reason I'm doing this to get rid of the axis?...
   this.reset('split');
 
-  // TODO: Change the hint on the button, seems like maybe this should go somewhere else?
-  d3.select("#split-hint").html("<br>" + filter);
-
-  // TODO: this isn't working properly b/c we're not turning this class of without a reset function
-  d3.select("#split-" + filter).classed('active-filter', true);
-
   if (dataType === "num") {
-    return this.orderBy(filter);
+    this.orderBy(filter);
   } else {
     // first determine the unique values for this filter, also sort alpha
     var uniqueKeys = Object.keys(this.uniqueValues[filter].values).sort()
@@ -343,13 +329,7 @@ Potato.prototype.sizeBy = function(filter, maxRadius=20) {
   this.activeSizeBy = filter;
   // TODO: if there are any labels, modify them to reflect the new sum
 
-  /*
-  if (this.nodes === void 0 || this.nodes.length === 0) {
-    return;
-  }*/
   //this.reset('size');
-  d3.select("#size-hint").html("<br>" + filter);
-  d3.select("#size-" + filter).classed('active-filter', true);
 
   var minRadius = 0.5;
   var extent = DataParse.prototype.getNumericExtent(filter, this.data);
@@ -412,9 +392,7 @@ Potato.prototype.applySize = function(data, simulation) {
   d3.select("#vis-svg").selectAll("circle")
       .data(data)
       .transition()
-      .attr("r", function(d) {
-        return d.radius;
-      });
+      .attr("r", function(d) { return d.radius; });
 
   // Recalculate chargeForce to take into account new node sizes
   simulation.force("charge", this.getChargeForce())
@@ -422,21 +400,12 @@ Potato.prototype.applySize = function(data, simulation) {
 };
 
 Potato.prototype.colorBy = function(filter, dataType) {
-  /*if (this.nodes === void 0 || this.nodes.length === 0) {
-    return;
-  }*/
   //this.reset('color');
 
-  d3.select("#color-hint").html("<br>" + filter);
-  d3.select("#color-" + filter).classed('active-filter', true);
+  // first determine the unique values for this filter, also sort alpha
+  var uniqueKeys = Object.keys(this.uniqueValues[filter].values).sort()
 
-
-  // first determine the unique values for this category in the dataset, also sort alpha
-  // historically it was ranked by number, but I think alpha may actually be better?
-  // to keep female/asian/Argentina as one color no matter what the other splits are?
-  var uniqueKeys = d3.map(this.data, function(d) {
-    return d[filter];
-  }).keys().sort();
+  // TODO: there used to be code to limit to 18 total colors, and then group the rest in "other"
 
   var numeric = dataType === 'num';
 
@@ -459,8 +428,6 @@ Potato.prototype.colorBy = function(filter, dataType) {
       .transition()
       .attr("fill", function(d) { return colorScale(d[filter]); } )
       .attr("stroke", function(d) { return d3.rgb(colorScale(d[filter])).darker(); }); // these are for the "hover border"
-
-  // TODO: there used to be code to limit to 18 total colors, and then group the rest in "other"
 
   // Setup legend
   var legendDotSize = 30;
@@ -509,8 +476,13 @@ Potato.prototype.applyFilter = function(type, filter, dataType) {
     this.colorBy(filter, dataType);
   }
   if (type === "size") {
-    return this.sizeBy(filter);
+    this.sizeBy(filter);
   }
+
+  d3.select(`#${type}-hint`).html("<br>" + filter);
+
+  d3.selectAll(`.${type}-option`).classed('active-filter', false);
+  d3.select(`#${type}-${filter}`).classed('active-filter', true);
 };
 
 Potato.prototype.resetToDefaultSize = function(data) {

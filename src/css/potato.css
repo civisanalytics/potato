@@ -234,10 +234,10 @@ button:hover {
   cursor: pointer;
 }
 
-.active-split {
+.active-filter {
   background-color: #86CFE8;
 }
-.active-split:hover {
+.active-filter:hover {
   background-color: #0194D3;
 }
 
