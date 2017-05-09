@@ -1,5 +1,6 @@
 const d3 = require('./d3.v4.min.js');
 const DataParse = require('./dataParse.js');
+const ForceSplit = require('./forceSplit.js');
 
 // default behavior is empty string
 // if string passed, will attempt to init split/color/size by filter passed
@@ -115,7 +116,7 @@ Potato.prototype.generateVis = function(data) {
         mergedNodes.attr("cx", function(d) { return d.x; })
             .attr("cy", function(d) { return d.y; });
 
-        that.updateAllLabelPositions(that.labels, that.data);
+        ForceSplit.prototype.updateAllLabelPositions(that.data, that.labels, that.axis);
         that.updateLabels(that.labels);
       });
 };
@@ -238,64 +239,6 @@ Potato.prototype.getChargeForce = function() {
     var multiplier = -0.2;
     return Math.pow((d.radius), 1.8) * multiplier;
   });
-};
-
-// Dynamic labels that "float" above their current position
-Potato.prototype.updateAllLabelPositions = function(labels, nodes) {
-  if(labels === undefined || labels.length === 0) { return; }
-
-  if(labels[0].type === "split") {
-    labels.forEach(function(label) {
-      var newPos = Potato.prototype.calculateLabelBounds(nodes, label);
-      label.tary = newPos.minY - 10;
-      label.tarx = newPos.avgX;
-    });
-  } else if(labels[0].type === "order") {
-    var newPos = Potato.prototype.calculateLabelBounds(nodes);
-    labels[0].tary = newPos.minY - 10;
-    labels[0].tarx = newPos.minX;
-    labels[1].tary = newPos.minY - 10;
-    labels[1].tarx = newPos.maxX;
-
-    this.axis.x1 = newPos.minX + 30;
-    this.axis.x2 = newPos.maxX - 35;
-
-    this.axis.y1 = newPos.minY - 8;
-    this.axis.y2 = newPos.minY - 8;
-  }
-};
-
-// label is optional, if specified, will only calculate bounds for nodes
-// that are related to the given label
-Potato.prototype.calculateLabelBounds = function(nodes, label) {
-  var minY, minX, maxX;
-
-  // Iterate over current nodes, and make adjustments to label based on the node locations
-  nodes.forEach(function(node) {
-
-    // If label is specified, only check nodes related to this label
-    // also ignore nodes that are out of bounds
-    if((label === undefined || node[label.split] == label.val) &&
-       (node.x > 0 && node.y > 0 && node.x < Potato.prototype.getWidth() && node.y < Potato.prototype.getHeight())) {
-
-      if(minY === undefined || ((node.y - node.radius) < minY)) {
-        minY = node.y - node.radius;
-      }
-      if(minX === undefined || (node.x > 0 && (node.x - node.radius) < minX)) {
-        minX = node.x - node.radius;
-      }
-      if(maxX === undefined || ((node.x + node.radius) > maxX)) {
-        maxX = node.x + node.radius;
-      }
-    }
-  });
-
-  return {
-    minY: minY,
-    avgX: (maxX - minX) / 2.0 + minX,
-    minX: minX,
-    maxX: maxX
-  };
 };
 
 // Will fade in new labels, the effect really only works if you reset the labels array each time
