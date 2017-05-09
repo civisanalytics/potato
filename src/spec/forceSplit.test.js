@@ -49,3 +49,54 @@ describe("label unit tests", () => {
     });
   });
 });
+
+
+describe("split unit tests", () => {
+  describe("#calculateSplitLocations", () => {
+    const width = 900;
+    const height = 450;
+
+    test("base case, just one key", () => {
+      const uniqueKeys = ["Canada"];
+      const output = ForceSplit.prototype.calculateSplitLocations(uniqueKeys, width, height);
+
+      expect(output["Canada"].x).toEqual(width / 2);
+      expect(output["Canada"].y).toEqual(height / 2);
+    });
+
+    test("four keys, (2x2)", () => {
+      const uniqueKeys = ["Canada", "Uganda", "USA", "Venezuela"];
+      const output = ForceSplit.prototype.calculateSplitLocations(uniqueKeys, width, height);
+
+      expect(output["Canada"].x).toEqual(output["USA"].x);
+      expect(output["Uganda"].x).toEqual(output["Venezuela"].x);
+
+      expect(output["Canada"].y).toEqual(output["Uganda"].y);
+      expect(output["USA"].y).toEqual(output["Venezuela"].y);
+
+      expect(output["Canada"].x).toBeLessThan(output["Uganda"].x);
+
+      expect(output["Uganda"].y).toBeLessThan(output["Venezuela"].y);
+    });
+
+    test("five keys, aka awkward imbalanced grid", () => {
+      const uniqueKeys = ["Canada", "Uganda", "USA", "Venezuela", "Togo"];
+      // We expect 2 rows, 3 columns, first row has 3 items, second row has 2 items
+      // ie.
+      // Canada     --   Uganda   -- USA
+      // Venezuela  --    Togo
+      const output = ForceSplit.prototype.calculateSplitLocations(uniqueKeys, width, height);
+
+      expect(output["Canada"].x).toEqual(output["Venezuela"].x);
+      expect(output["Uganda"].x).toEqual(output["Togo"].x);
+
+      expect(output["Canada"].y).toEqual(output["Uganda"].y);
+      expect(output["Canada"].y).toEqual(output["USA"].y);
+      expect(output["Venezuela"].y).toEqual(output["Togo"].y);
+
+      expect(output["Uganda"].x).toBeLessThan(output["USA"].x);
+
+      expect(output["Canada"].y).toBeLessThan(output["Venezuela"].x);
+    });
+  });
+});

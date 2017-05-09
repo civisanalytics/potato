@@ -117,7 +117,7 @@ Potato.prototype.generateVis = function(data) {
             .attr("cy", function(d) { return d.y; });
 
         ForceSplit.prototype.updateAllLabelPositions(that.data, that.labels, that.axis);
-        that.updateLabels(that.labels);
+        ForceSplit.prototype.updateLabels(that.labels, that.axis);
       });
 };
 
@@ -241,38 +241,6 @@ Potato.prototype.getChargeForce = function() {
   });
 };
 
-// Will fade in new labels, the effect really only works if you reset the labels array each time
-Potato.prototype.updateLabels = function(labels) {
-  var text = d3.select("#vis-svg").selectAll(".split-labels")
-      .data(labels);
-
-  // update every tick
-  text.enter().append("text")
-      .attr("class", "split-labels")
-      .text(function(d) { return d.text; })
-    .merge(text)
-      .attr("x", function(d) { return d.tarx; })
-      .attr("y", function(d) { return d.tary; });
-
-  text.exit().remove();
-
-  var axisData = this.axis ? [this.axis] : [];
-
-  var axis = d3.select("#vis-svg").selectAll(".axis-label")
-    .data(axisData);
-
-  axis.enter().append("line")
-      .attr("stroke", "#999")
-      .attr("class", "axis-label")
-    .merge(axis)
-      .attr("x1", function(d) { return d.x1; })
-      .attr("x2", function(d) { return d.x2; })
-      .attr("y1", function(d) { return d.y1; })
-      .attr("y2", function(d) { return d.y2; });
-
-  axis.exit().remove();
-}
-
 Potato.prototype.orderBy = function(filter) {
 
   var extent = DataParse.prototype.getNumericExtent(filter, this.data);
@@ -287,7 +255,7 @@ Potato.prototype.orderBy = function(filter) {
   // TODO: this should probably move to the reset function
   // wipe out the labels to get the fade in effect later
   this.labels = [];
-  this.updateLabels(this.labels);
+  ForceSplit.prototype.updateLabels(this.labels, this.axis);
 
   // Tail
   this.labels.push({
@@ -357,8 +325,8 @@ Potato.prototype.splitBy = function(filter, dataType) {
     // first determine the unique values for this filter, also sort alpha
     var uniqueKeys = Object.keys(this.uniqueValues[filter].values).sort()
 
-    var splitLocations = this.calculateSplitLocations(uniqueKeys);
-    this.labels = this.createSplitLabels(filter, splitLocations);
+    var splitLocations = ForceSplit.prototype.calculateSplitLocations(uniqueKeys, this.getWidth(), this.getHeight());
+    this.labels = ForceSplit.prototype.createSplitLabels(filter, splitLocations, this.uniqueValues, this.activeSizeBy);
 
     this.simulation.force("x", d3.forceX(function(d) {
       return splitLocations[d[filter]].x;
@@ -369,70 +337,6 @@ Potato.prototype.splitBy = function(filter, dataType) {
 
     this.simulation.alpha(1).restart();
   }
-};
-
-Potato.prototype.createSplitLabels = function(filter, splitLocations) {
-  var newLabels = [];
-  this.updateLabels(newLabels);
-
-  for(var label in splitLocations) {
-    var labelVal = "";
-    if (this.activeSizeBy != "") {
-      labelVal = this.uniqueValues[filter].values[label].sums[this.activeSizeBy].toLocaleString();
-    } else {
-      labelVal = this.uniqueValues[filter].values[label].count.toLocaleString();
-    }
-
-    // also add a filter label
-    newLabels.push({
-      text: label + ": " + labelVal,
-      val: label,
-      split: filter,
-      type: "split",
-      tarx: splitLocations[label].x,
-      tary: splitLocations[label].y
-    });
-  }
-
-  return newLabels;
-};
-
-// Given an array of uniqueKeys (strings), return an array of x/y coord positions that form a grid
-Potato.prototype.calculateSplitLocations = function(uniqueKeys) {
-  var numCols = Math.ceil(Math.sqrt(uniqueKeys.length));
-  var numRows = Math.ceil(uniqueKeys.length / numCols);
-
-  var padding = 0.8;
-
-  // Some padding for when the circle groups get large, also to make room for color legend
-  var paddedWidth = this.getWidth() * padding;
-  var paddedHeight = this.getHeight() * padding;
-  var leftPadding = (this.getWidth() - paddedWidth) / 2;
-  var topPadding = (this.getHeight() - paddedHeight) / 2;
-
-  var colSize = paddedWidth / (numCols + 1);
-  var rowSize = paddedHeight / (numRows + 1);
-
-  var splitLocations = {};
-
-  // then for each category value, increment to give the "row/col" coordinate
-  // maybe save this in an object where key == category and value = {row: X, col: Y}
-  var currRow = 1;
-  var currCol = 1;
-  uniqueKeys.forEach(function(d) {
-    splitLocations[d] = {
-      x: currCol * colSize + leftPadding,
-      y: currRow * rowSize + topPadding
-    };
-
-    currCol++;
-    if (currCol > numCols) {
-      currCol = 1;
-      currRow++;
-    }
-  });
-
-  return splitLocations;
 };
 
 Potato.prototype.sizeBy = function(filter, maxRadius=20) {
@@ -642,7 +546,7 @@ Potato.prototype.reset = function(type) {
   } else if (type === 'split' || type === 'order') {
     this.labels = [];
     this.axis = undefined;
-    this.updateLabels(this.labels);
+    ForceSplit.prototype.updateLabels(this.labels, this.axis);
 
     this.simulation.force("x", this.centerXForce());
     this.simulation.force("y", this.centerYForce());
