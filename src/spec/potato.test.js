@@ -35,11 +35,4 @@ describe("drag select unit tests", () => {
       expect(Potato.prototype.calculateDragBox(150, 200, 100, 100)).toEqual(dragOutput);
     });
   });
-
-  describe("#nodeInBox", () => {
-    test("base case", () => {
-      expect(Potato.prototype.nodeInBox(100, 100, 50, 50, 200, 200)).toEqual(true);
-      expect(Potato.prototype.nodeInBox(0, 0, 50, 50, 200, 200)).toEqual(false);
-    });
-  });
 });

@@ -1,6 +1,8 @@
 const d3 = require('./d3.v4.min.js');
 const DataParse = require('./dataParse.js');
 const ForceSplit = require('./forceSplit.js');
+const NodeSize = require('./nodeSize.js');
+
 
 // default behavior is empty string
 // if string passed, will attempt to init split/color/size by filter passed
@@ -24,7 +26,7 @@ function Potato(data, params) {
     d.potatoID = idx;
   });
 
-  this.resetToDefaultSize(data);
+  NodeSize.prototype.resetToDefaultSize(data);
 
   this.originalData = JSON.parse(JSON.stringify(data));
 
@@ -364,28 +366,14 @@ Potato.prototype.sizeBy = function(filter, maxRadius=20) {
   // while this runs?...
   this.simulation.on('tick.size', function() {
     if(that.simulation.alpha() < 0.8) {
-      that.adjustSize(that.data, filter, maxRadius);
+      var newRadius = NodeSize.prototype.adjustSize(that.data, maxRadius, that.getWidth(), that.getHeight());
+      if(newRadius != maxRadius) {
+        that.sizeBy(filter, newRadius);
+      }
     }
   });
 };
 
-// check all the nodes, if any are off the screen, then try resizing with a smaller
-// maxRadius?
-Potato.prototype.adjustSize = function(data, filter, maxRadius) {
-  if(maxRadius > 5) {
-    var nodeOutOfBounds = false;
-    data.forEach(function(d) {
-      var pad = 30; // 20 pixels of padding for any labels
-      if(!Potato.prototype.nodeInBox(d.x, d.y, pad, pad, Potato.prototype.getWidth() - pad, Potato.prototype.getHeight() - pad)) {
-        nodeOutOfBounds = true;
-      }
-    });
-
-    if(nodeOutOfBounds) {
-      this.sizeBy(filter, maxRadius - 1);
-    }
-  }
-};
 
 Potato.prototype.applySize = function(data, simulation) {
   // update the actual circle svg sizes
@@ -485,12 +473,6 @@ Potato.prototype.applyFilter = function(type, filter, dataType) {
   d3.select(`#${type}-${filter}`).classed('active-filter', true);
 };
 
-Potato.prototype.resetToDefaultSize = function(data) {
-  data.forEach(function(d) {
-    d.radius = 2;
-  });
-};
-
 Potato.prototype.resetSubselection = function() {
   d3.select("#reset-button")
     .classed("disabled-button", true);
@@ -512,7 +494,7 @@ Potato.prototype.reset = function(type) {
         .transition()
         .attr("fill", "#777");
   } else if (type === 'size') {
-    this.resetToDefaultSize(this.data);
+    NodeSize.prototype.resetToDefaultSize(this.data);
 
     this.applySize(this.data, this.simulation);
   } else if (type === 'split' || type === 'order') {
