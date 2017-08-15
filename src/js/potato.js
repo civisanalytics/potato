@@ -2,6 +2,7 @@ const d3 = require('./d3.v4.min.js');
 const DataParse = require('./dataParse.js');
 const ForceSplit = require('./forceSplit.js');
 const NodeSize = require('./nodeSize.js');
+const Tooltip = require('./tooltip.js');
 
 
 // default behavior is empty string
@@ -96,10 +97,14 @@ Potato.prototype.generateVis = function(data) {
       .attr("fill", defaultFill)
       .attr("stroke", d3.rgb(defaultFill).darker()) // these are for the "hover border"
       .attr("stroke-width", 0) // hide border until hover is active
-      .on("mouseover", function(d, i) {
-        that.showDetails(d, i, this);
-      }).on("mouseout", function(d, i) {
-        that.hideDetails(d, i, this);
+      .on("mouseover", function(d, _i) {
+        var content = Object.keys(that.uniqueValues).map(function(key) {
+          return key + ": " + d[key];
+        }).join("<br/>");
+
+        Tooltip.prototype.showDetails(content, this);
+      }).on("mouseout", function(_d, _i) {
+        Tooltip.prototype.hideDetails(this);
       })
     .merge(node)
       .attr("r", function(d) { return d.radius; });
@@ -170,9 +175,9 @@ Potato.prototype.dragSelect = function() {
 
       that.data.forEach(function(n) {
         if (Potato.prototype.nodeInBox(n.x, n.y, d.x, d.y, d.x + d.width, d.y + d.height)) {
-          that.highlightNode(d3.select("#node_" + n.potatoID).node(), true);
+          Tooltip.prototype.toggleNodeHighlight(d3.select("#node_" + n.potatoID).node(), true);
         } else {
-          that.highlightNode(d3.select("#node_" + n.potatoID).node(), false);
+          Tooltip.prototype.toggleNodeHighlight(d3.select("#node_" + n.potatoID).node(), false);
         }
       });
     }
@@ -186,7 +191,7 @@ Potato.prototype.dragSelect = function() {
 
     var newData = that.data.filter(function(c) {
       if (Potato.prototype.nodeInBox(c.x, c.y, sx, sy, sx2, sy2)) {
-        that.highlightNode(d3.select("#node_" + c.potatoID).node(), false);
+        Tooltip.prototype.toggleNodeHighlight(d3.select("#node_" + c.potatoID).node(), false);
         return c;
       } else {
         return null;
@@ -603,52 +608,6 @@ Potato.prototype.createResetButton = function() {
     });
 };
 
-Potato.prototype.showDetails = function(data, i, element) {
-  var content = Object.keys(this.uniqueValues).map(function(key) {
-    return key + ": " + data[key];
-  }).join("<br/>");
-
-  d3.select("#node-tooltip").html(content).style("display", "block");
-  this.updateTooltipPosition(d3.event, "node-tooltip");
-  this.highlightNode(element, true);
-};
-
-Potato.prototype.hideDetails = function(data, i, element) {
-  d3.select("#node-tooltip").style("display", "none");
-
-  this.highlightNode(element, false);
-};
-
-Potato.prototype.highlightNode = function(elementID, highlight) {
-  var element = d3.select(elementID);
-
-  // ignore custom colors
-  if (element.attr("class") !== undefined) {
-    var sWidth = highlight ? element.attr("r") * 0.3 : 0;
-
-    // temporarily make the circle "bigger"
-    // this has the effect of making the border appear "around" the existing circle
-    // rather than "just inside" the circle
-    element.attr("r", function(d) { return d.radius + (sWidth / 2.0); })
-           .attr("stroke-width", sWidth);
-  }
-};
-
-Potato.prototype.updateTooltipPosition = function(e, id) {
-  var xOffset = 20;
-  var yOffset = 10;
-  var rect = d3.select("#" + id).node().getBoundingClientRect();
-  var ttw = rect.width;
-  var tth = rect.height;
-
-  // If the tooltip is on the right or bottom edge, then flip the tooltip to keep on the screen.
-  var ttleft = (e.pageX + xOffset * 2 + ttw) > window.innerWidth ? e.pageX - ttw - xOffset * 2 : e.pageX + xOffset;
-  var tttop = (e.pageY + yOffset * 2 + tth) > window.innerHeight ? e.pageY - tth - yOffset * 2 : e.pageY + yOffset;
-
-  d3.select("#" + id)
-    .style("top", tttop + 'px')
-    .style("left", ttleft + 'px');
-};
 
 module.exports = Potato;
 window.Potato = Potato; // Hmmmm is this a bad idea?...
