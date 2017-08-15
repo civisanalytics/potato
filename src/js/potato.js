@@ -43,8 +43,6 @@ function Potato(data, params) {
 
   this.generateFilterButtons(params);
 
-  this.activeSizeBy = "";
-
   this.dragSelect();
 
   this.handleDefaultParams(params);
@@ -308,7 +306,7 @@ Potato.prototype.orderBy = function(filter) {
   }*/
 };
 
-Potato.prototype.splitBy = function(filter, dataType) {
+Potato.prototype.splitBy = function(filter, dataType, activeSize) {
   // TODO: is the only reason I'm doing this to get rid of the axis?...
   this.reset('split');
 
@@ -319,7 +317,7 @@ Potato.prototype.splitBy = function(filter, dataType) {
     var uniqueKeys = Object.keys(this.uniqueValues[filter].values).sort()
 
     var splitLocations = ForceSplit.prototype.calculateSplitLocations(uniqueKeys, this.getWidth(), this.getHeight());
-    this.labels = ForceSplit.prototype.createSplitLabels(filter, splitLocations, this.uniqueValues, this.activeSizeBy);
+    this.labels = ForceSplit.prototype.createSplitLabels(filter, splitLocations, this.uniqueValues, activeSize);
 
     this.simulation.force("x", d3.forceX(function(d) {
       return splitLocations[d[filter]].x;
@@ -333,7 +331,6 @@ Potato.prototype.splitBy = function(filter, dataType) {
 };
 
 Potato.prototype.sizeBy = function(filter, maxRadius=20) {
-  this.activeSizeBy = filter;
   // TODO: if there are any labels, modify them to reflect the new sum
 
   //this.reset('size');
@@ -463,7 +460,10 @@ Potato.prototype.colorBy = function(filter, dataType) {
 
 Potato.prototype.applyFilter = function(type, filter, dataType) {
   if (type === "split") {
-    this.splitBy(filter, dataType);
+    // If there is currently an active size filter,
+    // pass to display the correct label.
+    var activeSize = d3.select("#size-hint").html().substring(4);
+    this.splitBy(filter, dataType, activeSize);
   }
   if (type === "color") {
     this.colorBy(filter, dataType);
